@@ -21,19 +21,19 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 /**
  * Created by marius on 6/18/13.
  */
-public class CatalyzePerson extends CatalyzeObject {
+public class Person extends CatalyzeObject {
 
     protected static final String sPath = "/person";
 
-    public CatalyzePerson(String firstName, String lastName) {
+    public Person(String firstName, String lastName) {
         mContent.put(sFirstNameKey, firstName);
         mContent.put(sLastNameKey, lastName);
     }
 
-    CatalyzePerson() {
+    Person() {
     }
 
-    public CatalyzePerson create(RequestQueue requestQueue, Response.ErrorListener errorListener) {
+    public Person create(RequestQueue requestQueue, Response.ErrorListener errorListener) {
 
         CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.POST, sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
 
@@ -47,7 +47,7 @@ public class CatalyzePerson extends CatalyzeObject {
         return this;
     }
 
-    public CatalyzePerson retrieve(RequestQueue requestQueue, Response.ErrorListener errorListener) {
+    public Person retrieve(RequestQueue requestQueue, Response.ErrorListener errorListener) {
 
         final CatalyzeObject holder = this;
         CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.GET, sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
@@ -63,7 +63,7 @@ public class CatalyzePerson extends CatalyzeObject {
         return this;
     }
 
-    public CatalyzePerson update(RequestQueue requestQueue, Response.ErrorListener errorListener) {
+    public Person update(RequestQueue requestQueue, Response.ErrorListener errorListener) {
         CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.PUT, sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
 
             @Override
@@ -95,7 +95,7 @@ public class CatalyzePerson extends CatalyzeObject {
     /**
      * @param phone Must be formatted as xxx-xxx-xxxx
      */
-    public CatalyzePerson setPhone(String phone) {
+    public Person setPhone(String phone) {
         // TODO: do some phone number verification
         mContent.put(sPhoneKey, phone);
         return this;
@@ -106,7 +106,7 @@ public class CatalyzePerson extends CatalyzeObject {
         return Gender.fromString(gender);
     }
 
-    public CatalyzePerson setGender(Gender gender) {
+    public Person setGender(Gender gender) {
         mContent.put(sGenderKey, gender.toString());
         return this;
     }
@@ -115,7 +115,7 @@ public class CatalyzePerson extends CatalyzeObject {
         return super.getInt(sAgeKey);
     }
 
-    public CatalyzePerson setAge(int age) {
+    public Person setAge(int age) {
         if (age < 0) {
             throw new IllegalAgeFormatException(age);
         }
@@ -128,7 +128,7 @@ public class CatalyzePerson extends CatalyzeObject {
         return new SimpleDateFormat("yyyy-MM-dd").parse(s);
     }
 
-    public CatalyzePerson setBirthDate(Date birthDate) {
+    public Person setBirthDate(Date birthDate) {
         mContent.put(sBirthDateKey, new SimpleDateFormat("yyy-MM-dd").format(birthDate));
         return this;
     }
@@ -141,7 +141,7 @@ public class CatalyzePerson extends CatalyzeObject {
         return super.getString(sEmailKey);
     }
 
-    public CatalyzePerson setEmail(String email) {
+    public Person setEmail(String email) {
         //TODO: Implement some regex checking
         mContent.put(sEmailKey, email);
         return this;
@@ -156,7 +156,7 @@ public class CatalyzePerson extends CatalyzeObject {
      * @param zipCode
      * @return
      */
-    public CatalyzePerson setAddress(String street, String city, State state, ZipCode zipCode) {
+    public Person setAddress(String street, String city, State state, ZipCode zipCode) {
 
         // City, State and zip code are required when a street is provided. Fail fast.
         if (!isNullOrEmpty(street)) {
