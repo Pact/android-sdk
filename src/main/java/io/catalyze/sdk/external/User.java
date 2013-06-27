@@ -41,7 +41,8 @@ import io.catalyze.sdk.exceptions.IllegalUsernameFormatException;
  *     com.android.volley.Response.ErrorListener) login(queue, null, errorListener}. This will
  *     authenticate the user against the catalyze.io backend.</li>
  *     <li>If the user is a new user, either retrieve a empty {@link Person} for the user by calling
- *     {@link #create(com.android.volley.RequestQueue, com.android.volley.Response.ErrorListener, com.android.volley.Response.Listener} or create a {@link Person} yourself and call
+ *     {@link #create(com.android.volley.RequestQueue, com.android.volley.Response.ErrorListener,
+ *     com.android.volley.Response.Listener)} or create a {@link Person} yourself and call
  *     {@link #create(com.android.volley.RequestQueue, com.android.volley.Response.ErrorListener,
  *     Person)}. The user will automatically be authenticated.</li>
  *
