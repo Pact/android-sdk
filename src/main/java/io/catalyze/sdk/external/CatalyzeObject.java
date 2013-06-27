@@ -38,6 +38,9 @@ public class CatalyzeObject {
     protected static final String sPersonIdKey = "person_id";
     protected static final String sTransactionTypeKey = "transaction_type";
     protected static final String sDateCommittedKey = "date_committed";
+    protected static final String sPasswordKey = "password";
+    protected static final String sUsernameKey = "username";
+    protected static final String sUserIdKey = "user_id";
 
     static String sSessionToken = "";
     private static String sAppId = "";

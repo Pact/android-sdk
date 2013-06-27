@@ -14,12 +14,20 @@
  *    limitations under the License.
  */
 
-package io.catalyze.sdk.internal;
+package io.catalyze.sdk.exceptions;
 
 /**
- * Created by marius on 6/18/13.
+ * Thrown when there is an attempt to set a username to an illegal value.
+ *
+ * @see io.catalyze.sdk.external.User#checkUsernameFormat(String)  for format requirements
  */
-public interface CatalyzeConstants {
+public class IllegalUsernameFormatException extends Exception {
 
-    static final String PREFS_NAME = "catalyze.io_prefs";
+    /**
+     * @param username which is improperly formatted
+     */
+    public IllegalUsernameFormatException(final String username) {
+        super(username + " is not a valid username");
+    }
+
 }

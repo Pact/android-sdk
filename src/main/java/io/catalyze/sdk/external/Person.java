@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import io.catalyze.sdk.internal.IllegalAgeFormatException;
+import io.catalyze.sdk.exceptions.IllegalAgeFormatException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.emptyToNull;
@@ -115,7 +115,7 @@ public class Person extends CatalyzeObject {
         return super.getInt(sAgeKey);
     }
 
-    public Person setAge(int age) {
+    public Person setAge(int age) throws IllegalAgeFormatException {
         if (age < 0) {
             throw new IllegalAgeFormatException(age);
         }
@@ -143,6 +143,7 @@ public class Person extends CatalyzeObject {
 
     public Person setEmail(String email) {
         //TODO: Implement some regex checking
+        // https://code.google.com/p/emailaddress/source/detail?r=5
         mContent.put(sEmailKey, email);
         return this;
     }
