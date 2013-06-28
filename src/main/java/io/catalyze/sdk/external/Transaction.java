@@ -50,7 +50,7 @@ public class Transaction extends CatalyzeObject {
         } catch (PackageManager.NameNotFoundException e) {
         }
         mContent.put(sSourceKey, source);
-
+        mContent.put(sTransactionTypeKey, TransactionType.CUSTOM.toString());
     }
 
     public Transaction create(RequestQueue requestQueue, Response.ErrorListener errorListener) {
@@ -98,13 +98,7 @@ public class Transaction extends CatalyzeObject {
         return this;
     }
 
-    public String getTransactionType() {
-        return super.getString(sTransactionTypeKey);
-    }
-
-    // TODO: Update per discussion on Trello. Consider using enums. https://trello.com/c/8jRteIrs
-    public Transaction setTransactionType(String type) {
-        mContent.put(sTransactionTypeKey, type);
-        return this;
+    public TransactionType getTransactionType() {
+        return TransactionType.fromString(super.getString(sTransactionTypeKey));
     }
 }
