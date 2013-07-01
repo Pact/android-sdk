@@ -14,34 +14,21 @@
  *    limitations under the License.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
+package io.catalyze.android.library.exceptions;
+
+/**
+ * Thrown when there is an attempt to set a username to an illegal value.
+ *
+ * @see io.catalyze.android.library.external.User#checkUsernameFormat(String)  for format
+ *      requirements
+ */
+public class IllegalUsernameFormatException extends Exception {
+
+    /**
+     * @param username which is improperly formatted
+     */
+    public IllegalUsernameFormatException(final String username) {
+        super(username + " is not a valid username");
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.4.+'
-    }
-}
-apply plugin: 'android-library'
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    compile 'com.google.guava:guava:14.0.1'
-    compile 'com.squareup.okhttp:okhttp:1.1.0'
-    compile 'com.neovisionaries:nv-i18n:1.4'''
-    //compile files('libs/android-support-v4-catalyze.jar')
-    compile project(':volley')
-}
-
-android {
-    compileSdkVersion 17
-    buildToolsVersion "17.0.0"
-
-    defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 17
-    }
 }

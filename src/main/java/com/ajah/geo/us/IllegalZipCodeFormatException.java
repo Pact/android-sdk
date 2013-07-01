@@ -17,21 +17,19 @@ package com.ajah.geo.us;
 
 /**
  * Thrown when there is an attempt to set a ZIP code to an illegal value.
- * 
- * @see ZipCode
+ *
  * @author Eric F. Savage <code@efsavage.com>
- * 
+ * @see ZipCode
  */
 public class IllegalZipCodeFormatException extends IllegalArgumentException {
 
-	private static final long serialVersionUID = 6367113304959164109L;
+    private static final long serialVersionUID = 6367113304959164109L;
 
-	/**
-	 * @see IllegalArgumentException#IllegalArgumentException(String)
-	 * @param zip
-	 */
-	public IllegalZipCodeFormatException(final String zip) {
-		super(zip + " is not a valid ZIP code");
-	}
+    /**
+     * @see IllegalArgumentException#IllegalArgumentException(String)
+     */
+    public IllegalZipCodeFormatException(final String zip) {
+        super(zip + " is not a valid ZIP code");
+    }
 
 }

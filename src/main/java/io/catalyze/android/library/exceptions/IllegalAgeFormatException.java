@@ -14,34 +14,20 @@
  *    limitations under the License.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
+package io.catalyze.android.library.exceptions;
+
+/**
+ * Thrown when there is an attempt to set an age to an illegal value.
+ *
+ * @see io.catalyze.android.library.external.Person#setAge(int) for format requirements
+ */
+public class IllegalAgeFormatException extends Exception {
+
+    /**
+     * @param age which has an invalid format
+     */
+    public IllegalAgeFormatException(final int age) {
+        super(Integer.toString(age) + " is not a valid age");
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.4.+'
-    }
-}
-apply plugin: 'android-library'
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    compile 'com.google.guava:guava:14.0.1'
-    compile 'com.squareup.okhttp:okhttp:1.1.0'
-    compile 'com.neovisionaries:nv-i18n:1.4'''
-    //compile files('libs/android-support-v4-catalyze.jar')
-    compile project(':volley')
-}
-
-android {
-    compileSdkVersion 17
-    buildToolsVersion "17.0.0"
-
-    defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 17
-    }
 }
