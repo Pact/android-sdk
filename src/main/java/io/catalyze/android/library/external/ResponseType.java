@@ -19,26 +19,28 @@ package io.catalyze.android.library.external;
 import com.google.common.base.Strings;
 
 /**
- * Provides a reference as to the type of the transaction.
+ * Provides a reference as to the type of the response expected for a question.
  */
-public enum TransactionType {
+public enum ResponseType {
 
-    ANSWER("answer"), CUSTOM("custom"), SESSION("session");
+    // TODO: Provide a mechanism for casting or type checking
+
+    BOOLEAN("boolean"), INTEGER("integer"), DOUBLE("double"), LONG("long"), STRING("string");
 
     private String mJsonText;
 
-    private TransactionType(String jsonText) {
+    private ResponseType(String jsonText) {
         mJsonText = jsonText;
     }
 
     /**
-     * Creates this {@link TransactionType} from the provided string if the provided string is valid.
-     * @param value the string representation of the {@link TransactionType}
-     * @return the {@link TransactionType} the provided string represents or {@code null} if the string is not valid.
+     * Creates this {@link ResponseType} from the provided string if the provided string is valid.
+     * @param value the string representation of the {@link ResponseType}
+     * @return the {@link ResponseType} the provided string represents or {@code null} if the string is not valid.
      */
-    public static TransactionType fromString(String value) {
+    public static ResponseType fromString(String value) {
         if (!Strings.isNullOrEmpty(value)) {
-            for (TransactionType t : TransactionType.values()) {
+            for (ResponseType t : ResponseType.values()) {
                 if (value.equals(t.toString())) {
                     return t;
                 }

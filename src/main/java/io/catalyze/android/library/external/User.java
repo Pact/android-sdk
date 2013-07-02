@@ -31,7 +31,7 @@ import io.catalyze.android.library.exceptions.IllegalUsernameFormatException;
 /**
  * A {@link CatalyzeObject} used to represent Users on the catalyze.io API.
  *
- * <p>Uses of this class follow a pattern: <ol> <li>Verify the user's username and password using
+ * <p>Uses of this class follow a pattern: <ol> <li>Verify the user'sTransactionPath username and password using
  * {@link #checkUsernameFormat(String)} and {@link #checkPasswordFormat(String)} respectively.</li>
  * <li>Create a new {@code User} instance.</li> <li> If the user is a returning user, login the user
  * by calling {@link #login(com.android.volley.RequestQueue, com.android.volley.Response.Listener,
@@ -93,9 +93,6 @@ public class User extends CatalyzeObject {
         setPassword(password);
     }
 
-    private User() {
-    }
-
     /**
      * Verifies the formatting of the provided username against the requirements of the catalyze.io
      * API. <p/>
@@ -108,7 +105,7 @@ public class User extends CatalyzeObject {
      *      }
      * }</pre>
      *
-     * @param username the username which should have it's format checked
+     * @param username the username which should have it'sTransactionPath format checked
      * @return a {@link UsernameStatus} representing that status of the supplied username
      */
     public static UsernameStatus checkUsernameFormat(String username) {
@@ -128,7 +125,7 @@ public class User extends CatalyzeObject {
      *      }
      * }</pre>
      *
-     * @param password the password which should have it's format checked
+     * @param password the password which should have it'sTransactionPath format checked
      * @return a {@link PasswordStatus} representing that status of the supplied password
      */
     public static PasswordStatus checkPasswordFormat(String password) {
@@ -201,6 +198,8 @@ public class User extends CatalyzeObject {
             public void onResponse(JSONObject object) {
 
                 CatalyzeObject.sSessionToken = (String) object.remove(CatalyzeObject.sSessionId);
+
+                // TODO: do we really need to inflate? what is returned? if not, use parent method.
                 User.this.inflateFromJson(object);
             }
         }, errorListener);
@@ -221,26 +220,14 @@ public class User extends CatalyzeObject {
      * @return the {@link Request} representing this server interaction
      */
     public Request delete(RequestQueue queue, Response.ErrorListener errorListener) {
-
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.DELETE,
-                sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                CatalyzeObject.sSessionToken = (String) object.remove(CatalyzeObject.sSessionId);
-            }
-        }, errorListener);
-
-        queue.add(request);
-        return request;
+        return super.delete(queue, errorListener, sBasePath + sPath);
     }
 
     /**
      * Logs this {@link User} into the catalyze.io API backend. If an error occurs performing the
      * HTTP interaction, the interaction is not retried.
      *
-     * <p>This method must be called whenever a user's session on the server has expired.</p>
+     * <p>This method must be called whenever a user'sTransactionPath session on the server has expired.</p>
      *
      * @param queue         a {@link RequestQueue} from the Volley android library. This queue will
      *                      handle the HTTP interaction with the catalyze.io API servers.
@@ -257,14 +244,14 @@ public class User extends CatalyzeObject {
     }
 
     /**
-     * Revokes this {@link User}'s  session key from the catalyze.io API backend. This {@link User}
+     * Revokes this {@link User}'sTransactionPath  session key from the catalyze.io API backend. This {@link User}
      * is not modified as a result of this method, however future interactions will require a call
      * to {@link #login(com.android.volley.RequestQueue, com.android.volley.Response.Listener,
      * com.android.volley.Response.ErrorListener)}. If an error occurs performing the HTTP
      * interaction, the interaction is not retried.
      *
      * <p>This method may optionally be called when a user intends to end a session. If this method
-     * is not called, the user's session will simply expire after a certain amount of time. This
+     * is not called, the user'sTransactionPath session will simply expire after a certain amount of time. This
      * method will likely rarely be used.</p>
      *
      * @param queue         a {@link RequestQueue} from the Volley android library. This queue will
@@ -355,7 +342,7 @@ public class User extends CatalyzeObject {
     }
 
     /**
-     * Do not use this method. Calls to this method will simply be dropped as {@link User}s do not
+     * Do not use this method. Calls to this method will simply be dropped as {@link User}sTransactionPath do not
      * have optional fields.
      *
      * @param k do not use

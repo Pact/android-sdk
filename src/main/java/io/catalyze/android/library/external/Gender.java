@@ -19,7 +19,7 @@ package io.catalyze.android.library.external;
 import com.google.common.base.Strings;
 
 /**
- * Created by marius on 6/18/13.
+ * Provides a reference as to the gender of a {@link Person}.
  */
 public enum Gender {
 
@@ -31,6 +31,11 @@ public enum Gender {
         mJsonText = jsonText;
     }
 
+    /**
+     * Creates this {@link Gender} from the provided string if the provided string is valid.
+     * @param value the string representation of the {@link Gender}
+     * @return the {@link Gender} the provided string represents or {@code null} if the string is not valid.
+     */
     public static Gender fromString(String value) {
         if (!Strings.isNullOrEmpty(value)) {
             for (Gender g : Gender.values()) {

@@ -24,8 +24,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 
-import org.json.JSONObject;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -81,6 +79,7 @@ public class Person extends CatalyzeObject {
      * @see #setFirstName(String) for formatting specifications
      */
     public Person(String firstName, String lastName) {
+        super();
         setFirstName(firstName);
         setLastName(lastName);
     }
@@ -97,6 +96,7 @@ public class Person extends CatalyzeObject {
      *                 catalyze.io backend.
      */
     public Person(String personId) {
+        super();
         put(sPersonIdKey, personId);
     }
 
@@ -105,6 +105,7 @@ public class Person extends CatalyzeObject {
      */
     Person() {
         //TODO: See if we can limit scope on this to private
+        super();
     }
 
     /**
@@ -119,18 +120,7 @@ public class Person extends CatalyzeObject {
      * @return the {@link Request} representing this server interaction
      */
     public Request create(RequestQueue queue, Response.ErrorListener errorListener) {
-
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.POST,
-                sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-            }
-        }, errorListener);
-        queue.add(request);
-        return request;
+        return super.create(queue, errorListener, sBasePath + sPath);
     }
 
     /**
@@ -145,19 +135,7 @@ public class Person extends CatalyzeObject {
      * @return the {@link Request} representing this server interaction
      */
     public Request retrieve(RequestQueue queue, Response.ErrorListener errorListener) {
-        final CatalyzeObject holder = this;
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.GET,
-                sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-                holder.inflateFromJson(object);
-            }
-        }, errorListener);
-        queue.add(request);
-        return request;
+        return super.retrieve(queue, errorListener, sBasePath + sPath);
     }
 
     /**
@@ -167,24 +145,14 @@ public class Person extends CatalyzeObject {
      * will override any existing data on the backend for this {@link Person} regardless of whether
      * or not the data is out of sync with the local copy.
      *
-     * @param requestQueue  a {@link RequestQueue} from the Volley android library. This queue will
+     * @param queue         a {@link RequestQueue} from the Volley android library. This queue will
      *                      handle the HTTP interaction with the catalyze.io API servers.
      * @param errorListener to handle errors that may occur during the server interaction. A {@code
      *                      null} value will ignore all errors.
      * @return the {@link Request} representing this server interaction
      */
-    public Request update(RequestQueue requestQueue, Response.ErrorListener errorListener) {
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.PUT,
-                sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-            }
-        }, errorListener);
-        requestQueue.add(request);
-        return request;
+    public Request update(RequestQueue queue, Response.ErrorListener errorListener) {
+        return super.update(queue, errorListener, sBasePath + sPath);
     }
 
     /**
@@ -192,24 +160,14 @@ public class Person extends CatalyzeObject {
      * modified as a result of this method. If an error occurs performing the HTTP interaction, the
      * interaction is not retried.
      *
-     * @param requestQueue  a {@link RequestQueue} from the Volley android library. This queue will
+     * @param queue         a {@link RequestQueue} from the Volley android library. This queue will
      *                      handle the HTTP interaction with the catalyze.io API servers.
      * @param errorListener to handle errors that may occur during the server interaction. A {@code
      *                      null} value will ignore all errors.
      * @return the {@link Request} representing this server interaction
      */
-    public Request delete(RequestQueue requestQueue, Response.ErrorListener errorListener) {
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.DELETE,
-                sBasePath + sPath, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-            }
-        }, errorListener);
-        requestQueue.add(request);
-        return request;
+    public Request delete(RequestQueue queue, Response.ErrorListener errorListener) {
+        return super.delete(queue, errorListener, sBasePath + sPath);
     }
 
     /**
@@ -308,7 +266,7 @@ public class Person extends CatalyzeObject {
     }
 
     /**
-     * @param email this person's email address. This must be a valid format
+     * @param email this person'sTransactionPath email address. This must be a valid format
      * @return this {@link Person}
      */
     public Person setEmail(String email) {

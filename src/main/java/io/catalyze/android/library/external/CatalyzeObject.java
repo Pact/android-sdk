@@ -18,6 +18,10 @@ package io.catalyze.android.library.external;
 
 import com.google.common.base.Strings;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,6 +77,16 @@ public class CatalyzeObject {
 
     protected static final String sUserIdKey = "user_id";
 
+    protected static final String sQuestionIdKey = "question_id";
+
+    protected static final String sAnswerKey = "answer";
+
+    protected static final String sResponseTypeKey = "response_type";
+
+    protected static final String sQuestionTextKey = "content";
+
+    protected static final String sTransactionIdKey = "transaction_id";
+
     static final String sSessionId = "session_token";
 
     static final String sSessionHeader = "X-Session";
@@ -97,6 +111,69 @@ public class CatalyzeObject {
 
     public static void setAppId(String appId) {
         sAppId = appId;
+    }
+
+    protected Request create(RequestQueue queue, Response.ErrorListener errorListener,
+            String path) {
+
+        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.POST,
+                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject object) {
+
+                sSessionToken = (String) object.remove(sSessionId);
+            }
+        }, errorListener);
+        queue.add(request);
+        return request;
+    }
+
+    protected Request retrieve(RequestQueue queue, Response.ErrorListener errorListener,
+            String path) {
+        final CatalyzeObject holder = this;
+        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.GET,
+                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject object) {
+
+                sSessionToken = (String) object.remove(sSessionId);
+                holder.inflateFromJson(object);
+            }
+        }, errorListener);
+        queue.add(request);
+        return request;
+    }
+
+    protected Request update(RequestQueue queue, Response.ErrorListener errorListener,
+            String path) {
+        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.PUT,
+                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject object) {
+
+                sSessionToken = (String) object.remove(sSessionId);
+            }
+        }, errorListener);
+        queue.add(request);
+        return request;
+    }
+
+    protected Request delete(RequestQueue queue, Response.ErrorListener errorListener,
+            String path) {
+        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.DELETE,
+                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject object) {
+
+                sSessionToken = (String) object.remove(sSessionId);
+            }
+        }, errorListener);
+        queue.add(request);
+        return request;
     }
 
     protected void inflateFromJson(JSONObject json) {

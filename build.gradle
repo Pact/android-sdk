@@ -31,7 +31,7 @@ repositories {
 dependencies {
     compile 'com.google.guava:guava:14.0.1'
     compile 'com.squareup.okhttp:okhttp:1.1.0'
-    compile 'com.neovisionaries:nv-i18n:1.4'''
+    compile 'com.neovisionaries:nv-i18n:1.4'
     //compile files('libs/android-support-v4-catalyze.jar')
     compile project(':volley')
 }
