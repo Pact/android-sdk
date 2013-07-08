@@ -20,7 +20,14 @@ local.properties
 .project
 
 # IDEA files
-.iml
+*.iml
 
 # Build outputs
 build/
+
+# Mac OS
+.DS_Store
+
+# Exclude volley for the time being since it has it's own repo.
+# Need to see if we can just link straight to the repo for volley support
+volley/
