@@ -59,6 +59,8 @@ public class CatalyzeObject {
 
     protected static final String sStreetKey = "street";
 
+    protected static final String sCountryCodeKey = "country";
+
     protected static final String sEmailKey = "email";
 
     protected static final String sFirstNameKey = "first_name";

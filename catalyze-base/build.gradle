@@ -19,6 +19,10 @@ apply plugin: 'java'
 sourceCompatability = 1.6
 targetCompatability = 1.6
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile 'com.google.guava:guava:14.0.1'
     compile 'com.neovisionaries:nv-i18n:1.4'

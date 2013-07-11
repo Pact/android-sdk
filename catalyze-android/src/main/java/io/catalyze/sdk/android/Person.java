@@ -31,8 +31,6 @@ import java.util.Date;
 import io.catalyze.sdk.Gender;
 import io.catalyze.sdk.exceptions.IllegalAgeFormatException;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-
 /**
  * A {@link CatalyzeObject} used to represent Persons on the catalyze.io API.
  *
@@ -267,33 +265,13 @@ public class Person extends CatalyzeObject {
     }
 
     /**
-     * @param email this person'sTransactionPath email address. This must be a valid format
+     * @param email this person's email address. This must be a valid format
      * @return this {@link Person}
      */
     public Person setEmail(String email) {
         //TODO: Implement some regex checking & specify what valid formats are.
         // https://code.google.com/p/emailaddress/source/detail?r=5
         mContent.put(sEmailKey, email);
-        return this;
-    }
-
-    // TODO: update zipCode comment with validation types once implemented https://www.pivotaltracker.com/story/show/52553637
-
-    /**
-     * @param zipCode the zip code in which this {@link Person} lives
-     * @param street  the house number and street name of the address at which this {@link Person}
-     *                lives
-     * @return this {@link Person}
-     */
-    public Person setAddress(ZipCode zipCode, String street) {
-
-        setZipCode(zipCode);
-
-        if (isNullOrEmpty(street)) {
-            return this;
-        }
-
-        mContent.put(sStreetKey, street);
         return this;
     }
 
@@ -305,10 +283,28 @@ public class Person extends CatalyzeObject {
     }
 
     /**
+     * @param street on which this {@link Person} lives
+     * @return this {@link Person}
+     */
+    public Person setStreet(String street) {
+        mContent.put(sStreetKey, street);
+        return this;
+    }
+
+    /**
      * @return the city in which this {@link Person} lives
      */
     public String getCity() {
         return super.getString(sCityKey);
+    }
+
+    /**
+     * @param city in which this {@link Person} lives
+     * @return this {@link Person}
+     */
+    public Person setCity(String city) {
+        mContent.put(sCityKey, city);
+        return this;
     }
 
     /**
@@ -318,6 +314,15 @@ public class Person extends CatalyzeObject {
      */
     public State getState() {
         return State.valueOf(super.getString(sStateKey));
+    }
+
+    /**
+     * @param state the state in which this {@link Person} lives
+     * @return this {@link Person}
+     */
+    public Person setState(State state) {
+        mContent.put(sStateKey, state.toString());
+        return this;
     }
 
     /**
@@ -335,6 +340,22 @@ public class Person extends CatalyzeObject {
      */
     public Person setZipCode(ZipCode zipCode) {
         mContent.put(sZipCodeKey, zipCode.toString());
+        return this;
+    }
+
+    /**
+     * @return the name of the country in which this {@link Person} lives.
+     */
+    public String getCountry() {
+        return super.getString(sCountryCodeKey);
+    }
+
+    /**
+     * @param country the name of the country in which this {@link Person} lives
+     * @return this {@link Person}
+     */
+    public Person setCountry(String country) {
+        mContent.put(sCountryCodeKey, country);
         return this;
     }
 

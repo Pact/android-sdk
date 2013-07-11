@@ -21,9 +21,11 @@ local.properties
 
 # IDEA files
 *.iml
+.idea/
 
 # Build outputs
 build/
+.gradle/
 
 # Mac OS
 .DS_Store
