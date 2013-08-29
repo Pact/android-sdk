@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package io.catalyze.sdk.android;
+package io.catalyze.sdk.android.old;
 
-import com.ajah.geo.us.ZipCode;
+import io.catalyze.sdk.ZipCode;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import io.catalyze.sdk.TransactionType;
-import io.catalyze.sdk.android.old.OldCatalyzeObject;
 
 /**
  * Transactions are interactions with persons on the catalyze.io backend. Transactions are immutable

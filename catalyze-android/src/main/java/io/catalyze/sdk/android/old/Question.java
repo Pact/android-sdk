@@ -14,14 +14,13 @@
  *    limitations under the License.
  */
 
-package io.catalyze.sdk.android;
+package io.catalyze.sdk.android.old;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 
 import io.catalyze.sdk.ResponseType;
-import io.catalyze.sdk.android.old.OldCatalyzeObject;
 
 /**
  * Questions are created by the developer and serve as reference points for {@link Answer}sTransactionPath.

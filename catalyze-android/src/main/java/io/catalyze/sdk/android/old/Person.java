@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package io.catalyze.sdk.android;
+package io.catalyze.sdk.android.old;
 
 import com.google.common.base.Strings;
 
-import com.ajah.geo.us.State;
-import com.ajah.geo.us.ZipCode;
+import io.catalyze.sdk.State;
+import io.catalyze.sdk.ZipCode;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -29,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.catalyze.sdk.Gender;
-import io.catalyze.sdk.android.old.OldCatalyzeObject;
 import io.catalyze.sdk.exceptions.IllegalAgeFormatException;
 
 /**

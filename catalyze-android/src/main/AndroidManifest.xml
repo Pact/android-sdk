@@ -16,17 +16,9 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.catalyze.sdk.android"
-          android:versionCode="1"
-          android:versionName="1.0.0" >
-
-    <uses-sdk
-            android:minSdkVersion="8"
-            android:targetSdkVersion="17" />
+          package="io.catalyze.sdk.sdk.android" >
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
-    <application>
-    </application>
+    <application />
 
 </manifest>

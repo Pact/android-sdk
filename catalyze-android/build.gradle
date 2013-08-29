@@ -14,26 +14,7 @@
  *    limitations under the License.
  */
 
-/*
- * Special thanks to Koushik Dutta for his build template
- * https://github.com/koush/mvn-repo/blob/master/maven.gradle
- */
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.5.+'
-    }
-}
 apply plugin: 'android-library'
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     compile project(':volley')
@@ -41,109 +22,21 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion "17.0.0"
+    compileSdkVersion 18
+    buildToolsVersion "18.0.1"
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 17
+        targetSdkVersion 18
+        versionCode 1
+        versionName '0.0.1'
+        packageName 'io.catalyze.sdk.android'
+    }
+
+    debug {
+        packageNameSuffix '.debug'
+        versionNameSuffix '-SNAPSHOT'
     }
 }
-//afterEvaluate { project ->
-//    user = null     // Not used anymore
-//    repo = null
-//    'git remote -v'.execute(null, project.projectDir).getText().find('git@github.com:(.*?)/(.*?).git') {
-//        match ->
-//            user = match[1]
-//            repo = match[2]
-//    }
-//
-//    githubUrl = 'https://api.github.com/repos/' + user + '/' + repo;
-//    if (System.getenv().GITHUB_TOKEN)
-//        githubUrl += '?access_token=' + System.getenv().GITHUB_TOKEN
-//    repoInfo = new groovy.json.JsonSlurper().parseText(new URL(githubUrl).getText())
-//
-//    android_manifest = new XmlParser(false, false).parseText(new File(project.projectDir, 'AndroidManifest.xml').getText())
-//    versionName = android_manifest.'@android:versionName'
-//    package_name = android_manifest.'@package'
-//    artifact_id = repo.toLowerCase()
-//    project.version = versionName
-//    project.group = package_name
-//
-//    uploadArchives {
-//        repositories {
-//            mavenDeployer {
-//
-//                beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
-//                pom.groupId = package_name
-//                pom.artifactId = artifact_id
-//                pom.version = versionName
-//
-//                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-//                    authentication(userName: sonatypeUsername, password: sonatypePassword)
-//                }
-//
-//                pom.project {
-//                    name repo
-//                    packaging 'jar'
-//                    description repoInfo.description
-//                    url repoInfo.html_url
-//
-//                    scm {
-//                        url repoInfo.git_url
-//                        connection repoInfo.git_url
-//                        developerConnection repoInfo.ssh_url
-//                    }
-//
-//                    licenses {
-//                        license {
-//                            name 'The Apache Software License, Version 2.0'
-//                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                            distribution 'repo'
-//                        }
-//                    }
-//
-//                    organization {
-//                        name 'catalyze.io'
-//                        url 'http://www.catalyze.io'
-//                    }
-//
-//                    developers {
-//                        developer {
-//                            id 'marius'
-//                            name 'Marius Volkhart'
-//                            email 'Marius@volkhart.com'
-//                            organization 'catalyze.io'
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    signing {
-//        sign configurations.archives
-//    }
-//
-//    task androidJavadocs(type: Javadoc) {
-//        source = android.sourceSets.main.allJava
-//    }
-//
-//    task androidJavadocsJar(type: Jar) {
-//        classifier = 'javadoc'
-//        basename = artifact_id
-//        from androidJavadocs.destinationDir
-//    }
-//
-//    task androidSourcesJar(type: Jar) {
-//        classifier = 'sources'
-//        basename = artifact_id
-//        from android.sourceSets.main.allSource
-//    }
-//
-//    artifacts {
-//        archives packageReleaseJar
-//        archives androidSourcesJar
-//        archives androidJavadocsJar
-//    }
-//}
+
+//apply from: '../maven_push.gradle'

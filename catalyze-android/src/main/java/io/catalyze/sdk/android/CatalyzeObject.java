@@ -1,27 +1,8 @@
-/*
- * Copyright (C) 2013 catalyze.io, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package io.catalyze.sdk.android;
 
-import com.google.common.base.Strings;
+import com.google.common.base.Objects;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,202 +10,97 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * Created by marius on 6/18/13.
+ * Created by mvolkhart on 8/26/13.
  */
-public class CatalyzeObject {
+public abstract class CatalyzeObject {
 
-    protected static final String sBasePath = "https://api.catalyze.io/v1";
+    protected final JSONObject mJson;
 
-    // API Map Keys
-    protected static final String sAppIdKey = "app_key";
-
-    protected static final String sSourceKey = "source";
-
-    protected static final String sGenderKey = "gender";
-
-    protected static final String sPhoneKey = "phone";
-
-    protected static final String sAgeKey = "age";
-
-    protected static final String sBirthDateKey = "birth_date";
-
-    protected static final String sZipCodeKey = "zip_code";
-
-    protected static final String sStateKey = "state";
-
-    protected static final String sCityKey = "city";
-
-    protected static final String sStreetKey = "street";
-
-    protected static final String sCountryCodeKey = "country";
-
-    protected static final String sEmailKey = "email";
-
-    protected static final String sFirstNameKey = "first_name";
-
-    protected static final String sLastNameKey = "last_name";
-
-    protected static final String sPersonIdKey = "person_id";
-
-    protected static final String sTransactionTypeKey = "transaction_type";
-
-    protected static final String sDateCommittedKey = "date_committed";
-
-    protected static final String sPasswordKey = "password";
-
-    protected static final String sUsernameKey = "username";
-
-    protected static final String sUserIdKey = "user_id";
-
-    protected static final String sQuestionIdKey = "question_id";
-
-    protected static final String sAnswerKey = "answer";
-
-    protected static final String sResponseTypeKey = "response_type";
-
-    protected static final String sQuestionTextKey = "content";
-
-    protected static final String sTransactionIdKey = "transaction_id";
-
-    static final String sSessionId = "session_token";
-
-    static final String sSessionHeader = "X-Session";
-
-    static String sSessionToken = "";
-
-    private static String sAppId = "";
-
-    protected Map<String, Object> mContent;
-
-    protected CatalyzeObject() {
-        mContent = new HashMap<String, Object>();
-        mContent.put(sAppIdKey, getAppId());
+    public CatalyzeObject() {
+        this(new JSONObject());
     }
 
-    static String getAppId() {
-        sAppId = Strings.emptyToNull(sAppId);
-        return checkNotNull(sAppId,
-                "Specify the appId by calling " + CatalyzeObject.class.getSimpleName()
-                        + ".setAppId()");
+    protected CatalyzeObject(JSONObject json) {
+        mJson = json;
     }
 
-    public static void setAppId(String appId) {
-        sAppId = appId;
+    public JSONObject asJson() {
+        return mJson;
     }
 
-    protected Request create(RequestQueue queue, Response.ErrorListener errorListener,
-            String path) {
-
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.POST,
-                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-            }
-        }, errorListener);
-        queue.add(request);
-        return request;
-    }
-
-    protected Request retrieve(RequestQueue queue, Response.ErrorListener errorListener,
-            String path) {
-        final CatalyzeObject holder = this;
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.GET,
-                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-                holder.inflateFromJson(object);
-            }
-        }, errorListener);
-        queue.add(request);
-        return request;
-    }
-
-    protected Request update(RequestQueue queue, Response.ErrorListener errorListener,
-            String path) {
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.PUT,
-                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-            }
-        }, errorListener);
-        queue.add(request);
-        return request;
-    }
-
-    protected Request delete(RequestQueue queue, Response.ErrorListener errorListener,
-            String path) {
-        CatalyzeJsonObjectRequest request = new CatalyzeJsonObjectRequest(Request.Method.DELETE,
-                path, new JSONObject(mContent), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-
-                sSessionToken = (String) object.remove(sSessionId);
-            }
-        }, errorListener);
-        queue.add(request);
-        return request;
-    }
-
-    protected void inflateFromJson(JSONObject json) {
-        Iterator<String> iter = json.keys();
+    protected Map<String, Object> handleJSONObject(JSONObject object) {
+        Map<String, Object> retVal = new HashMap<String, Object>();
+        Iterator<String> iter = object.keys();
         while (iter.hasNext()) {
             String key = iter.next();
             try {
-                mContent.put(key, json.get(key));
+                Object value = object.get(key);
+                if (value instanceof JSONArray) {
+                    handleJSONArray((JSONArray) value);
+                } else if (value instanceof JSONObject) {
+                    retVal.put(key, handleJSONObject(object.getJSONObject(key)));
+                } else {
+                    retVal.put(key, value);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        return retVal;
     }
 
-    public int getInt(String key) {
-        return (Integer) get(key);
+    protected Object[] handleJSONArray(JSONArray array) {
+        Object[] retVal = new Object[array.length()];
+        for (int i = 0, max = array.length(); i < max; i++) {
+            Object value = array.opt(i);
+            if (value instanceof JSONArray) {
+                retVal[i] = handleJSONArray((JSONArray) value);
+            } else if (value instanceof JSONObject) {
+                retVal[i] = handleJSONObject((JSONObject) value);
+            } else {
+                try {
+                    retVal[i] = array.get(i);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return retVal;
     }
 
-    public boolean getBoolean(String key) {
-        return (Boolean) get(key);
+    @Override
+    public int hashCode() {
+        return mJson.hashCode();
     }
 
-    public double getDouble(String key) {
-        return (Double) get(key);
-    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
 
-    public String getString(String key) {
-        return (String) get(key);
-    }
+        if (!(o instanceof User)) {
+            return false;
+        }
 
-    public long getLong(String key) {
-        return (Long) get(key);
-    }
-
-    public Object get(String key) {
-        return mContent.get(key);
-    }
-
-    public CatalyzeObject put(String k, Object v) {
-        mContent.put(k, v);
-        return this;
+        User that = (User) o;
+        return Objects.equal(mJson, that.mJson);
     }
 
     @Override
     public String toString() {
-        return new JSONObject(mContent).toString();
+        return mJson.toString();
     }
 
-    public String toString(int indentSpaces) throws JSONException {
-        return new JSONObject(mContent).toString(indentSpaces);
+    public String toString(int indentSpaces) {
+        try {
+            return mJson.toString(indentSpaces);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
+
+
 }
