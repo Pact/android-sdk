@@ -18,7 +18,8 @@ apply plugin: 'android-library'
 
 dependencies {
     compile project(':volley')
-    compile project(':catalyze-base')
+    compile 'com.google.guava:guava:14.0.1'
+    compile 'com.neovisionaries:nv-i18n:1.5'
 }
 
 android {

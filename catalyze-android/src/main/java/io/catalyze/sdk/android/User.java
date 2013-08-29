@@ -1,6 +1,5 @@
 package io.catalyze.sdk.android;
 
-import io.catalyze.sdk.ZipCode;
 import com.google.common.base.Strings;
 import com.neovisionaries.i18n.CountryCode;
 
@@ -12,7 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import io.catalyze.sdk.Gender;
+import io.catalyze.sdk.android.user.Gender;
+import io.catalyze.sdk.android.user.ZipCode;
 
 /**
  * Created by mvolkhart on 8/23/13.

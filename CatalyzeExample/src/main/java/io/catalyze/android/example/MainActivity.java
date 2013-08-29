@@ -13,10 +13,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.common.base.Optional;
 
-import io.catalyze.sdk.sdk.android.Catalyze;
-import io.catalyze.sdk.sdk.android.CatalyzeRequest;
-import io.catalyze.sdk.sdk.android.User;
-import io.catalyze.sdk.sdk.android.UserRequest;
+import io.catalyze.sdk.android.Catalyze;
+import io.catalyze.sdk.android.CatalyzeRequest;
+import io.catalyze.sdk.android.User;
+import io.catalyze.sdk.android.UserRequest;
 
 public class MainActivity extends Activity {
 
