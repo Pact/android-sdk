@@ -21,8 +21,8 @@ import io.catalyze.sdk.android.UserRequest;
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private MyApplication mMyApplication;
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,36 +47,23 @@ public class MainActivity extends Activity {
                 Catalyze.INSTANCE.logout(MainActivity.this);
             }
         });
-    }
 
+        findViewById(R.id.user).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestUser(mUser);
+            }
+        });
+    }
 
     // TODO instead of defining the intent-receiver in manifest & tying it to the activity,
     // register one in code & intercept the redirect to extract data.
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.d(TAG, "Got it");
         final Optional<User> userOptional = Catalyze.INSTANCE.finalizeLogin(this, intent);
         if (userOptional.isPresent()) {
-            Log.d(TAG, "in");
-            final User user = userOptional.get();
-            UserRequest.Builder builder = new UserRequest.Builder(this);
-            CatalyzeRequest request = builder.setMethod(CatalyzeRequest.Method.RETRIEVE).setContent
-                    (user).setErrorListener
-                    (new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-
-                        }
-                    }).setListener(new Response.Listener<User>() {
-                @Override
-                public void onResponse(User response) {
-                    Log.d(TAG, response.toString(2));
-                    fillUserView(response);
-                }
-            }).build();
-
-            Log.d(TAG, "gonna request");
-            mMyApplication.getRequestQueue().add(request);
+            mUser = userOptional.get();
+            requestUser(mUser);
         }
     }
 
@@ -89,6 +76,27 @@ public class MainActivity extends Activity {
 
     private void fillUserView(User user) {
         ((TextView) findViewById(R.id.UserView)).setText(user.toString(2));
+    }
+
+    private void requestUser(User user) {
+        UserRequest.Builder builder = new UserRequest.Builder(this);
+        CatalyzeRequest request = builder.setMethod(CatalyzeRequest.Method.RETRIEVE).setContent
+                (user).setErrorListener
+                (new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, error.toString());
+                    }
+                }).setListener(new Response.Listener<User>() {
+            @Override
+            public void onResponse(User response) {
+                Log.d(TAG, response.toString(2));
+                fillUserView(response);
+            }
+        }).build();
+
+        mMyApplication.getRequestQueue().add(request);
+        mMyApplication.getRequestQueue().start();
     }
 
 }

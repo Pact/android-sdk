@@ -16,20 +16,28 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="User"
-            android:id="@+id/UserView"
-            android:layout_below="@+id/login"
-            android:layout_alignLeft="@+id/login"/>
-
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Logout"
             android:id="@+id/logout"
-            android:layout_above="@+id/UserView"
+            android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/login"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get User"
+            android:id="@+id/user"
+            android:layout_below="@+id/login"
+            android:layout_alignParentLeft="true"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User"
+            android:id="@+id/UserView"
+            android:layout_below="@+id/user"
+            android:layout_alignParentLeft="true"/>
 
 </RelativeLayout>

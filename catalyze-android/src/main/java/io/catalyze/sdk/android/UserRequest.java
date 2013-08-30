@@ -1,9 +1,11 @@
 package io.catalyze.sdk.android;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Response;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.catalyze.sdk.android.CatalyzeRequest;
@@ -35,6 +37,11 @@ public class UserRequest {
             setJsonListener(new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
+                    try {
+                        Log.d("UserRequest", response.toString(2));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     listener.onResponse(new User(response));
                 }
             });

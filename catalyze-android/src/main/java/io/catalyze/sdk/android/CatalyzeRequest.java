@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -14,14 +13,8 @@ import com.google.common.collect.ImmutableMap;
 
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,16 +23,15 @@ import java.util.Map;
  */
 public class CatalyzeRequest extends JsonObjectRequest {
 
+    public static final String BASE_PATH = "https://api.catalyze.io/v1";
     private static final String TAG = CatalyzeRequest.class.getSimpleName();
-
     private static final String ACCESS_KEY_HEADER = "X-Access-Key";
     private static final String ACCESS_KEY_TYPE = "android ";
     private static final String ACCESS_KEY_VALIDATOR_KEY = "io.catalyze.android.sdk.v1.ACCESS_KEY";
     private static final String CONTENT_TYPE = "application/json";
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String AUTHENTICATION_HEADER = "Authentication";
+    private static final String AUTHENTICATION_HEADER = "Authorization";
     private static final String AUTHENTICATION_SCHEMA = "Bearer ";
-    public static final String BASE_PATH = "https://api.catalyze.io/v1";
     private final Map<String, String> mHeaders = new HashMap<String, String>();
     private Priority mPriority;
 
@@ -130,6 +122,9 @@ public class CatalyzeRequest extends JsonObjectRequest {
             if (mMethod == Integer.MIN_VALUE) {
                 request = new CatalyzeRequest(mUrl, mJson, mListener, mErrorListener);
             } else {
+                if (mMethod == Request.Method.GET || mMethod == Request.Method.DELETE) {
+                    mJson = null;
+                }
                 request = new CatalyzeRequest(mMethod, mUrl, mJson, mListener, mErrorListener);
             }
 
@@ -190,12 +185,9 @@ public class CatalyzeRequest extends JsonObjectRequest {
             try {
                 md = MessageDigest.getInstance("SHA1");
                 md.update(certRaw);
-                for (byte b : md.digest()) {
-                    strResult += Integer.toString(b & 0xff, 16);
-                }
+                strResult = new String(md.digest());
                 strResult = strResult.toUpperCase();
-            }
-            catch (NoSuchAlgorithmException ex) {
+            } catch (NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
             }
             return strResult;

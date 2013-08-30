@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.provider.Browser;
 
 import com.google.common.base.Optional;
 
@@ -25,7 +26,9 @@ public enum Catalyze {
 
         Uri uri = Uri.parse(String.format(SIGNIN_URL, applicationId,
                 applicationScheme.toLowerCase()));
-        return new Intent(Intent.ACTION_VIEW, uri);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.putExtra(Browser.EXTRA_APPLICATION_ID, CATALYZE);
+        return intent;
 
         /*
          * Cases
