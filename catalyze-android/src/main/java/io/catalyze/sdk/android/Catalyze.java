@@ -1,90 +1,151 @@
 package io.catalyze.sdk.android;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.provider.Browser;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.google.common.base.Optional;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import android.content.Context;
+import android.widget.TextView;
 
 /**
  * Created by mvolkhart on 8/24/13.
  */
-public enum Catalyze {
-
-    INSTANCE;
-    public static final String CATALYZE = "catalyze";
+public class Catalyze{
+    
+    protected String apiKey;
+    private final static String baseUrl = "https://api.catalyze.io";
+    
+    protected static TextView mResult;
     private static final String AUTHORIZED = "authorized";
-    private static final String SIGNIN_URL = "https://api.catalyze" +
-            ".io/v1/%s/auth/signin?callbackUri=%s";
-    private static final String LOGIN_USER_ID = "userId";
-
-    private String userSessionToken;
-
-    public Intent login(String applicationId, String applicationScheme) {
-
-        Uri uri = Uri.parse(String.format(SIGNIN_URL, applicationId,
-                applicationScheme.toLowerCase()));
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.putExtra(Browser.EXTRA_APPLICATION_ID, CATALYZE);
-        return intent;
-
-        /*
-         * Cases
-         *
-         * 1. User is not logged in. No preferences.
-         * 2. User is logged in & preferences are out of date. Need to check & update creds.
-         * 3. User is logged in correctly. Skip network calls.
-         */
+    private static final String SIGNIN_URL = "https://api.catalyze.io/v1/auth/signin";
+    private static final String SIGNUP_URL = "https://api.catalyze.io/v1/user";
+    private static final String USER_LOCATION_URL = "https://api.catalyze.io/v1/user";
+    private static final String ANDROID = "android";
+    private final String identifier;
+    private CatalyzeUser user;
+    private Context appContext;
+    
+    public Catalyze(String apiKey, String identifier, Context context){
+    	this.apiKey = apiKey;
+    	appContext = context;
+    	this.identifier = identifier;
     }
-
-    /*
-    returns true if login succeeded, otherwise false.
-     */
-    public Optional<User> finalizeLogin(Context context, Intent intent) {
-        Uri data = intent.getData();
-        User user = null;
-        SharedPreferences preferences = context.getSharedPreferences(CATALYZE,
-                Context.MODE_PRIVATE);
-        if (data != null) {
-            boolean authorized = Boolean.parseBoolean(data.getQueryParameter(AUTHORIZED));
-            if (authorized) {
-                final String token = data.getQueryParameter(User.SESSION_TOKEN);
-                final long userId = Long.parseLong(data.getQueryParameter(LOGIN_USER_ID));
-                user = new User();
-                user.setId(userId);
-                user.setSessionToken(token);
-
-
-                preferences.edit().putLong(User.ID, user.getId()).putString(User.SESSION_TOKEN,
-                        user.getSessionToken()).commit();
-                userSessionToken = token;
-            }
-        } else {
-            user = new User();
-            user.setId(preferences.getLong(User.ID, -1));
-            user.setSessionToken(preferences.getString(User.SESSION_TOKEN, null));
-            userSessionToken = user.getSessionToken();
-        }
-        return Optional.fromNullable(user);
+    
+    /**
+	 * Catalyze Constructor for logging in an existing user
+	 * 
+	 * @param apiKey
+	 * @param userName
+	 * @param password
+	 * @param context
+	 */
+	public Catalyze(String apiKey, String identifier, String userName, String password,
+			CatalyzeListener<CatalyzeUser> handleResponse, Context context) {
+		this.apiKey = apiKey;
+		user = new CatalyzeUser(this);
+    	user.getAuthenticatedUser(userName, password, handleResponse, context);
+    	appContext = context;
+    	this.identifier = identifier;
     }
+    
+    /***
+	 * Catalyze constructor for signing up a new new user
+	 * 
+	 * @param apiKey
+	 * @param userName
+	 * @param password
+	 * @param firstName
+	 * @param lastName
+	 * @param context
+	 */
+//	public Catalyze(String apiKey, String userName, String password,
+//			String firstName, String lastName,
+//			Response.Listener<JSONObject> handleResponse, Context context) {
+//		this.apiKey = apiKey;
+//		user = new CatalyzeUser(apiKey);
+//		user.signUp(userName, password, firstName, lastName, context);
+//	}
+	
+	public void updateContext(Context context){
+		this.appContext = context;
+	}
+	
+	protected Context getContext(){
+		return appContext;
+	}
+	
+	protected CatalyzeUser getUser(){
+		return user;
+	}
+	
+	public void getUser(String userName, String password, CatalyzeListener<CatalyzeUser> callbackHandler){
+		user = new CatalyzeUser(this);
+		user.getAuthenticatedUser(userName, password, callbackHandler, appContext);
+		//return user;
+	}
+	
+	public void signUp(String userName, String password, String firstName, String lastName, CatalyzeListener<CatalyzeUser> callbackHandler){
+		user = new CatalyzeUser(this);
+		user.signUp(userName, password, firstName, lastName, callbackHandler, appContext);
+		//return user;
+	}
+	
+	public void logoutCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler){
+		user.signOut(callbackHandler, appContext);
+	}
+	
+	public void deleteCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler){
+		user.deleteUser(callbackHandler, appContext);
+	}
 
-    public void logout(Context context) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(CATALYZE,
-                Context.MODE_PRIVATE).edit();
-        editor.remove(User.ID).remove(User.SESSION_TOKEN).commit();
-        userSessionToken = null;
-    }
+	protected String getAPIKey() {
+		return apiKey;
+	}
+	
+	protected Map<String, String> getDefaultHeaders(){
+		Map<String, String> headers = new HashMap<String, String>();
+		//headers.put("X-Api-Key", "android io.catalyze.example " + getAPIKey());
+		headers.put("X-Api-Key", "android " +  identifier + " " + getAPIKey());
+		headers.put("Content-Type", "application/json");
+		return headers;
+	}
 
-    @Deprecated
-    public String getAppId() {
-        return "";
-    }
-
-    public String getUserSessionToken() {
-        return userSessionToken;
-    }
-
-
+	/**
+	 * Returns the currently signed in user. If no user has been previously created will return null
+	 * @return
+	 */
+	public CatalyzeUser getCurrentUser() {
+		return user;
+	}
+	
+	/***
+	 * FIXME add additional error reporting
+	 * Generic error handler
+	 * @return
+	 */	
+	protected Response.ErrorListener createErrorListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+		return new Response.ErrorListener() {
+			
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				JSONObject e = new JSONObject();
+				CatalyzeError ce = new CatalyzeError(error);
+				try {
+					e = new JSONObject();
+					e.put("error", error.toString());
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				userCallback.onError(ce);
+			}
+		};
+	}
+    
+    
 }

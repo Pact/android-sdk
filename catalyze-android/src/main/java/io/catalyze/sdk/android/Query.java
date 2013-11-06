@@ -1,8 +1,7 @@
-package io.catalyze.sdk.android.customclasses;
+package io.catalyze.sdk.android;
 
 import org.json.JSONException;
 
-import io.catalyze.sdk.android.CatalyzeObject;
 
 /**
  * Created by mvolkhart on 8/26/13.

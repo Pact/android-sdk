@@ -1,4 +1,4 @@
-package io.catalyze.sdk.android.customclasses;
+package io.catalyze.sdk.android;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.catalyze.sdk.android.CatalyzeObject;
 
 /**
  * Created by mvolkhart on 8/26/13.

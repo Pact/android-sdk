@@ -1,5 +1,7 @@
 package io.catalyze.sdk.android;
 
+import android.widget.TextView;
+
 import com.google.common.base.Objects;
 
 import org.json.JSONArray;
@@ -13,9 +15,10 @@ import java.util.Map;
 /**
  * Created by mvolkhart on 8/26/13.
  */
-public abstract class CatalyzeObject {
-
-    protected final JSONObject mJson;
+public abstract class CatalyzeObject{
+    protected JSONObject mJson;
+    protected static TextView mResult;
+   
 
     public CatalyzeObject() {
         this(new JSONObject());
@@ -23,6 +26,10 @@ public abstract class CatalyzeObject {
 
     protected CatalyzeObject(JSONObject json) {
         mJson = json;
+    }
+    
+    public void setJson(JSONObject json){
+    	mJson = json;
     }
 
     public JSONObject asJson() {
@@ -80,11 +87,11 @@ public abstract class CatalyzeObject {
             return true;
         }
 
-        if (!(o instanceof User)) {
+        if (!(o instanceof CatalyzeUser)) {
             return false;
         }
 
-        User that = (User) o;
+        CatalyzeUser that = (CatalyzeUser) o;
         return Objects.equal(mJson, that.mJson);
     }
 

@@ -1,0 +1,4 @@
+INDEX VERSION 1.126+/Users/Tyler/Documents/Eclipse/android-sdk/.metadata/.plugins/org.eclipse.jdt.core
+765453901.index
+467623344.index
+1444952361.index

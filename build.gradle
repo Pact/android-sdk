@@ -18,3 +18,4 @@ def isReleaseBuild() {
 }
 
 apply plugin: 'android-reporting'
+apply plugin: 'eclipse'

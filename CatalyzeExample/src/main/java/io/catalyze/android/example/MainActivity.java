@@ -1,5 +1,13 @@
 package io.catalyze.android.example;
 
+
+import java.util.Date;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.android.volley.Response;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,23 +15,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.google.common.base.Optional;
+import io.catalyze.sdk.android.*;
+import io.catalyze.sdk.android.user.Gender;
+import io.catalyze.sdk.android.user.ZipCode;
 
-import io.catalyze.sdk.android.Catalyze;
-import io.catalyze.sdk.android.CatalyzeRequest;
-import io.catalyze.sdk.android.User;
-import io.catalyze.sdk.android.UserRequest;
+
 
 public class MainActivity extends Activity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     private MyApplication mMyApplication;
-    private User mUser;
-
+    private CatalyzeUser mUser;
+    private Catalyze catalyze;
+    private CustomClass customClass;
+    private static final String APIKey = "1ca769ce-07b3-40bf-95c0-2feda3e3c909";//io.catalyze.example or something
+    private static final String api =    "1f077962-18cc-4ade-8075-d9fa1642f316";
+    private static final String identifier = "android.example";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,40 +40,171 @@ public class MainActivity extends Activity {
 
         mMyApplication = (MyApplication) getApplication();
         mMyApplication.getRequestQueue().start();
+        
+        catalyze = new Catalyze(api, identifier, MainActivity.this);
+        //Catalyze.setAppID(AppId);
 
-        Button login = (Button) findViewById(R.id.login);
-
-        login.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(Catalyze.INSTANCE.login("2", "catalyzeexample"));
+            	EditText mEdit = (EditText)findViewById(R.id.userNameTextField);
+            	String username = mEdit.getText().toString();
+            	mEdit = (EditText)findViewById(R.id.passwordTextField);
+            	
+                catalyze.getUser(username, mEdit.getText().toString(), newUserResponseHandler());
             }
         });
-
+        
         findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Catalyze.INSTANCE.logout(MainActivity.this);
+            	catalyze.logoutCurrentUser(newResponseHandler());
             }
         });
 
-        findViewById(R.id.user).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.GetUser).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestUser(mUser);
+            	JSONObject newInstance = new JSONObject();
+            	try{
+            	newInstance.put("", "philip");
+            	newInstance.put("occupation", "barber");
+            	newInstance.put("location", "somewhere");
+            	newInstance.put("age", 55);
+            	}
+            	catch(JSONException e){
+            		
+            	}
+            	CustomClass.addInstance("customClassTest2x", newInstance, catalyze, newCCHandler());
+            	
+            	
+            	
+            	
+//            	JSONObject schema = new JSONObject();
+//            	try {
+//					schema.put("name", "string");
+//					schema.put("occupation", "string");
+//					schema.put("location", "string");
+//					schema.put("age", "integer");
+//				} catch (JSONException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//            	
+//            	
+//            	CustomClass cc = new CustomClass("customClassTest1", false, schema, catalyze, newCCHandler());
+            	
+            	//CustomClass.getInstance(catalyze, "customClassTest", newCCHandler());
             }
         });
+        findViewById(R.id.signUp).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	EditText mEdit = (EditText)findViewById(R.id.userNameTextField);
+            	
+            	String username = mEdit.getText().toString();
+            	mEdit = (EditText)findViewById(R.id.passwordTextField);
+            	Response.Listener<JSONObject> responseHandler = createListener();
+            	catalyze.signUp(username, mEdit.getText().toString(), "John", "johnson", newUserResponseHandler());
+            	
+            	
+            }
+        });
+        findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	//catalyze.getUser("test@user.com", "testpass", newUserResposneHandler());
+            	
+            	mUser.setAge(55);
+            	mUser.setCity("Madison");
+            	mUser.update(newUserResponseHandler(), MainActivity.this);
+            }
+        });
+        
+        findViewById(R.id.customClasses).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	CustomClass cc = new CustomClass();
+            	
+            	cc.getCustomClass("customClassTest1", catalyze, newCCHandler());
+            	
+            }
+        });
+        
+        findViewById(R.id.DeleteUser).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	catalyze.deleteCurrentUser(newResponseHandler());
+            }
+        });
+        
     }
+    
+    private Response.Listener<JSONObject> createListener() {
+        return new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+            	//stop loading screen code goes here
+            	String s = "hello we are deoingn somet stuff";
+            	System.out.println(mUser.getUsername());
+            	System.out.println(mUser.getAge());
+            	System.out.println(s);
+            }
+        };
+    }
+    
+    private CatalyzeListener<CatalyzeUser> newUserResponseHandler() {
+        return new CatalyzeListener<CatalyzeUser>() {
 
-    // TODO instead of defining the intent-receiver in manifest & tying it to the activity,
-    // register one in code & intercept the redirect to extract data.
-    @Override
-    protected void onNewIntent(Intent intent) {
-        final Optional<User> userOptional = Catalyze.INSTANCE.finalizeLogin(this, intent);
-        if (userOptional.isPresent()) {
-            mUser = userOptional.get();
-            requestUser(mUser);
-        }
+			@Override
+			public void onError(CatalyzeError response) {
+				// TODO Auto-generated method stub
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(CatalyzeUser response) {
+				// TODO Auto-generated method stub
+				mUser = response;
+				String s = "Successful operation!!!";
+            	System.out.println(s);
+			}
+        };
+    }
+    
+    private CatalyzeListener<CatalyzeUser> newResponseHandler() {
+        return new CatalyzeListener<CatalyzeUser>() {
+
+			@Override
+			public void onError(CatalyzeError response) {
+				// TODO Auto-generated method stub
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(CatalyzeUser response) {
+				// TODO Auto-generated method stub
+				
+			}
+        };
+    }
+    
+    private CatalyzeListener<CustomClass> newCCHandler(){
+    	return new CatalyzeListener<CustomClass>(){
+
+			@Override
+			public void onError(CatalyzeError response) {
+				// TODO Auto-generated method stub
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(CustomClass response) {
+				// TODO Auto-generated method stub
+				customClass = response;
+			}
+    		
+    	};
     }
 
     @Override
@@ -72,31 +212,6 @@ public class MainActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
-
-    private void fillUserView(User user) {
-        ((TextView) findViewById(R.id.UserView)).setText(user.toString(2));
-    }
-
-    private void requestUser(User user) {
-        UserRequest.Builder builder = new UserRequest.Builder(this);
-        CatalyzeRequest request = builder.setMethod(CatalyzeRequest.Method.RETRIEVE).setContent
-                (user).setErrorListener
-                (new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, error.toString());
-                    }
-                }).setListener(new Response.Listener<User>() {
-            @Override
-            public void onResponse(User response) {
-                Log.d(TAG, response.toString(2));
-                fillUserView(response);
-            }
-        }).build();
-
-        mMyApplication.getRequestQueue().add(request);
-        mMyApplication.getRequestQueue().start();
     }
 
 }
