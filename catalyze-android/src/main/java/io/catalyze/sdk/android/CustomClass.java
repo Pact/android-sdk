@@ -19,16 +19,13 @@ public class CustomClass extends CatalyzeObject {
 	private static final String CUSTOM_CLASS_URL = "https://api.catalyze.io/v1/classes";
 	
 	private static final String NAME = "name";
-	private static final String ENTRYID = "entryId";
-	//reference should be is actual refID + /refName
-	private static final String REFERENCE = "/refName";
-	private static final String REFID = "refId";
     private static final String CONTENT = "content";
     private static final String PHI = "phi";
     private static final String PARENT_ID = "parentId";
     private static final String SCHEMA = "schema";
-    private static Response.ErrorListener errorListener;
-    private static Response.Listener<JSONObject> responseListener;
+    private static final String REF = "ref";
+    private CatalyzeUser user;
+    public String id;
     public CustomClass() {
         this(new JSONObject());
         try {
@@ -41,8 +38,19 @@ public class CustomClass extends CatalyzeObject {
 	public CustomClass(JSONObject json) {
 		super(json);
 	}
-
-	public CustomClass(String name, boolean phi, JSONObject schema, Catalyze catalyze, CatalyzeListener<CustomClass> callbackHandler) {
+	
+	public CustomClass(CatalyzeUser user){
+		this(new JSONObject());
+        try {
+			mJson.put(CONTENT, new JSONObject());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        this.user = user;
+	}
+	
+	//This is just for testing
+	public void createCustomClass(String name, boolean phi, JSONObject schema, CatalyzeListener<CustomClass> callbackHandler) {
 		setPHI(phi);
 		mJson = new JSONObject();
 		try {
@@ -53,14 +61,12 @@ public class CustomClass extends CatalyzeObject {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	responseListener = createListener(callbackHandler, this);
+    	responseListener = createListenerWithCCReturn(callbackHandler, this);
     	errorListener = createErrorListener(callbackHandler);
     	CatalyzeRequest request = new CatalyzeRequest(CUSTOM_CLASS_URL, mJson, responseListener, errorListener);
-    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
-    	request.post(catalyze.getContext());
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.post(user.catalyze.getContext());
     } 
-	
-	
 
     public Object getContent(String key) {
         Object value = mJson.opt(key);
@@ -117,34 +123,196 @@ public class CustomClass extends CatalyzeObject {
      * @param user
      * @return CustomClass instance for CatalyzeUser user
      */
-    public static void getInstance(Catalyze catalyze, String customClassName, CatalyzeListener<CustomClass> callbackHandler){
-    	CustomClass cc = new CustomClass();
-    	responseListener = createListener(callbackHandler, cc);
-    	errorListener = createErrorListener(callbackHandler);
-    	CatalyzeRequest request = new CatalyzeRequest(CUSTOM_CLASS_URL + "/" + customClassName, null, responseListener, errorListener);
-    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
-    	request.get(catalyze.getContext());
+    public static CustomClass getInstance(CatalyzeUser user){
+    	CustomClass cc = new CustomClass(user);
+    	return cc;
     }
     
-    public void getCustomClass(String className, Catalyze catalyze, CatalyzeListener<CustomClass> callbackHandler){
+    /******
+     * Perform= API call to get a custom class
+     * TODO: Remove when dev portal can make them?
+     * @param className
+     * @param callbackHandler
+     */
+    public void get(String className, CatalyzeListener<CustomClass> callbackHandler){
     	CustomClass cc = new CustomClass();
-    	responseListener = createListener(callbackHandler, cc);
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
     	errorListener = createErrorListener(callbackHandler);
-    	CatalyzeRequest request = new CatalyzeRequest(CUSTOM_CLASS_URL + "/" + className, null, responseListener, errorListener);
-    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
-    	request.get(catalyze.getContext());
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className), null, responseListener, errorListener);
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.get(user.catalyze.getContext());
     }
     
-    public static void addInstance(String className, JSONObject newData, Catalyze catalyze, CatalyzeListener<CustomClass> callbackHandler){
+    /******
+     * Api call to add fields to a custom class
+     * TODO: Remove when dev portal can make them?
+     * @param className
+     * @param callbackHandler
+     */
+    public void addFields(String className, JSONObject newFields, CatalyzeListener<CustomClass> callbackHandler){
     	CustomClass cc = new CustomClass();
-    	responseListener = createListener(callbackHandler, cc);
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className), newFields, responseListener, errorListener);
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.put(user.catalyze.getContext());
+    }
+    
+    /******
+     * Api call to delete a custom class
+     * TODO: Remove when dev portal can make them?
+     * @param className
+     * @param callbackHandler
+     */
+    public void delete(String className, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className), null, responseListener, errorListener);
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.delete(user.catalyze.getContext());
+    }
+    
+    /**
+     * Perform API call to add an entry to a custom class
+     * @param className name of class to add entry to
+     * @param newData data to add as an entry
+     * @param callbackHandler 
+     */
+    public void addEntry(String className, JSONObject newData, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
     	errorListener = createErrorListener(callbackHandler);
     	CatalyzeRequest request = new CatalyzeRequest(CUSTOM_CLASS_URL + "/" + className, newData, responseListener, errorListener);
-    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
-    	request.post(catalyze.getContext());
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.post(user.catalyze.getContext());
     }
     
-    private static Response.Listener<JSONObject> createListener(final CatalyzeListener<CustomClass> callbackHandler, final CustomClass cc) {
+    /**
+     * Perform API call to retrieve an entry from a custom class
+     * @param className
+     * @param entryId
+     * @param catalyze
+     * @param callbackHandler
+     */
+    public void getEntry(String className, String entryId, Catalyze catalyze, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, entryId), null, responseListener, errorListener);
+    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
+    	request.get(catalyze.getContext());
+    }
+    
+    /**
+     * Perform api call to update an entry in a custom class, will write data to server as it is passed, so to do partial update first do a get.
+     * @param className Name of custom class
+     * @param entryId ID of entry to update
+     * @param newData New entry to save 
+     * @param catalyze
+     * @param callbackHandler
+     */
+    public void updateEntry(String className, String entryId, JSONObject newData, Catalyze catalyze, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerNoCCReturned(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, entryId), newData, responseListener, errorListener);
+    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
+    	request.put(catalyze.getContext());
+    }
+    
+    /**
+     * Perform api call to delete an entry within a custom class
+     * @param className Name of custom class
+     * @param entryId ID of entry to delete
+     * @param callbackHandler
+     */
+    public void deleteEntry(String className, String entryId, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerNoCCReturned(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, entryId), null	, responseListener, errorListener);
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.delete(user.catalyze.getContext());
+    }
+    
+    //TODO Custom class array items need to be fully implemented
+    /**
+     * Perform api call to retreive array of custom class objects
+     * @param className Name of custom class
+     * @param entryId ID of entry to delete
+     * @param refName 
+     * @param callbackHandler
+     */
+    public void getArray(String className, String entryId, String refName, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, entryId, REF, refName), null	, responseListener, errorListener);
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.get(user.catalyze.getContext());
+    }
+    
+    //FIXME
+    public void addReferenceArray(String className, String entryId, String refName, Catalyze catalyze, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, entryId, REF, refName), null	, responseListener, errorListener);
+    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
+    	request.put(catalyze.getContext());
+    }
+    
+    public void getArrayRef(String className, String entryId, String refName, String refId, Catalyze catalyze, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, entryId, REF, refName, refId), null	, responseListener, errorListener);
+    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
+    	request.get(catalyze.getContext());
+    }
+    
+    /**
+     * Get custom class url with arguments appended to base url with "/" separating	 each
+     * @param args
+     * @return
+     */
+    private String getCustomClassUrl(String... args){
+    	String url = CUSTOM_CLASS_URL;
+    	for(String s : args){
+    		url += "/" + s;
+    	}
+    	return url;
+    }
+
+	/**
+	 * Volley response handler for custom class, takes the JSONObject response
+	 * and sets the CustomClasses json to this then returns it to user callback
+	 * handler
+	 * 
+	 * @param callbackHandler
+	 * @param cc 
+	 * @return
+	 */
+    private static Response.Listener<JSONObject> createListenerWithCCReturn(final CatalyzeListener<CustomClass> callbackHandler, final CustomClass cc) {
+        return new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                	cc.setJson(response);
+                	callbackHandler.onSuccess(cc);
+            }
+		};
+	}
+    
+    /**
+     * Volley response handler for custom class, takes the JSONObject response
+	 * and sets the CustomClasses json to this then returns it to user callback
+	 * handler
+     * @param callbackHandler
+     * @param cc
+     * @return
+     */
+    private static Response.Listener<JSONObject> createListenerNoCCReturned(final CatalyzeListener<CustomClass> callbackHandler, final CustomClass cc) {
         return new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -163,21 +331,5 @@ public class CustomClass extends CatalyzeObject {
 //            }
 //		};
 //	}
-    
-    /***
-	 * FIXME add additional error reporting
-	 * Generic error handler
-	 * @return
-	 */	
-	private static Response.ErrorListener createErrorListener(final CatalyzeListener<CustomClass> callbackHandler) {
-		return new Response.ErrorListener() {
-			
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				CatalyzeError ce = (CatalyzeError) error;
-				callbackHandler.onError(ce);
-			}
-		};
-	}
     
 }

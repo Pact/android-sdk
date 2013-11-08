@@ -2,6 +2,8 @@ package io.catalyze.sdk.android;
 
 import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.common.base.Objects;
 
 import org.json.JSONArray;
@@ -13,12 +15,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created by mvolkhart on 8/26/13.
+ * Base class for different Catalyze objects
+ *
  */
 public abstract class CatalyzeObject{
     protected JSONObject mJson;
     protected static TextView mResult;
-   
+    protected Response.ErrorListener errorListener;
+    protected Response.Listener<JSONObject> responseListener;
 
     public CatalyzeObject() {
         this(new JSONObject());
@@ -109,5 +113,21 @@ public abstract class CatalyzeObject{
         return null;
     }
 
-
+    /**
+	 * Generic volley error callback handler, returns a CatalyzeError back to
+	 * the user passed callback handler
+	 * 
+	 * @param userCallback
+	 * @return
+	 */
+	protected static <T> Response.ErrorListener createErrorListener(
+			final CatalyzeListener<T> userCallback) {
+		return new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				CatalyzeError ce = new CatalyzeError(error);
+				userCallback.onError(ce);
+			}
+		};
+	}
 }

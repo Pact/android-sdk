@@ -1,6 +1,9 @@
 package io.catalyze.sdk.android;
 
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.android.volley.Response;
 
 
 /**
@@ -12,9 +15,19 @@ public class Query extends CatalyzeObject {
     private static final String SEARCH_BY = "searchBy";
     private static final String PAGE_NUMBER = "pageNumber";
     private static final String PAGE_SIZE = "pageSize";
-
-    public Query() {
+    private static final String QUERY_ROUTE = "";
+    private String customClassName;
+    private int pageSize;
+    private int pageNumber;
+    private String queryField;
+    private String queryValue;
+    
+    
+    
+    
+    public Query(String className) {
         super();
+        customClassName = className;
     }
 
     public String getField() {
@@ -30,27 +43,24 @@ public class Query extends CatalyzeObject {
         return mJson.optString(SEARCH_BY, null);
     }
 
-    public Query setSearchBy(String data) {
+    public void setSearchBy(String data) {
         setSomething(SEARCH_BY, data);
-        return this;
     }
 
-    public Query setPageNumber(int pageNumber) {
+    public void setPageNumber(int pageNumber) {
         try {
             mJson.put(PAGE_NUMBER, pageNumber);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return this;
     }
 
-    public Query setPageSize(int pageSize) {
+    public void setPageSize(int pageSize) {
         try {
             mJson.put(PAGE_SIZE, pageSize);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return this;
     }
 
     private void setSomething(String key, String value) {
@@ -60,4 +70,23 @@ public class Query extends CatalyzeObject {
             e.printStackTrace();
         }
     }
+    
+    public void executeQuery(Catalyze catalyze, CatalyzeListener<Query> callbackHandler){
+    	responseListener = createListener(callbackHandler, this);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(QUERY_ROUTE, null, responseListener, errorListener);
+    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
+    	request.get(catalyze.getContext());
+    }
+    
+    private static Response.Listener<JSONObject> createListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
+        return new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                	q.setJson(response);
+                	callbackHandler.onSuccess(q);
+            }
+		};
+	}
+    
 }

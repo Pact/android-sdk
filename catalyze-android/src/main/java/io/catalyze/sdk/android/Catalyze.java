@@ -13,30 +13,42 @@ import android.content.Context;
 import android.widget.TextView;
 
 /**
- * Created by mvolkhart on 8/24/13.
+ * Base class for making Catalyze.io API calls. This class must be instantiated
+ * with an API key and Application identifier before any api calls can be made.
+ * Once Catalyze has been instantiated it can be used to generate an
+ * authenticated CatalyzeUser instance that will be associated with this
+ * instance of Catalyze.
+ * 
+ * Any API routes being performed must be provided a CatalyzeListener. Upon
+ * completion of API request the provided CatalyzeListener will be called with
+ * either a success or error response.
+ * 
+ * All API calls are handled asynchronously, if calls require a fixed order,
+ * this must be handled outside of the Catalyze Android SDK
  */
-public class Catalyze{
-    
-    protected String apiKey;
-    private final static String baseUrl = "https://api.catalyze.io";
-    
-    protected static TextView mResult;
-    private static final String AUTHORIZED = "authorized";
-    private static final String SIGNIN_URL = "https://api.catalyze.io/v1/auth/signin";
-    private static final String SIGNUP_URL = "https://api.catalyze.io/v1/user";
-    private static final String USER_LOCATION_URL = "https://api.catalyze.io/v1/user";
-    private static final String ANDROID = "android";
-    private final String identifier;
-    private CatalyzeUser user;
-    private Context appContext;
-    
-    public Catalyze(String apiKey, String identifier, Context context){
-    	this.apiKey = apiKey;
-    	appContext = context;
-    	this.identifier = identifier;
-    }
-    
-    /**
+public class Catalyze {
+
+	protected String apiKey;
+	protected static TextView mResult;
+	private static final String ANDROID = "android";
+	private final String identifier;
+	private CatalyzeUser user;
+	private Context appContext;
+
+	/**
+	 * Create a Catalyze interface for making authenticated api calls
+	 * 
+	 * @param apiKey
+	 * @param identifier
+	 * @param context
+	 */
+	public Catalyze(String apiKey, String identifier, Context context) {
+		this.apiKey = apiKey;
+		appContext = context;
+		this.identifier = identifier;
+	}
+
+	/**
 	 * Catalyze Constructor for logging in an existing user
 	 * 
 	 * @param apiKey
@@ -44,108 +56,101 @@ public class Catalyze{
 	 * @param password
 	 * @param context
 	 */
-	public Catalyze(String apiKey, String identifier, String userName, String password,
-			CatalyzeListener<CatalyzeUser> handleResponse, Context context) {
+	public Catalyze(String apiKey, String identifier, String userName,
+			String password, CatalyzeListener<CatalyzeUser> handleResponse,
+			Context context) {
 		this.apiKey = apiKey;
 		user = new CatalyzeUser(this);
-    	user.getAuthenticatedUser(userName, password, handleResponse, context);
-    	appContext = context;
-    	this.identifier = identifier;
-    }
-    
-    /***
-	 * Catalyze constructor for signing up a new new user
+		user.getAuthenticatedUser(userName, password, handleResponse, context);
+		appContext = context;
+		this.identifier = identifier;
+	}
+
+	public void updateContext(Context context) {
+		this.appContext = context;
+	}
+
+	protected Context getContext() {
+		return appContext;
+	}
+
+	protected CatalyzeUser getUser() {
+		return user;
+	}
+
+	/**
 	 * 
-	 * @param apiKey
+	 * @param userName
+	 * @param password
+	 * @param callbackHandler
+	 */
+	public void getUser(String userName, String password,
+			CatalyzeListener<CatalyzeUser> callbackHandler) {
+		user = new CatalyzeUser(this);
+		user.getAuthenticatedUser(userName, password, callbackHandler,
+				appContext);
+	}
+
+	/**
+	 * Perform API call to create a new user for this application. Will return a
+	 * CatalyzeUser to the provided callback function
+	 * 
 	 * @param userName
 	 * @param password
 	 * @param firstName
 	 * @param lastName
-	 * @param context
+	 * @param callbackHandler
 	 */
-//	public Catalyze(String apiKey, String userName, String password,
-//			String firstName, String lastName,
-//			Response.Listener<JSONObject> handleResponse, Context context) {
-//		this.apiKey = apiKey;
-//		user = new CatalyzeUser(apiKey);
-//		user.signUp(userName, password, firstName, lastName, context);
-//	}
-	
-	public void updateContext(Context context){
-		this.appContext = context;
-	}
-	
-	protected Context getContext(){
-		return appContext;
-	}
-	
-	protected CatalyzeUser getUser(){
-		return user;
-	}
-	
-	public void getUser(String userName, String password, CatalyzeListener<CatalyzeUser> callbackHandler){
+	public void signUp(String userName, String password, String firstName,
+			String lastName, CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user = new CatalyzeUser(this);
-		user.getAuthenticatedUser(userName, password, callbackHandler, appContext);
-		//return user;
+		user.signUp(userName, password, firstName, lastName, callbackHandler,
+				appContext);
 	}
-	
-	public void signUp(String userName, String password, String firstName, String lastName, CatalyzeListener<CatalyzeUser> callbackHandler){
-		user = new CatalyzeUser(this);
-		user.signUp(userName, password, firstName, lastName, callbackHandler, appContext);
-		//return user;
-	}
-	
-	public void logoutCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler){
+
+	/**
+	 * Log out the current user
+	 * 
+	 * @param callbackHandler
+	 */
+	public void logoutCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user.signOut(callbackHandler, appContext);
 	}
-	
-	public void deleteCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler){
+
+	/**
+	 * Delete the user currently associated with Catalyze
+	 * 
+	 * @param callbackHandler
+	 */
+	public void deleteCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user.deleteUser(callbackHandler, appContext);
 	}
 
 	protected String getAPIKey() {
 		return apiKey;
 	}
-	
-	protected Map<String, String> getDefaultHeaders(){
+
+	/**
+	 * Returns headers required for a non-user authorized API call
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getDefaultHeaders() {
 		Map<String, String> headers = new HashMap<String, String>();
-		//headers.put("X-Api-Key", "android io.catalyze.example " + getAPIKey());
-		headers.put("X-Api-Key", "android " +  identifier + " " + getAPIKey());
+		headers.put("X-Api-Key", ANDROID + " " + identifier + " " + getAPIKey());
 		headers.put("Content-Type", "application/json");
 		return headers;
 	}
 
 	/**
-	 * Returns the currently signed in user. If no user has been previously created will return null
+	 * Returns the currently signed in user. If no user has been previously
+	 * created will return null
+	 * 
 	 * @return
 	 */
 	public CatalyzeUser getCurrentUser() {
 		return user;
 	}
+
 	
-	/***
-	 * FIXME add additional error reporting
-	 * Generic error handler
-	 * @return
-	 */	
-	protected Response.ErrorListener createErrorListener(final CatalyzeListener<CatalyzeUser> userCallback) {
-		return new Response.ErrorListener() {
-			
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				JSONObject e = new JSONObject();
-				CatalyzeError ce = new CatalyzeError(error);
-				try {
-					e = new JSONObject();
-					e.put("error", error.toString());
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				userCallback.onError(ce);
-			}
-		};
-	}
-    
-    
 }
