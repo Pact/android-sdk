@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
 	private CustomClass customClass;
 	private static final String APIKey = "1ca769ce-07b3-40bf-95c0-2feda3e3c909";
 	private Object synchObj = new Object();										
-																				
+	private Query query;
 	private static final String api = "1f077962-18cc-4ade-8075-d9fa1642f316";
 	private static final String identifier = "android.example";
 	private boolean waitingForResponse;
@@ -85,17 +85,17 @@ public class MainActivity extends Activity {
 						}
 						
 						
-						cc.delete(classname, newCCHandler());
-						JSONObject newInstance = new JSONObject();
-						try {
-							newInstance.put("name", "philip");
-							newInstance.put("occupation", "barber");
-							newInstance.put("location", "somewhere");
-							newInstance.put("age", 55);
-						} catch (JSONException e) {
-
-						}
-						
+//						cc.delete(classname, newCCHandler());
+//						JSONObject newInstance = new JSONObject();
+//						try {
+//							newInstance.put("name", "philip");
+//							newInstance.put("occupation", "barber");
+//							newInstance.put("location", "somewhere");
+//							newInstance.put("age", 55);
+//						} catch (JSONException e) {
+//
+//						}
+						cc.createCustomClass(classname, false, schema, newCCHandler());
 						//cc.addInstance(classname, newInstance, newCCHandler());
 						//cc.get(classname, newCCHandler());
 
@@ -152,28 +152,29 @@ public class MainActivity extends Activity {
 						mUser.setPhoneNumber("9876543210");
 						mUser.setZipCode(new ZipCode("54321"));
 						mUser.update(newUserResponseHandler());
-					}
-				});
+			}
+		});
 
-		findViewById(R.id.customClasses).setOnClickListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						CustomClass cc = CustomClass.getInstance(mUser);
-						//cc.get("ccTest1", newCCHandler());
-						JSONObject newInstance = new JSONObject();
-						try {
-							newInstance.put("name", "philip");
-							newInstance.put("occupation", "barber");
-							newInstance.put("location", "somewhere");
-							newInstance.put("age", 55);
-						} catch (JSONException e) {
+		findViewById(R.id.customClasses).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				CustomClass cc = CustomClass.getInstance(mUser);
+				//cc.query("ccTest1", newCCHandler());
+				Query q = new Query("ccTest1");
+				q.executeQuery(catalyze, newQueryHandler());
+				// cc.get("ccTest1", newCCHandler());
+				JSONObject newInstance = new JSONObject();
+				try {
+					newInstance.put("name", "philip");
+					newInstance.put("occupation", "barber");
+					newInstance.put("location", "somewhere");
+					newInstance.put("age", 55);
+				} catch (JSONException e) {
 
-						}
-						cc.addEntry("ccTest2" +
-								"", newInstance, newCCHandler());
-					}
-				});
+				}
+				//cc.addEntry("ccTest2" + "", newInstance, newCCHandler());
+			}
+		});
 
 		findViewById(R.id.DeleteUser).setOnClickListener(
 				new View.OnClickListener() {
@@ -250,6 +251,26 @@ public class MainActivity extends Activity {
 				// TODO Auto-generated method stub
 				waitingForResponse = false;
 				customClass = response;
+			}
+
+		};
+	}
+	
+	private CatalyzeListener<Query> newQueryHandler() {
+		return new CatalyzeListener<Query>() {
+
+			@Override
+			public void onError(CatalyzeError response) {
+				// TODO Auto-generated method stub
+				waitingForResponse = false;
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(Query response) {
+				// TODO Auto-generated method stub
+				waitingForResponse = false;
+				query = response;
 			}
 
 		};

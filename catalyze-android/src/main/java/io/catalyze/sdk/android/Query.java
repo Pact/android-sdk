@@ -1,5 +1,6 @@
 package io.catalyze.sdk.android;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,15 +16,14 @@ public class Query extends CatalyzeObject {
     private static final String SEARCH_BY = "searchBy";
     private static final String PAGE_NUMBER = "pageNumber";
     private static final String PAGE_SIZE = "pageSize";
-    private static final String QUERY_ROUTE = "";
+    private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
     private String customClassName;
-    private int pageSize;
-    private int pageNumber;
-    private String queryField;
-    private String queryValue;
+    private JSONArray json;
+    private Response.Listener<JSONArray> responseListener;
     
-    
-    
+    private void setJson(JSONArray json){
+    	this.json = json;
+    }
     
     public Query(String className) {
         super();
@@ -74,16 +74,16 @@ public class Query extends CatalyzeObject {
     public void executeQuery(Catalyze catalyze, CatalyzeListener<Query> callbackHandler){
     	responseListener = createListener(callbackHandler, this);
     	errorListener = createErrorListener(callbackHandler);
-    	CatalyzeRequest request = new CatalyzeRequest(QUERY_ROUTE, null, responseListener, errorListener);
+    	CatalyzeRequest request = new CatalyzeRequest(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
     	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
-    	request.get(catalyze.getContext());
+    	request.post(catalyze.getContext());
     }
     
-    private static Response.Listener<JSONObject> createListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
-        return new Response.Listener<JSONObject>() {
+    private static Response.Listener<JSONArray> createListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
+        return new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONObject response) {
-                	q.setJson(response);
+            public void onResponse(JSONArray response) {
+            		q.setJson(response);
                 	callbackHandler.onSuccess(q);
             }
 		};

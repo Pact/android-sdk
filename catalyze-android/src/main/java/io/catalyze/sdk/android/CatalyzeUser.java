@@ -53,9 +53,9 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
 
 	// URL s
-	private static final String SIGNIN_URL = "https://api.catalyze.io/v1/auth/signin";
-	private static final String SIGOUT_URL = "https://api.catalyze.io/v1/auth/signout";
-	private static final String USER_ROUTE = "https://api.catalyze.io/v1/user";
+	private static final String SIGNIN_URL = Catalyze.BASE_URL +  "auth/signin";
+	private static final String SIGOUT_URL = Catalyze.BASE_URL + "auth/signout";
+	private static final String USER_ROUTE = Catalyze.BASE_URL + "user";
 	private String userSessionToken;
 	Catalyze catalyze;
 
@@ -63,7 +63,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		this.catalyze = catalyze;
 	}
 
-	public CatalyzeUser(JSONObject json) {
+	public CatalyzeUser(JSONObject json) {	
 		super(json);
 	}
 

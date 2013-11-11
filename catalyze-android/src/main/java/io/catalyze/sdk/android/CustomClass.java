@@ -16,7 +16,7 @@ import android.content.Context;
 public class CustomClass extends CatalyzeObject {
 
 	//URL CONSTANTS
-	private static final String CUSTOM_CLASS_URL = "https://api.catalyze.io/v1/classes";
+	private static final String CUSTOM_CLASS_URL = Catalyze.BASE_URL + "classes";
 	
 	private static final String NAME = "name";
     private static final String CONTENT = "content";
@@ -236,7 +236,7 @@ public class CustomClass extends CatalyzeObject {
     	request.delete(user.catalyze.getContext());
     }
     
-    //TODO Custom class array items need to be fully implemented
+    //TODO Custom class/foreign key array items need to be fully implemented
     /**
      * Perform api call to retreive array of custom class objects
      * @param className Name of custom class
@@ -270,6 +270,15 @@ public class CustomClass extends CatalyzeObject {
     	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, entryId, REF, refName, refId), null	, responseListener, errorListener);
     	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
     	request.get(catalyze.getContext());
+    }
+    
+    public void query(String className, CatalyzeListener<CustomClass> callbackHandler){
+    	CustomClass cc = new CustomClass();
+    	responseListener = createListenerWithCCReturn(callbackHandler, cc);
+    	errorListener = createErrorListener(callbackHandler);
+    	CatalyzeRequest request = new CatalyzeRequest(getCustomClassUrl(className, "query"), null	, responseListener, errorListener);
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.post(user.catalyze.getContext());
     }
     
     /**
@@ -322,6 +331,7 @@ public class CustomClass extends CatalyzeObject {
 		};
 	}
     
+    //Foreign key callback
 //    private static Response.Listener<JSONObject> createListener(final CatalyzeListener<CustomClass[]> callbackHandler, final CustomClass[] cc) {
 //        return new Response.Listener<JSONObject>() {
 //            @Override

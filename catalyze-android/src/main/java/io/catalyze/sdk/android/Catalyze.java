@@ -34,6 +34,7 @@ public class Catalyze {
 	private final String identifier;
 	private CatalyzeUser user;
 	private Context appContext;
+	protected static final String BASE_URL = "https://api.catalyze.io/v1/";
 
 	/**
 	 * Create a Catalyze interface for making authenticated api calls
