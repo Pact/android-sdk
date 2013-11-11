@@ -161,6 +161,10 @@ public class MainActivity extends Activity {
 				CustomClass cc = CustomClass.getInstance(mUser);
 				//cc.query("ccTest1", newCCHandler());
 				Query q = new Query("ccTest1");
+				q.setField("");
+				q.setPageNumber(1);
+				q.setSearchBy("");
+				q.setPageSize(25);
 				q.executeQuery(catalyze, newQueryHandler());
 				// cc.get("ccTest1", newCCHandler());
 				JSONObject newInstance = new JSONObject();
@@ -271,6 +275,7 @@ public class MainActivity extends Activity {
 				// TODO Auto-generated method stub
 				waitingForResponse = false;
 				query = response;
+				System.out.println("Query response completed succesfully");
 			}
 
 		};

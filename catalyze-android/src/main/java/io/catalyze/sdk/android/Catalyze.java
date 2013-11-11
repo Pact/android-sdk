@@ -3,12 +3,6 @@ package io.catalyze.sdk.android;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-
 import android.content.Context;
 import android.widget.TextView;
 

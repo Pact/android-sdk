@@ -1,34 +1,31 @@
 package io.catalyze.sdk.android;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.widget.TextView;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.*;
-import com.android.volley.*;
-import com.google.common.collect.ImmutableMap;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by mvolkhart on 8/24/13. CatalzeRequest is an extension of This class
  * handles all Catalyze network requests
+ * @param <T>
  */
-public class CatalyzeRequest extends JsonObjectRequest {
+public class CatalyzeRequest<T> extends JsonRequest<T> {
 
 	public static final String BASE_PATH = "https://api.catalyze.io/v1";
 	private Map<String, String> mHeaders = new HashMap<String, String>();
@@ -36,10 +33,11 @@ public class CatalyzeRequest extends JsonObjectRequest {
 	private static TextView mResult;
 	private int mMethod;
 
-	public CatalyzeRequest(String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener,
+	@SuppressWarnings("deprecation")
+	public CatalyzeRequest(String url, JSONObject jsonRequest, Response.Listener<T> listener,
 			Response.ErrorListener errorListener) {
-
-		super(url, jsonRequest, listener, errorListener);
+		super(url, jsonRequest.toString(), listener, errorListener);
+		//super(url, jsonRequest, listener, errorListener);
 	}
 
 	/**
@@ -55,11 +53,11 @@ public class CatalyzeRequest extends JsonObjectRequest {
 	 *            Handler for Volley error response
 	 * @param headers
 	 */
-	public CatalyzeRequest(String url, JSONObject jsonBody, Response.Listener<JSONObject> listener,
-			Response.ErrorListener errorListener, Map<String, String> headers) {
-		super(url, jsonBody, listener, errorListener);
-		mHeaders = headers;
-	}
+//	public CatalyzeRequest(String url, JSONObject jsonBody, Response.Listener<JSONObject> listener,
+//			Response.ErrorListener errorListener, Map<String, String> headers) {
+//		super(url, jsonBody, listener, errorListener);
+//		mHeaders = headers;
+//	}
 
 	@Override
 	public Map<String, String> getHeaders() {
@@ -140,5 +138,25 @@ public class CatalyzeRequest extends JsonObjectRequest {
 			return mRequestQueue;
 		} else
 			return mRequestQueue;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected Response<T> parseNetworkResponse(NetworkResponse response) {
+		try {
+			String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+
+			if (jsonString.charAt(0) == '{') {
+				return (Response<T>) Response.success(new JSONObject(jsonString),
+						HttpHeaderParser.parseCacheHeaders(response));
+			} else {
+				return (Response<T>) Response.success(new JSONArray(jsonString),
+						HttpHeaderParser.parseCacheHeaders(response));
+			}
+		} catch (UnsupportedEncodingException e) {
+			return Response.error(new ParseError(e));
+		} catch (JSONException je) {
+			return Response.error(new ParseError(je));
+		} 
 	}
 }

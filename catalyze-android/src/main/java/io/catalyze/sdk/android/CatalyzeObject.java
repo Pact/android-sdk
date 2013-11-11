@@ -23,22 +23,32 @@ public abstract class CatalyzeObject{
     protected static TextView mResult;
     protected Response.ErrorListener errorListener;
     protected Response.Listener<JSONObject> responseListener;
-
-    public CatalyzeObject() {
-        this(new JSONObject());
-    }
-
-    protected CatalyzeObject(JSONObject json) {
-        mJson = json;
-    }
+    protected JSONArray mJsonArray;
     
-    public void setJson(JSONObject json){
-    	mJson = json;
-    }
+	public CatalyzeObject() {
+		this(new JSONObject());
+	}
 
-    public JSONObject asJson() {
-        return mJson;
-    }
+	protected CatalyzeObject(JSONObject json) {
+		mJson = json;
+	}
+
+	protected void setJson(JSONObject json) {
+		mJson = json;
+	}
+
+	public JSONObject asJson() {
+		return mJson;
+	}
+
+	public JSONArray asJsonArray(){
+		return mJsonArray;
+	}
+	
+	protected void setJsonArray(JSONArray json) {
+		mJsonArray = json;
+	}
+
 
     protected Map<String, Object> handleJSONObject(JSONObject object) {
         Map<String, Object> retVal = new HashMap<String, Object>();

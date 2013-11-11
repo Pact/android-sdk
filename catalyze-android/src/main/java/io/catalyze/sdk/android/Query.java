@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.volley.Response;
+import com.android.volley.toolbox.JsonArrayRequest;
 
 
 /**
@@ -18,12 +19,6 @@ public class Query extends CatalyzeObject {
     private static final String PAGE_SIZE = "pageSize";
     private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
     private String customClassName;
-    private JSONArray json;
-    private Response.Listener<JSONArray> responseListener;
-    
-    private void setJson(JSONArray json){
-    	this.json = json;
-    }
     
     public Query(String className) {
         super();
@@ -72,21 +67,39 @@ public class Query extends CatalyzeObject {
     }
     
     public void executeQuery(Catalyze catalyze, CatalyzeListener<Query> callbackHandler){
-    	responseListener = createListener(callbackHandler, this);
+    	Response.Listener<JSONArray> responseListener = testListener(callbackHandler, this);
     	errorListener = createErrorListener(callbackHandler);
-    	CatalyzeRequest request = new CatalyzeRequest(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
+    	CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
     	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
     	request.post(catalyze.getContext());
     }
     
-    private static Response.Listener<JSONArray> createListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
+//    public void executeQuery(Catalyze catalyze, CatalyzeListener<Query> callbackHandler){
+//    	Response.Listener<JSONArray> responseListener;
+//    	responseListener = testListener(callbackHandler, this);
+//    	errorListener = createErrorListener(callbackHandler);
+//    	JsonArrayRequest r = new JsonArrayRequest(QUERY_ROUTE + customClassName + "/query", null, errorListener);
+//    	//CatalyzeRequest request = new CatalyzeRequest(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
+////    	r.setHeaders(catalyze.getUser().getAuthorizedHeaders());
+////    	r.post(catalyze.getContext());
+//    }
+//    
+//    private static Response.Listener<JSONObject> createListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
+//        return new Response.Listener<JSONObject>() {
+//            @Override
+//            public void onResponse(JSONObject response) {
+//                	q.setJson(response);
+//                	callbackHandler.onSuccess(q);
+//            }
+//		};
+//	}
+    private static Response.Listener<JSONArray> testListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
         return new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-            		q.setJson(response);
+                	q.setJsonArray(response);
                 	callbackHandler.onSuccess(q);
             }
 		};
 	}
-    
 }
