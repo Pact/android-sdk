@@ -37,11 +37,11 @@ public abstract class CatalyzeObject{
 		mJson = json;
 	}
 
-	public JSONObject asJson() {
+	protected JSONObject asJson() {
 		return mJson;
 	}
 
-	public JSONArray asJsonArray(){
+	protected JSONArray asJsonArray(){
 		return mJsonArray;
 	}
 	

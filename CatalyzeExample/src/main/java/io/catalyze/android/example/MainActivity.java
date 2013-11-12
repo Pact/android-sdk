@@ -73,18 +73,18 @@ public class MainActivity extends Activity {
 						waitingForResponse = true;
 
 						CustomClass cc = CustomClass.getInstance(mUser);
-						
-						JSONObject schema = new JSONObject();
-						try {
-							schema.put("name", "string");
-							schema.put("occupation", "string");
-							schema.put("location", "string");
-							schema.put("age", "integer");
-						} catch (JSONException e) {
-
-						}
-						
-						
+//						
+//						JSONObject schema = new JSONObject();
+//						try {
+//							schema.put("name", "string");
+//							schema.put("occupation", "string");
+//							schema.put("location", "string");
+//							schema.put("age", "integer");
+//						} catch (JSONException e) {
+//
+//						}
+//						
+						cc.get("MyNewClass", newCCHandler());
 //						cc.delete(classname, newCCHandler());
 //						JSONObject newInstance = new JSONObject();
 //						try {
@@ -95,7 +95,7 @@ public class MainActivity extends Activity {
 //						} catch (JSONException e) {
 //
 //						}
-						cc.createCustomClass(classname, false, schema, newCCHandler());
+						//cc.createCustomClass(classname, false, schema, newCCHandler());
 						//cc.addInstance(classname, newInstance, newCCHandler());
 						//cc.get(classname, newCCHandler());
 
@@ -142,7 +142,7 @@ public class MainActivity extends Activity {
 						// catalyze.getUser("test@user.com", "testpass",
 						// newUserResposneHandler());
 
-						mUser.setStreet("1 E Main St");
+						//mUser.setStreet("1 E Main St");
 						mUser.setAge(55);
 						mUser.setCity("Madison");
 						mUser.setState("Wisconsin");

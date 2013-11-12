@@ -2,10 +2,7 @@ package io.catalyze.sdk.android;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.android.volley.Response;
-import com.android.volley.toolbox.JsonArrayRequest;
 
 
 /**
@@ -93,6 +90,16 @@ public class Query extends CatalyzeObject {
 //            }
 //		};
 //	}
+    private static Response.Listener<JSONArray> testListener2(final CatalyzeListener<CustomClass[]> callbackHandler, final CustomClass[] results) {
+        return new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+//                	q.setJsonArray(response);
+//                	callbackHandler.onSuccess(q);
+            }
+		};
+	}
+    
     private static Response.Listener<JSONArray> testListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
         return new Response.Listener<JSONArray>() {
             @Override

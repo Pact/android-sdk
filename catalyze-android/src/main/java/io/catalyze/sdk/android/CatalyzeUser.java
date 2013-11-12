@@ -482,6 +482,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		request.setHeaders(headers);
 		request.get(context);
 	}
+	
+	
 
 	/**
 	 * Return HTTP headers needed for authorized api calls
@@ -553,7 +555,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	/***
 	 * FIXME Maybe figure out a better way around this bug? Specialized error
 	 * listener for use in delete and signout path to deal with "End of input"
-	 * json error
+	 * json error - test that this is fixed
 	 * 
 	 * @return
 	 */

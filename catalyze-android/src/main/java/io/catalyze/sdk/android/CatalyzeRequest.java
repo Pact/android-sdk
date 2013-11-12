@@ -8,8 +8,6 @@ import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.*;
 
 import org.json.JSONArray;
@@ -39,26 +37,8 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 		super(url, jsonRequest.toString(), listener, errorListener);
 		//super(url, jsonRequest, listener, errorListener);
 	}
-
-	/**
-	 * Make a new HTTP request
-	 * 
-	 * @param url
-	 * @param jsonBody
-	 *            JSON to send to server, can be left null if there is none to
-	 *            send
-	 * @param listener
-	 *            Handler for Volley success response
-	 * @param errorListener
-	 *            Handler for Volley error response
-	 * @param headers
-	 */
-//	public CatalyzeRequest(String url, JSONObject jsonBody, Response.Listener<JSONObject> listener,
-//			Response.ErrorListener errorListener, Map<String, String> headers) {
-//		super(url, jsonBody, listener, errorListener);
-//		mHeaders = headers;
-//	}
-
+	
+	
 	@Override
 	public Map<String, String> getHeaders() {
 		return mHeaders;
