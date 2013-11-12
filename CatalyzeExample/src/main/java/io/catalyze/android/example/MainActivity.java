@@ -160,22 +160,22 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				CustomClass cc = CustomClass.getInstance(mUser);
 				//cc.query("ccTest1", newCCHandler());
-				Query q = new Query("ccTest1");
+				Query q = new Query("MyNewClass");
 				q.setField("");
 				q.setPageNumber(1);
 				q.setSearchBy("");
 				q.setPageSize(25);
 				q.executeQuery(catalyze, newQueryHandler());
 				// cc.get("ccTest1", newCCHandler());
-				JSONObject newInstance = new JSONObject();
-				try {
-					newInstance.put("name", "philip");
-					newInstance.put("occupation", "barber");
-					newInstance.put("location", "somewhere");
-					newInstance.put("age", 55);
-				} catch (JSONException e) {
-
-				}
+//				JSONObject newInstance = new JSONObject();
+//				try {
+//					newInstance.put("name", "philip");
+//					newInstance.put("occupation", "barber");
+//					newInstance.put("location", "somewhere");
+//					newInstance.put("age", 55);
+//				} catch (JSONException e) {
+//
+//				}
 				//cc.addEntry("ccTest2" + "", newInstance, newCCHandler());
 			}
 		});

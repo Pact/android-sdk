@@ -1,7 +1,10 @@
 package io.catalyze.sdk.android;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import com.android.volley.Response;
 
 
@@ -16,10 +19,11 @@ public class Query extends CatalyzeObject {
     private static final String PAGE_SIZE = "pageSize";
     private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
     private String customClassName;
-    
+    public ArrayList<CustomClass> queryResults;
     public Query(String className) {
         super();
         customClassName = className;
+        queryResults = new ArrayList<CustomClass>();
     }
 
     public String getField() {
@@ -69,42 +73,20 @@ public class Query extends CatalyzeObject {
     	CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
     	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
     	request.post(catalyze.getContext());
-    }
-    
-//    public void executeQuery(Catalyze catalyze, CatalyzeListener<Query> callbackHandler){
-//    	Response.Listener<JSONArray> responseListener;
-//    	responseListener = testListener(callbackHandler, this);
-//    	errorListener = createErrorListener(callbackHandler);
-//    	JsonArrayRequest r = new JsonArrayRequest(QUERY_ROUTE + customClassName + "/query", null, errorListener);
-//    	//CatalyzeRequest request = new CatalyzeRequest(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
-////    	r.setHeaders(catalyze.getUser().getAuthorizedHeaders());
-////    	r.post(catalyze.getContext());
-//    }
-//    
-//    private static Response.Listener<JSONObject> createListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
-//        return new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//                	q.setJson(response);
-//                	callbackHandler.onSuccess(q);
-//            }
-//		};
-//	}
-    private static Response.Listener<JSONArray> testListener2(final CatalyzeListener<CustomClass[]> callbackHandler, final CustomClass[] results) {
-        return new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-//                	q.setJsonArray(response);
-//                	callbackHandler.onSuccess(q);
-            }
-		};
-	}
+    }  
     
     private static Response.Listener<JSONArray> testListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
         return new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                	q.setJsonArray(response);
+                	//q.setJsonArray(response);
+            	for(int i = 0; i < response.length(); i++){
+            		try {
+						q.queryResults.add(new CustomClass(response.getJSONObject(i)));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+            	}
                 	callbackHandler.onSuccess(q);
             }
 		};
