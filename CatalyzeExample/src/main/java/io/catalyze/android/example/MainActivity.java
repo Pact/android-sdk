@@ -32,7 +32,6 @@ public class MainActivity extends Activity {
 	private Query query;
 	private static final String api = "1f077962-18cc-4ade-8075-d9fa1642f316";
 	private static final String identifier = "android.example";
-	private boolean waitingForResponse;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +69,9 @@ public class MainActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						String classname = "ccTest1";
-						waitingForResponse = true;
-
-						CustomClass cc = CustomClass.getInstance(mUser);
+						
+						if(customClass == null) customClass = CustomClass.getInstance(mUser);
+						
 //						
 //						JSONObject schema = new JSONObject();
 //						try {
@@ -84,7 +83,12 @@ public class MainActivity extends Activity {
 //
 //						}
 //						
-						cc.get("MyNewClass", newCCHandler());
+						//cc.get("MyNewClass", newCCHandler());
+						JSONObject newData = new JSONObject();
+						
+						//cc.getEntry("MyNewClass", "5282742e11709322bbbb9e37", newCCHandler());
+						customClass.putContent("city", "chicago");
+						customClass.updateEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
 //						cc.delete(classname, newCCHandler());
 //						JSONObject newInstance = new JSONObject();
 //						try {
@@ -158,14 +162,16 @@ public class MainActivity extends Activity {
 		findViewById(R.id.customClasses).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				CustomClass cc = CustomClass.getInstance(mUser);
+				if(customClass == null) customClass = CustomClass.getInstance(mUser);
+//				
 				//cc.query("ccTest1", newCCHandler());
-				Query q = new Query("MyNewClass");
-				q.setField("");
-				q.setPageNumber(1);
-				q.setSearchBy("");
-				q.setPageSize(25);
-				q.executeQuery(catalyze, newQueryHandler());
+//				Query q = new Query("MyNewClass");
+//				q.setField("");
+//				q.setPageNumber(1);
+//				q.setSearchBy("");
+//				q.setPageSize(25);
+//				q.executeQuery(catalyze, newQueryHandler());
+				customClass.getEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
 				// cc.get("ccTest1", newCCHandler());
 //				JSONObject newInstance = new JSONObject();
 //				try {
@@ -216,7 +222,6 @@ public class MainActivity extends Activity {
 			public void onSuccess(CatalyzeUser response) {
 				// TODO Auto-generated method stub
 				mUser = response;
-				waitingForResponse = false;
 				String s = "Successful operation!!!";
 				System.out.println(s);
 			}
@@ -245,15 +250,11 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onError(CatalyzeError response) {
-				// TODO Auto-generated method stub
-				waitingForResponse = false;
 				System.out.println("SOMETHING WENT WRONG");
 			}
 
 			@Override
 			public void onSuccess(CustomClass response) {
-				// TODO Auto-generated method stub
-				waitingForResponse = false;
 				customClass = response;
 			}
 
@@ -265,15 +266,11 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onError(CatalyzeError response) {
-				// TODO Auto-generated method stub
-				waitingForResponse = false;
 				System.out.println("SOMETHING WENT WRONG");
 			}
 
 			@Override
 			public void onSuccess(Query response) {
-				// TODO Auto-generated method stub
-				waitingForResponse = false;
 				query = response;
 				System.out.println("Query response completed succesfully");
 			}
@@ -286,15 +283,11 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onError(CatalyzeError response) {
-				// TODO Auto-generated method stub
-				waitingForResponse = false;
 				System.out.println("SOMETHING WENT WRONG");
 			}
 
 			@Override
 			public void onSuccess(CustomClass response) {
-				// TODO Auto-generated method stub
-				waitingForResponse = false;
 				customClass = response;
 			}
 

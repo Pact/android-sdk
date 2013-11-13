@@ -34,10 +34,8 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	@SuppressWarnings("deprecation")
 	public CatalyzeRequest(String url, JSONObject jsonRequest, Response.Listener<T> listener,
 			Response.ErrorListener errorListener) {
-		super(url, jsonRequest.toString(), listener, errorListener);
-		//super(url, jsonRequest, listener, errorListener);
+		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
 	}
-	
 	
 	@Override
 	public Map<String, String> getHeaders() {
@@ -107,9 +105,9 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	}
 
 	/**
-	 * FIXME: this could this go in constructor?
+	 * Return the Volley request queue or instantiate one if needed
 	 * 
-	 * @param context
+	 * @param context 
 	 * @return
 	 */
 	private RequestQueue getRequestQueue(Context context) {
