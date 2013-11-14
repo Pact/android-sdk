@@ -176,7 +176,10 @@ public class MainActivity extends Activity {
 //				q.setSearchBy("");
 //				q.setPageSize(25);
 //				q.executeQuery(catalyze, newQueryHandler());
-				customClass.getEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
+//				customClass.getEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
+//				customClass.getArrayRef("user", "5284ff081170cc2a30370937", "address", "5284fe141170cc2a30370935", newCCHandler());
+				//customClass.getArray("user", "5284ff081170cc2a30370937", "address", newCCHandler());
+				customClass.deleteArrayRef("user", "5284ff081170cc2a30370937", "address", "5284fe141170cc2a30370935", newCCHandler());
 				// cc.get("ccTest1", newCCHandler());
 //				JSONObject newInstance = new JSONObject();
 //				try {

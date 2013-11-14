@@ -13,7 +13,7 @@ public class CustomClass extends CatalyzeObject {
 	// URL CONSTANTS
 	private static final String CUSTOM_CLASS_URL = Catalyze.BASE_URL + "classes";
 
-	private static final String NAME = "name";
+	//private static final String NAME = "name";
 	private static final String CONTENT = "content";
 	private static final String PHI = "phi";
 	private static final String PARENT_ID = "parentId";
@@ -45,29 +45,6 @@ public class CustomClass extends CatalyzeObject {
 		}
 		this.user = user;
 	}
-
-	// // This is just for testing
-	// public void createCustomClass(String name, boolean phi, JSONObject
-	// schema,
-	// CatalyzeListener<CustomClass> callbackHandler) {
-	// setPHI(phi);
-	// mJson = new JSONObject();
-	// try {
-	// mJson.put(NAME, name);
-	// mJson.put(SCHEMA, schema);
-	// mJson.put(PHI, phi);
-	// } catch (JSONException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// responseListener = createListenerWithCCReturn(callbackHandler, this);
-	// errorListener = createErrorListener(callbackHandler);
-	// CatalyzeRequest<JSONObject> request = new
-	// CatalyzeRequest<JSONObject>(CUSTOM_CLASS_URL, mJson,
-	// responseListener, errorListener);
-	// request.setHeaders(user.getAuthorizedHeaders());
-	// request.post(user.catalyze.getContext());
-	// }
 
 	public Object getContent(String key) {
 		Object value = mJson.opt(key);
@@ -109,7 +86,6 @@ public class CustomClass extends CatalyzeObject {
 			e.printStackTrace();
 		}
 		return id;
-		// return mJson.optLong(PARENT_ID, Long.MIN_VALUE);
 	}
 
 	CustomClass setParentId(String id) {
@@ -159,8 +135,8 @@ public class CustomClass extends CatalyzeObject {
 
 	/******
 	 * Perform= API call to get a custom class TODO: Remove when dev portal can
-	 * make them?
-	 * Returns the schema and info
+	 * make them? Returns the schema and info
+	 * 
 	 * @param className
 	 * @param callbackHandler
 	 */
@@ -173,24 +149,8 @@ public class CustomClass extends CatalyzeObject {
 		request.get(user.catalyze.getContext());
 	}
 
-//	/******
-//	 * Api call to add fields to a custom class TODO: Remove when dev portal can
-//	 * make them?
-//	 * 
-//	 * @param className
-//	 * @param callbackHandler
-//	 */
-//	public void addFields(String className, JSONObject newFields, CatalyzeListener<CustomClass> callbackHandler) {
-//		responseListener = createListenerWithCCReturn(callbackHandler, this);
-//		errorListener = createErrorListener(callbackHandler);
-//		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(getCustomClassUrl(className), newFields,
-//				responseListener, errorListener);
-//		request.setHeaders(user.getAuthorizedHeaders());
-//		request.put(user.catalyze.getContext());
-//	}
-
 	/******
-	 * Api call to delete a custom class TODO: Remove when dev portal can make
+	 * Api call to delete a custom class TODO: Do we want this as part of sdk?
 	 * them?
 	 * 
 	 * @param className
@@ -224,7 +184,6 @@ public class CustomClass extends CatalyzeObject {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -305,8 +264,8 @@ public class CustomClass extends CatalyzeObject {
 		request.get(user.catalyze.getContext());
 	}
 
-	// FIXME
-	public void addReferenceArray(String className, String entryId, String refName,
+	// FIXME shoiuld this be included?
+	public void addNewReferenceArray(String className, String entryId, String refName,
 			CatalyzeListener<CustomClass> callbackHandler) {
 		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getCustomClassUrl(className, entryId, REF,
@@ -315,15 +274,46 @@ public class CustomClass extends CatalyzeObject {
 		request.put(user.catalyze.getContext());
 	}
 
+	/**
+	 * 
+	 * @param className
+	 * @param entryId
+	 * @param refName
+	 * @param refId
+	 * @param callbackHandler
+	 */
 	public void getArrayRef(String className, String entryId, String refName, String refId,
 			CatalyzeListener<CustomClass> callbackHandler) {
 		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getCustomClassUrl(className, entryId, REF,
-				refName, refId), null, createArrayListener(callbackHandler, this), errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(getCustomClassUrl(className, entryId,
+				REF, refName, refId), null, createListenerWithCCReturn(callbackHandler, this), errorListener);
 		request.setHeaders(user.getAuthorizedHeaders());
 		request.get(user.catalyze.getContext());
 	}
+	
+	/**
+	 * 
+	 * @param className
+	 * @param entryId
+	 * @param refName
+	 * @param refId
+	 * @param callbackHandler
+	 */
+	public void deleteArrayRef(String className, String entryId, String refName, String refId,
+			CatalyzeListener<CustomClass> callbackHandler) {
+		errorListener = createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(getCustomClassUrl(className, entryId,
+				REF, refName, refId), null, createListenerWithCCReturn(callbackHandler, this), errorListener);
+		request.setHeaders(user.getAuthorizedHeaders());
+		request.delete(user.catalyze.getContext());
+	}
 
+	/**
+	 * Perform query on this custom class
+	 * 
+	 * @param className
+	 * @param callbackHandler
+	 */
 	public void query(String className, CatalyzeListener<CustomClass> callbackHandler) {
 		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getCustomClassUrl(className, "query"),
@@ -387,7 +377,12 @@ public class CustomClass extends CatalyzeObject {
 		};
 	}
 
-	// Foreign key callback
+	/**
+	 * Handle volley response when response will be a JSONArray
+	 * @param callbackHandler
+	 * @param cc
+	 * @return
+	 */
 	private static Response.Listener<JSONArray> createArrayListener(
 			final CatalyzeListener<CustomClass> callbackHandler, final CustomClass cc) {
 		return new Response.Listener<JSONArray>() {
