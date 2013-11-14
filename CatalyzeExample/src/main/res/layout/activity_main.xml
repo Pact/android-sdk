@@ -41,7 +41,7 @@
         android:layout_marginTop="36dp"
         android:ems="10"
         android:inputType="text|textAutoComplete|textAutoCorrect|textEmailAddress"
-        android:text="test@user.com" >
+        android:text="tyler@catalyze.io" >
 
         <requestFocus />
     </EditText>
@@ -55,7 +55,7 @@
         android:layout_marginTop="38dp"
         android:ems="10"
         android:inputType="textPassword"
-        android:text="testpass" >
+        android:text="password" >
     </EditText>
 
     <Button
@@ -89,5 +89,14 @@
         android:layout_above="@+id/DeleteUser"
         android:layout_alignLeft="@+id/DeleteUser"
         android:text="UpdateUser" />
+
+    <Button
+        android:id="@+id/superUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/signUp"
+        android:layout_below="@+id/passwordTextField"
+        android:layout_marginTop="22dp"
+        android:text="SuperUser" />
 
 </RelativeLayout>

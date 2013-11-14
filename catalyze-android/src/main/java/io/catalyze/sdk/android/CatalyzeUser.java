@@ -12,9 +12,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 
 import io.catalyze.sdk.android.user.Gender;
@@ -55,7 +53,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
 
 	// URL s
-	private static final String SIGNIN_URL = Catalyze.BASE_URL +  "auth/signin";
+	private static final String SIGNIN_URL = Catalyze.BASE_URL + "auth/signin";
 	private static final String SIGOUT_URL = Catalyze.BASE_URL + "auth/signout";
 	private static final String USER_ROUTE = Catalyze.BASE_URL + "user";
 	private String userSessionToken;
@@ -65,7 +63,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		this.catalyze = catalyze;
 	}
 
-	public CatalyzeUser(JSONObject json) {	
+	public CatalyzeUser(JSONObject json) {
 		super(json);
 	}
 
@@ -127,7 +125,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 		try {
 			mJson.put(DATE_OF_BIRTH, dateOfBirth);
-			//mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
+			// mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -138,7 +136,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 		try {
 			mJson.put(DATE_OF_BIRTH, dateOfBirth);
-			//mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
+			// mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -326,7 +324,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		}
 		responseListener = createListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(SIGNIN_URL, jsonBody, responseListener, errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(SIGNIN_URL, jsonBody, responseListener,
+				errorListener);
 		request.setHeaders(headers);
 		request.post(context);
 	}
@@ -341,7 +340,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, null, responseListener, errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, null, responseListener,
+				errorListener);
 		request.setHeaders(headers);
 		request.get(context);
 	}
@@ -360,36 +360,37 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		JSONObject updates = new JSONObject();
 
 		// Remove data fields from user that should not be included in update
-//		Iterator<String> keys = json.keys();
+		// Iterator<String> keys = json.keys();
 		try {
-//			do {
-				 updates.put(FIRST_NAME,json.get(FIRST_NAME));
-				 updates.put(LAST_NAME,json.get(LAST_NAME));
-				 updates.put(DATE_OF_BIRTH,json.get(DATE_OF_BIRTH));
-				 updates.put(AGE,json.get(AGE));
-				 updates.put(PHONE_NUMBER,json.get(PHONE_NUMBER));
-				 updates.put(STREET,json.get(STREET));
-				 updates.put(CITY,json.get(CITY));
-				 updates.put(STATE,json.get(STATE));
-				 updates.put(COUNTRY,json.get(COUNTRY));
-				 updates.put(EXTRAS,json.get(EXTRAS));
-				 updates.put(GENDER,json.get(GENDER));
-				 updates.put(ZIP_CODE,json.get(ZIP_CODE));
-//				String k = keys.next();
-//				if (!json.isNull(k)) {
-//					updates.put(k, json.get(k));
-//				}
-//			} while (keys.hasNext());
+			// do {
+			updates.put(FIRST_NAME, json.get(FIRST_NAME));
+			updates.put(LAST_NAME, json.get(LAST_NAME));
+			updates.put(DATE_OF_BIRTH, json.get(DATE_OF_BIRTH));
+			updates.put(AGE, json.get(AGE));
+			updates.put(PHONE_NUMBER, json.get(PHONE_NUMBER));
+			updates.put(STREET, json.get(STREET));
+			updates.put(CITY, json.get(CITY));
+			updates.put(STATE, json.get(STATE));
+			updates.put(COUNTRY, json.get(COUNTRY));
+			updates.put(EXTRAS, json.get(EXTRAS));
+			updates.put(GENDER, json.get(GENDER));
+			updates.put(ZIP_CODE, json.get(ZIP_CODE));
+			// String k = keys.next();
+			// if (!json.isNull(k)) {
+			// updates.put(k, json.get(k));
+			// }
+			// } while (keys.hasNext());
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
-//		updates.remove(USERNAME);
-//		updates.remove(ID);
-//		updates.remove(SESSION_TOKEN);
-//		updates.remove("appId");
-//		updates.remove("updatedAt");
-//		updates.remove("createdAt");
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, updates, responseListener, errorListener);
+		// updates.remove(USERNAME);
+		// updates.remove(ID);
+		// updates.remove(SESSION_TOKEN);
+		// updates.remove("appId");
+		// updates.remove("updatedAt");
+		// updates.remove("createdAt");
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, updates, responseListener,
+				errorListener);
 		request.setHeaders(headers);
 		request.put(catalyze.getContext());
 	}
@@ -405,13 +406,15 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSignoutListener(callbackHandler);
 		errorListener = blankResponseErrorHandler(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, null, responseListener, errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, null, responseListener,
+				errorListener);
 		request.setHeaders(headers);
 		request.delete(context);
 	}
 
 	/**
 	 * Perform an API to create a new user
+	 * 
 	 * @param userName
 	 * @param password
 	 * @param firstName
@@ -446,7 +449,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		responseListener = createListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
 		// errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, jsonBody, responseListener, errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, jsonBody, responseListener,
+				errorListener);
 		request.setHeaders(headers);
 		request.post(context);
 	}
@@ -462,26 +466,29 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSignoutListener(callbackHandler);
 		errorListener = blankResponseErrorHandler(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(SIGOUT_URL, null, responseListener, errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(SIGOUT_URL, null, responseListener,
+				errorListener);
 		request.setHeaders(headers);
 		request.get(context);
 	}
-	
-	//TODO - test
-	public void deleteField(String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context){
+
+	// TODO - test
+	public void deleteField(String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSignoutListener(callbackHandler);
 		errorListener = blankResponseErrorHandler(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + fieldName, null, responseListener, errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + fieldName, null,
+				responseListener, errorListener);
 		request.setHeaders(headers);
 		request.delete(context);
 	}
 
-	// TODO Supervisor routes - need testing
+	// TODO Supervisor routes - delete field need testing
 	/***
 	 * Lookup user info, must be a supervisor for this route to work
 	 * 
-	 * @param userName name of user to lookup
+	 * @param userName
+	 *            name of user to lookup
 	 * @param callbackHandler
 	 * @param context
 	 */
@@ -489,12 +496,12 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSupervisorListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName, null, responseListener,
-				errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName, null,
+				responseListener, errorListener);
 		request.setHeaders(headers);
 		request.get(context);
 	}
-	
+
 	protected void updateUser(CatalyzeUser user, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 
 		JSONObject json = user.asJson();
@@ -519,35 +526,27 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSupervisorListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + user.getUsername(), updates,
-				responseListener, errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + user.getUsername(),
+				updates, responseListener, errorListener);
 		request.setHeaders(headers);
 		request.put(context);
 	}
-	
-	protected void deleteUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+
+	protected void deleteUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler,
+			Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSupervisorDeleteListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName, null, responseListener,
-				errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName + "/"
+				+ fieldName, null, responseListener, errorListener);
 		request.setHeaders(headers);
 		request.delete(context);
 	}
-	
-	protected void deleteUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
-		Map<String, String> headers = getAuthorizedHeaders();
-		responseListener = createSupervisorDeleteListener(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName + "/" + fieldName, null, responseListener,
-				errorListener);
-		request.setHeaders(headers);
-		request.delete(context);
-	}
-	
+
 	/**
-	 * TODO - Needs to return a list of search results, needs handler for JSONArray?
-	 * Supervisor route to search for user
+	 * Supervisor route, returns array of strings containing all users with
+	 * 'partialUsername' as part of username to callback
+	 * 
 	 * @param partialUsername
 	 * @param callbackHandler
 	 * @param context
@@ -556,13 +555,11 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSupervisorSearchListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + partialUsername, null, responseListener,
-				errorListener);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				USER_ROUTE + "/search/" + partialUsername, null, responseListener, errorListener);
 		request.setHeaders(headers);
 		request.get(context);
 	}
-	
-	
 
 	/**
 	 * Return HTTP headers needed for authorized api calls
@@ -611,9 +608,10 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			}
 		};
 	}
-	
-	//TODO
-	private Response.Listener<JSONObject> createSupervisorDeleteListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+
+	// TODO
+	private Response.Listener<JSONObject> createSupervisorDeleteListener(
+			final CatalyzeListener<CatalyzeUser> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -622,26 +620,30 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		};
 	}
 
+	/**
+	 * Callback handler for search route response
+	 * @param userCallback
+	 * @return
+	 */
 	private Response.Listener<JSONObject> createSupervisorSearchListener(final CatalyzeListener<String[]> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				ArrayList<String> stringResults = new ArrayList<String>();
-				JSONArray results;
+				String[] stringResults = new String[0];
 				try {
-					results = response.getJSONArray("results");
-				
-				for(int i = 0; i < results.length(); i++){
-					stringResults.add(results.getString(i));
-				}
+					JSONArray results = response.getJSONArray("results");
+					stringResults = new String[results.length()];
+					for (int i = 0; i < results.length(); i++) {
+						stringResults[i] = results.getString(i);
+					}
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				userCallback.onResponse((String[]) stringResults.toArray());
+				userCallback.onResponse(stringResults);
 			}
 		};
 	}
-	
+
 	/**
 	 * This is supposed to be the logout/delete handler, not currently reached
 	 * as those cause a weird bug that goes to the error handler
@@ -660,7 +662,6 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			}
 		};
 	}
-	
 
 	/***
 	 * FIXME Maybe figure out a better way around this bug? Specialized error

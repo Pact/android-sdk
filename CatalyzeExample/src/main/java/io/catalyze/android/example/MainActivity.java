@@ -1,21 +1,18 @@
 package io.catalyze.android.example;
 
-import java.util.Date;
+//import java.util.Date;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.android.volley.Response;
 
 import android.app.Activity;
-import android.content.Intent;
+//import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+//import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
+//import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+//import android.widget.TextView;
 
 import io.catalyze.sdk.android.*;
 import io.catalyze.sdk.android.user.Gender;
@@ -28,11 +25,11 @@ public class MainActivity extends Activity {
 	private Catalyze catalyze;
 	private CustomClass customClass;
 	private static final String APIKey = "1ca769ce-07b3-40bf-95c0-2feda3e3c909";
-	private Object synchObj = new Object();										
+	//private Object synchObj = new Object();										
 	private Query query;
 	private static final String api = "1f077962-18cc-4ade-8075-d9fa1642f316";
 	private static final String identifier = "android.example";
-
+	private CatalyzeUser otherUser;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,8 +67,8 @@ public class MainActivity extends Activity {
 					public void onClick(View v) {
 						String classname = "ccTest1";
 						
-						if(customClass == null) customClass = CustomClass.getInstance(mUser);
-						
+//						if(customClass == null) customClass = CustomClass.getInstance(mUser);
+						catalyze.lookupUser("test@user.com", lookupUserHandler());
 //						
 //						JSONObject schema = new JSONObject();
 //						try {
@@ -84,11 +81,9 @@ public class MainActivity extends Activity {
 //						}
 //						
 						//cc.get("MyNewClass", newCCHandler());
-						JSONObject newData = new JSONObject();
-						
 						//cc.getEntry("MyNewClass", "5282742e11709322bbbb9e37", newCCHandler());
-						customClass.putContent("city", "chicago");
-						customClass.updateEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
+//						customClass.putContent("city", "chicago");
+//						customClass.updateEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
 //						cc.delete(classname, newCCHandler());
 //						JSONObject newInstance = new JSONObject();
 //						try {
@@ -133,10 +128,20 @@ public class MainActivity extends Activity {
 
 						String username = mEdit.getText().toString();
 						mEdit = (EditText) findViewById(R.id.passwordTextField);
-						Response.Listener<JSONObject> responseHandler = createListener();
 						catalyze.signUp(username, mEdit.getText().toString(),
 								"John", "johnson", newUserResponseHandler());
 
+					}
+				});
+		
+		findViewById(R.id.superUser).setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						//catalyze.lookupUser("test@user.com", newUserResponseHandler());
+//						otherUser.setFirstName("asdfghjkl");
+//						catalyze.updateUser(otherUser, newUserResponseHandler());
+						catalyze.searchForUser("test", userSearchHandler());
 					}
 				});
 		findViewById(R.id.update).setOnClickListener(
@@ -196,19 +201,6 @@ public class MainActivity extends Activity {
 
 	}
 
-	private Response.Listener<JSONObject> createListener() {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				// stop loading screen code goes here
-				String s = "hello we are deoingn somet stuff";
-				System.out.println(mUser.getUsername());
-				System.out.println(mUser.getAge());
-				System.out.println(s);
-			}
-		};
-	}
-
 	private CatalyzeListener<CatalyzeUser> newUserResponseHandler() {
 		return new CatalyzeListener<CatalyzeUser>() {
 
@@ -245,6 +237,40 @@ public class MainActivity extends Activity {
 		};
 	}
 
+	private CatalyzeListener<CatalyzeUser> lookupUserHandler() {
+		return new CatalyzeListener<CatalyzeUser>() {
+
+			@Override
+			public void onError(CatalyzeError response) {
+				// TODO Auto-generated method stub
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(CatalyzeUser response) {
+				otherUser = response;
+
+			}
+		};
+	}
+	
+	private CatalyzeListener<String[]> userSearchHandler() {
+		return new CatalyzeListener<String[]>() {
+
+			@Override
+			public void onError(CatalyzeError response) {
+				// TODO Auto-generated method stub
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(String[] response) {
+				String[] results = response;
+
+			}
+		};
+	}
+	
 	private CatalyzeListener<CustomClass> newCCHandler() {
 		return new CatalyzeListener<CustomClass>() {
 

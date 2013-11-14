@@ -135,17 +135,8 @@ public class Catalyze {
 	 * @param user
 	 * @param callbackHandler
 	 */
-	public void updateUser(CatalyzeUser user, CatalyzeListener<CatalyzeUser> callbackHandler){
-		user.updateUser(user, callbackHandler, appContext);
-	}
-	
-	/**
-	 * Supervisor call to delete a user
-	 * @param userName
-	 * @param callbackHandler
-	 */
-	public void deleteAUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler){
-		user.deleteUser(userName, callbackHandler, appContext);
+	public void updateUser(CatalyzeUser otherUser, CatalyzeListener<CatalyzeUser> callbackHandler){
+		user.updateUser(otherUser, callbackHandler, appContext);
 	}
 	
 	/**
@@ -156,6 +147,10 @@ public class Catalyze {
 	 */
 	public void deleteAUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler){
 		user.deleteUserField(userName, fieldName, callbackHandler, appContext);
+	}
+	
+	public void searchForUser(String partialUsername, CatalyzeListener<String[]> callbackHandler){
+		user.searchForUser(partialUsername, callbackHandler, appContext);
 	}
 
 	protected String getAPIKey() {
