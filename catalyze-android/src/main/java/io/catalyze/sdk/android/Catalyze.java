@@ -118,7 +118,44 @@ public class Catalyze {
 	 * @param callbackHandler
 	 */
 	public void deleteCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler) {
-		user.deleteUser(callbackHandler, appContext);
+		user.delete(callbackHandler, appContext);
+	}
+	
+	/**
+	 * Supervisor call to get info about a user
+	 * @param userName
+	 * @param callbackHandler
+	 */
+	public void lookupUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler){
+		user.getUserInfo(userName, callbackHandler, appContext);
+	}
+	
+	/**
+	 * Supervisor call to update the given user
+	 * @param user
+	 * @param callbackHandler
+	 */
+	public void updateUser(CatalyzeUser user, CatalyzeListener<CatalyzeUser> callbackHandler){
+		user.updateUser(user, callbackHandler, appContext);
+	}
+	
+	/**
+	 * Supervisor call to delete a user
+	 * @param userName
+	 * @param callbackHandler
+	 */
+	public void deleteAUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler){
+		user.deleteUser(userName, callbackHandler, appContext);
+	}
+	
+	/**
+	 * Supervisor route to delete a user's data field
+	 * @param userName
+	 * @param fieldName
+	 * @param callbackHandler
+	 */
+	public void deleteAUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler){
+		user.deleteUserField(userName, fieldName, callbackHandler, appContext);
 	}
 
 	protected String getAPIKey() {

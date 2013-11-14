@@ -6,11 +6,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.common.base.Strings;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -399,7 +401,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	protected void deleteUser(CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	protected void delete(CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSignoutListener(callbackHandler);
 		errorListener = blankResponseErrorHandler(callbackHandler);
@@ -464,12 +466,22 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		request.setHeaders(headers);
 		request.get(context);
 	}
+	
+	//TODO - test
+	public void deleteField(String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context){
+		Map<String, String> headers = getAuthorizedHeaders();
+		responseListener = createSignoutListener(callbackHandler);
+		errorListener = blankResponseErrorHandler(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + fieldName, null, responseListener, errorListener);
+		request.setHeaders(headers);
+		request.delete(context);
+	}
 
-	// TODO Supervisor routes
+	// TODO Supervisor routes - need testing
 	/***
 	 * Lookup user info, must be a supervisor for this route to work
 	 * 
-	 * @param userName
+	 * @param userName name of user to lookup
 	 * @param callbackHandler
 	 * @param context
 	 */
@@ -478,6 +490,73 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		responseListener = createSupervisorListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName, null, responseListener,
+				errorListener);
+		request.setHeaders(headers);
+		request.get(context);
+	}
+	
+	protected void updateUser(CatalyzeUser user, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+
+		JSONObject json = user.asJson();
+		JSONObject updates = new JSONObject();
+		try {
+			updates.put(FIRST_NAME, json.get(FIRST_NAME));
+			updates.put(LAST_NAME, json.get(LAST_NAME));
+			updates.put(DATE_OF_BIRTH, json.get(DATE_OF_BIRTH));
+			updates.put(AGE, json.get(AGE));
+			updates.put(PHONE_NUMBER, json.get(PHONE_NUMBER));
+			updates.put(STREET, json.get(STREET));
+			updates.put(CITY, json.get(CITY));
+			updates.put(STATE, json.get(STATE));
+			updates.put(COUNTRY, json.get(COUNTRY));
+			updates.put(EXTRAS, json.get(EXTRAS));
+			updates.put(GENDER, json.get(GENDER));
+			updates.put(ZIP_CODE, json.get(ZIP_CODE));
+		} catch (JSONException e) {
+			throw new RuntimeException(e);
+		}
+
+		Map<String, String> headers = getAuthorizedHeaders();
+		responseListener = createSupervisorListener(callbackHandler);
+		errorListener = createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + user.getUsername(), updates,
+				responseListener, errorListener);
+		request.setHeaders(headers);
+		request.put(context);
+	}
+	
+	protected void deleteUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+		Map<String, String> headers = getAuthorizedHeaders();
+		responseListener = createSupervisorDeleteListener(callbackHandler);
+		errorListener = createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName, null, responseListener,
+				errorListener);
+		request.setHeaders(headers);
+		request.delete(context);
+	}
+	
+	protected void deleteUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+		Map<String, String> headers = getAuthorizedHeaders();
+		responseListener = createSupervisorDeleteListener(callbackHandler);
+		errorListener = createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName + "/" + fieldName, null, responseListener,
+				errorListener);
+		request.setHeaders(headers);
+		request.delete(context);
+	}
+	
+	/**
+	 * TODO - Needs to return a list of search results, needs handler for JSONArray?
+	 * Supervisor route to search for user
+	 * @param partialUsername
+	 * @param callbackHandler
+	 * @param context
+	 */
+	protected void searchForUser(String partialUsername, CatalyzeListener<String[]> callbackHandler, Context context) {
+		Map<String, String> headers = getAuthorizedHeaders();
+		responseListener = createSupervisorSearchListener(callbackHandler);
+		errorListener = createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + partialUsername, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
 		request.get(context);
@@ -532,7 +611,37 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			}
 		};
 	}
+	
+	//TODO
+	private Response.Listener<JSONObject> createSupervisorDeleteListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+		return new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				userCallback.onResponse(null);
+			}
+		};
+	}
 
+	private Response.Listener<JSONObject> createSupervisorSearchListener(final CatalyzeListener<String[]> userCallback) {
+		return new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				ArrayList<String> stringResults = new ArrayList<String>();
+				JSONArray results;
+				try {
+					results = response.getJSONArray("results");
+				
+				for(int i = 0; i < results.length(); i++){
+					stringResults.add(results.getString(i));
+				}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				userCallback.onResponse((String[]) stringResults.toArray());
+			}
+		};
+	}
+	
 	/**
 	 * This is supposed to be the logout/delete handler, not currently reached
 	 * as those cause a weird bug that goes to the error handler
@@ -551,6 +660,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			}
 		};
 	}
+	
 
 	/***
 	 * FIXME Maybe figure out a better way around this bug? Specialized error
