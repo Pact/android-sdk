@@ -37,6 +37,12 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
 	}
 	
+	@SuppressWarnings("deprecation")
+	public CatalyzeRequest(JSONArray jsonRequest, String url, Response.Listener<T> listener,
+			Response.ErrorListener errorListener) {
+		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
+	}
+	
 	@Override
 	public Map<String, String> getHeaders() {
 		return mHeaders;

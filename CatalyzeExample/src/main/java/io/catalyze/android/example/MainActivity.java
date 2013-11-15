@@ -167,7 +167,7 @@ public class MainActivity extends Activity {
 		findViewById(R.id.customClasses).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(customClass == null) customClass = CustomClass.getInstance(mUser);
+				if(customClass == null) customClass = CustomClass.getInstance("user2", mUser);
 //				
 				//cc.query("ccTest1", newCCHandler());
 //				Query q = new Query("MyNewClass");
@@ -178,8 +178,9 @@ public class MainActivity extends Activity {
 //				q.executeQuery(catalyze, newQueryHandler());
 //				customClass.getEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
 //				customClass.getArrayRef("user", "5284ff081170cc2a30370937", "address", "5284fe141170cc2a30370935", newCCHandler());
-				//customClass.getArray("user", "5284ff081170cc2a30370937", "address", newCCHandler());
-				customClass.deleteArrayRef("user", "5284ff081170cc2a30370937", "address", "5284fe141170cc2a30370935", newCCHandler());
+				customClass.getArray("528653c7117079bb586e5aa7", "visits", newCCHandler());
+				//customClass.deleteArrayRef("user", "5284ff081170cc2a30370937", "address", "5284fe141170cc2a30370935", newCCHandler());
+				//customClass.addReferenceArray("user2", "528653c7117079bb586e5aa7", "visits", "528660e6117079bb586e5abb", newCCHandler());
 				// cc.get("ccTest1", newCCHandler());
 //				JSONObject newInstance = new JSONObject();
 //				try {

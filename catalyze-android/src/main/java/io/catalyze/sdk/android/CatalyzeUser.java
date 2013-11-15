@@ -255,11 +255,18 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		return this;
 	}
 
-	long getId() {
-		return mJson.optLong(ID, Long.MIN_VALUE);
+	public String getId() {
+		String id = "";
+		try {
+			id = mJson.getString(ID);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return id;
 	}
 
-	CatalyzeUser setId(long id) {
+	CatalyzeUser setId(String id) {
 		try {
 			mJson.put(ID, id);
 		} catch (JSONException e) {
@@ -405,7 +412,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	protected void delete(CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSignoutListener(callbackHandler);
-		errorListener = blankResponseErrorHandler(callbackHandler);
+		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
@@ -465,7 +472,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	protected void signOut(CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSignoutListener(callbackHandler);
-		errorListener = blankResponseErrorHandler(callbackHandler);
+		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(SIGOUT_URL, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
@@ -476,7 +483,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	public void deleteField(String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		responseListener = createSignoutListener(callbackHandler);
-		errorListener = blankResponseErrorHandler(callbackHandler);
+		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + fieldName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
@@ -502,6 +509,12 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		request.get(context);
 	}
 
+	/**
+	 * Supervisor call to update a user
+	 * @param user
+	 * @param callbackHandler
+	 * @param context
+	 */
 	protected void updateUser(CatalyzeUser user, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 
 		JSONObject json = user.asJson();
@@ -663,27 +676,27 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		};
 	}
 
-	/***
-	 * FIXME Maybe figure out a better way around this bug? Specialized error
-	 * listener for use in delete and signout path to deal with "End of input"
-	 * json error - test that this is fixed
-	 * 
-	 * @return
-	 */
-	private Response.ErrorListener blankResponseErrorHandler(final CatalyzeListener<CatalyzeUser> userCallback) {
-		return new Response.ErrorListener() {
-
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				CatalyzeError ce = new CatalyzeError(error);
-				if (error.getMessage() != null
-						&& error.getMessage().equals("org.json.JSONException: End of input at character 0 of ")) {
-					setJson(null);
-					setUserSessionToken(null);
-					userCallback.onSuccess(CatalyzeUser.this);
-				} else
-					userCallback.onError(ce);
-			}
-		};
-	}
+//	/***
+//	 * FIXME Maybe figure out a better way around this bug? Specialized error
+//	 * listener for use in delete and signout path to deal with "End of input"
+//	 * json error - test that this is fixed
+//	 * 
+//	 * @return
+//	 */
+//	private Response.ErrorListener blankResponseErrorHandler(final CatalyzeListener<CatalyzeUser> userCallback) {
+//		return new Response.ErrorListener() {
+//
+//			@Override
+//			public void onErrorResponse(VolleyError error) {
+//				CatalyzeError ce = new CatalyzeError(error);
+//				if (error.getMessage() != null
+//						&& error.getMessage().equals("org.json.JSONException: End of input at character 0 of ")) {
+//					setJson(null);
+//					setUserSessionToken(null);
+//					userCallback.onSuccess(CatalyzeUser.this);
+//				} else
+//					userCallback.onError(ce);
+//			}
+//		};
+//	}
 }
