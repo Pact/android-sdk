@@ -79,7 +79,6 @@ public class Query extends CatalyzeObject {
         return new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                	//q.setJsonArray(response);
             	for(int i = 0; i < response.length(); i++){
             		try {
 						q.queryResults.add(new CustomClass(response.getJSONObject(i)));

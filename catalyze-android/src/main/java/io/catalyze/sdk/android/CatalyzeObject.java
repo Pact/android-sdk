@@ -23,7 +23,7 @@ public abstract class CatalyzeObject{
     protected static TextView mResult;
     protected Response.ErrorListener errorListener;
     protected Response.Listener<JSONObject> responseListener;
-    protected JSONArray mJsonArray;
+    //protected JSONArray mJsonArray;
     
 	public CatalyzeObject() {
 		this(new JSONObject());
@@ -41,13 +41,7 @@ public abstract class CatalyzeObject{
 		return mJson;
 	}
 
-	protected JSONArray asJsonArray(){
-		return mJsonArray;
-	}
-	
-	protected void setJsonArray(JSONArray json) {
-		mJsonArray = json;
-	}
+
 
 
     protected Map<String, Object> handleJSONObject(JSONObject object) {

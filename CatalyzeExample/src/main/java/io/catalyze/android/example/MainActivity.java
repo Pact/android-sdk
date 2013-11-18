@@ -65,10 +65,12 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						String classname = "ccTest1";
+//						String classname = "ccTest1";
 						
-//						if(customClass == null) customClass = CustomClass.getInstance(mUser);
-						catalyze.lookupUser("test@user.com", lookupUserHandler());
+						if(customClass == null) customClass = CustomClass.getInstance("user2", mUser);
+						customClass.getEntry("528653c7117079bb586e5aa7", newCCHandler());
+						
+//						catalyze.lookupUser("test@user.com", lookupUserHandler());
 //						
 //						JSONObject schema = new JSONObject();
 //						try {
@@ -178,7 +180,7 @@ public class MainActivity extends Activity {
 //				q.executeQuery(catalyze, newQueryHandler());
 //				customClass.getEntry("MyNewClass", "5282ad77117003b47fad4c00", newCCHandler());
 //				customClass.getArrayRef("user", "5284ff081170cc2a30370937", "address", "5284fe141170cc2a30370935", newCCHandler());
-				customClass.getArray("528653c7117079bb586e5aa7", "visits", newCCHandler());
+				customClass.getArray("visits", newCCArrayHandler());
 				//customClass.deleteArrayRef("user", "5284ff081170cc2a30370937", "address", "5284fe141170cc2a30370935", newCCHandler());
 				//customClass.addReferenceArray("user2", "528653c7117079bb586e5aa7", "visits", "528660e6117079bb586e5abb", newCCHandler());
 				// cc.get("ccTest1", newCCHandler());
@@ -286,6 +288,22 @@ public class MainActivity extends Activity {
 			@Override
 			public void onSuccess(CustomClass response) {
 				customClass = response;
+			}
+
+		};
+	}
+	
+	private CatalyzeListener<CustomClass[]> newCCArrayHandler() {
+		return new CatalyzeListener<CustomClass[]>() {
+
+			@Override
+			public void onError(CatalyzeError response) {
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(CustomClass[] response) {
+				CustomClass[] a = response;
 			}
 
 		};
