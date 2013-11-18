@@ -143,7 +143,17 @@ public class MainActivity extends Activity {
 						//catalyze.lookupUser("test@user.com", newUserResponseHandler());
 //						otherUser.setFirstName("asdfghjkl");
 //						catalyze.updateUser(otherUser, newUserResponseHandler());
-						catalyze.searchForUser("test", userSearchHandler());
+//						catalyze.searchForUser("test", userSearchHandler()); 
+						UMLS u = new UMLS(catalyze);
+						//u.getCodesetList(userSearchHandler());
+						//u.getValueSetList(userSearchHandler());
+						//u.codeLookup("SNOMEDCT", "244329001", listenForUmlsResults());
+						u.valueLookup("city", "1581834", listenForUmlsResult());
+						u.searchByKeyword("rxnorm", "Acetaminophen", listenForUmlsResults());
+						
+						//u.searchByCodeOrConcept("concept", "snomedct", "244329001", listenForUmlsResults());
+						//u.searchByPrefix("snomedct", "acet", listenForUmlsResults());
+						
 					}
 				});
 		findViewById(R.id.update).setOnClickListener(
@@ -214,6 +224,7 @@ public class MainActivity extends Activity {
 			public void onError(CatalyzeError response) {
 				// TODO Auto-generated method stub
 				System.out.println("SOMETHING WENT WRONG");
+				mUser.toString();
 			}
 
 			@Override
@@ -272,6 +283,38 @@ public class MainActivity extends Activity {
 			@Override
 			public void onSuccess(String[] response) {
 				String[] results = response;
+
+			}
+		};
+	}
+	
+	private CatalyzeListener<UmlsResult[]> listenForUmlsResults() {
+		return new CatalyzeListener<UmlsResult[]>() {
+
+			@Override
+			public void onError(CatalyzeError response) {
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(UmlsResult[] response) {
+				UmlsResult[] results = response;
+
+			}
+		};
+	}
+	
+	private CatalyzeListener<UmlsResult> listenForUmlsResult() {
+		return new CatalyzeListener<UmlsResult>() {
+
+			@Override
+			public void onError(CatalyzeError response) {
+				System.out.println("SOMETHING WENT WRONG");
+			}
+
+			@Override
+			public void onSuccess(UmlsResult response) {
+				UmlsResult results = response;
 
 			}
 		};

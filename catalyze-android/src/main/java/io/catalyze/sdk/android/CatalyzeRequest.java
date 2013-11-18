@@ -1,7 +1,6 @@
 package io.catalyze.sdk.android;
 
 import android.content.Context;
-import android.widget.TextView;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -28,7 +27,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	public static final String BASE_PATH = "https://api.catalyze.io/v1";
 	private Map<String, String> mHeaders = new HashMap<String, String>();
 	private static RequestQueue mRequestQueue;
-	private static TextView mResult;
 	private int mMethod;
 
 	@SuppressWarnings("deprecation")
@@ -41,6 +39,11 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	public CatalyzeRequest(JSONArray jsonRequest, String url, Response.Listener<T> listener,
 			Response.ErrorListener errorListener) {
 		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
+	}
+	
+	public CatalyzeRequest(String url, Response.Listener<T> listener, Response.ErrorListener errorListener){
+		super(url, null, listener, errorListener);
+		
 	}
 	
 	@Override
@@ -68,7 +71,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	 * @param context
 	 */
 	public void post(Context context) {
-		mResult = new TextView(context);
 		mMethod = Request.Method.POST;
 		mRequestQueue = getRequestQueue(context);
 		mRequestQueue.add(this);
@@ -80,7 +82,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	 * @param context
 	 */
 	public void get(Context context) {
-		mResult = new TextView(context);
 		mMethod = Request.Method.GET;
 		mRequestQueue = getRequestQueue(context);
 		mRequestQueue.add(this);
@@ -92,7 +93,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	 * @param context
 	 */
 	public void put(Context context) {
-		mResult = new TextView(context);
 		mMethod = Request.Method.PUT;
 		mRequestQueue = getRequestQueue(context);
 		mRequestQueue.add(this);
@@ -104,7 +104,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	 * @param context
 	 */
 	public void delete(Context context) {
-		mResult = new TextView(context);
 		mMethod = Request.Method.DELETE;
 		mRequestQueue = getRequestQueue(context);
 		mRequestQueue.add(this);

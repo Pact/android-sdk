@@ -3,7 +3,6 @@ package io.catalyze.sdk.android;
 import android.content.Context;
 
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.google.common.base.Strings;
 
 import org.json.JSONArray;
@@ -455,7 +454,6 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		}
 		responseListener = createListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
-		// errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, jsonBody, responseListener,
 				errorListener);
 		request.setHeaders(headers);
@@ -675,28 +673,4 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			}
 		};
 	}
-
-//	/***
-//	 * FIXME Maybe figure out a better way around this bug? Specialized error
-//	 * listener for use in delete and signout path to deal with "End of input"
-//	 * json error - test that this is fixed
-//	 * 
-//	 * @return
-//	 */
-//	private Response.ErrorListener blankResponseErrorHandler(final CatalyzeListener<CatalyzeUser> userCallback) {
-//		return new Response.ErrorListener() {
-//
-//			@Override
-//			public void onErrorResponse(VolleyError error) {
-//				CatalyzeError ce = new CatalyzeError(error);
-//				if (error.getMessage() != null
-//						&& error.getMessage().equals("org.json.JSONException: End of input at character 0 of ")) {
-//					setJson(null);
-//					setUserSessionToken(null);
-//					userCallback.onSuccess(CatalyzeUser.this);
-//				} else
-//					userCallback.onError(ce);
-//			}
-//		};
-//	}
 }

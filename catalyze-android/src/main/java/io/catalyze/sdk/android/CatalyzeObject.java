@@ -23,7 +23,6 @@ public abstract class CatalyzeObject{
     protected static TextView mResult;
     protected Response.ErrorListener errorListener;
     protected Response.Listener<JSONObject> responseListener;
-    //protected JSONArray mJsonArray;
     
 	public CatalyzeObject() {
 		this(new JSONObject());
@@ -41,12 +40,10 @@ public abstract class CatalyzeObject{
 		return mJson;
 	}
 
-
-
-
     protected Map<String, Object> handleJSONObject(JSONObject object) {
         Map<String, Object> retVal = new HashMap<String, Object>();
-        Iterator<String> iter = object.keys();
+        @SuppressWarnings("unchecked")
+		Iterator<String> iter = object.keys();
         while (iter.hasNext()) {
             String key = iter.next();
             try {

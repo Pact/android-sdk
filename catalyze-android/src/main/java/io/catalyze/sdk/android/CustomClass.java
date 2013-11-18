@@ -13,7 +13,6 @@ public class CustomClass extends CatalyzeObject {
 	// URL CONSTANTS
 	private static final String CUSTOM_CLASS_URL = Catalyze.BASE_URL + "classes";
 	
-	private static final String NAME = "name";
 	private static final String CONTENT = "content";
 	private static final String PHI = "phi";
 	private static final String PARENT_ID = "parentId";
@@ -211,7 +210,6 @@ public class CustomClass extends CatalyzeObject {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -230,9 +228,8 @@ public class CustomClass extends CatalyzeObject {
 		request.delete(user.catalyze.getContext());
 	}
 
-	// TODO Custom class/foreign key array items need to be fully implemented
 	/**
-	 * Perform api call to retreive array of custom class objects
+	 * Perform api call to retrieve array of custom class objects
 	 * 
 	 * @param entryId
 	 *            ID of entry to delete
@@ -340,25 +337,6 @@ public class CustomClass extends CatalyzeObject {
 				cc.user = CustomClass.this.user;
 				cc.className = CustomClass.this.className;
 				callbackHandler.onSuccess(cc);
-			}
-		};
-	}
-
-	/**
-	 * Volley response handler for custom class, takes the JSONObject response
-	 * and sets the CustomClasses json to this then returns it to user callback
-	 * handler
-	 * For methods that do not have a response - 
-	 * @param callbackHandler
-	 * @param cc
-	 * @return
-	 */
-	private static Response.Listener<JSONObject> createListenerNoCCReturned(
-			final CatalyzeListener<Boolean> callbackHandler) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				callbackHandler.onSuccess(true);
 			}
 		};
 	}
