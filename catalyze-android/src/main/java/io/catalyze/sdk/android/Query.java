@@ -7,23 +7,34 @@ import org.json.JSONException;
 
 import com.android.volley.Response;
 
-
 /**
- * Created by mvolkhart on 8/26/13.
+ * Use this class to query a custom class. To perform a query operation, first
+ * instantiate an instance of Query with the name of the Custom Class to query
+ * and an authenticated user. Next set field, searchBy, pageNumber and pageSize as
+ * desired, then call execute query.
  */
 public class Query extends CatalyzeObject {
 
-    private static final String FIELD = "field";
-    private static final String SEARCH_BY = "searchBy";
-    private static final String PAGE_NUMBER = "pageNumber";
+	private static final String FIELD = "field";
+	private static final String SEARCH_BY = "searchBy";
+	private static final String PAGE_NUMBER = "pageNumber";
     private static final String PAGE_SIZE = "pageSize";
     private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
+    private CatalyzeUser user;
     private String customClassName;
-    public ArrayList<CustomClass> queryResults;
-    public Query(String className) {
+    private ArrayList<CustomClass> queryResults;
+    public Query(String className, Catalyze catalyze) {
         super();
         customClassName = className;
         queryResults = new ArrayList<CustomClass>();
+    }
+    
+    /**
+     * Get the results from the last executed query.
+     * @return
+     */
+    public ArrayList<CustomClass> getResults(){
+    	return queryResults;
     }
 
     public String getField() {
@@ -50,6 +61,14 @@ public class Query extends CatalyzeObject {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Change the name of the custom class to query.
+     * @param className
+     */
+    public void setCustomClassName(String className){
+    	customClassName = className;
+    }
 
     public void setPageSize(int pageSize) {
         try {
@@ -63,16 +82,27 @@ public class Query extends CatalyzeObject {
         try {
             mJson.put(key, value);
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public void executeQuery(Catalyze catalyze, CatalyzeListener<Query> callbackHandler){
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Run a query with the current settings of this isntance of Query
+	 * 
+	 * @param catalyze
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a Query on successful
+	 *            callback. This Query will be a reference to this instance of
+	 *            query, and will have been updated to so that a call to
+	 *            getResults will return a list containing the results form the
+	 *            last executed query
+	 */
+    public void executeQuery(CatalyzeListener<Query> callbackHandler){
     	Response.Listener<JSONArray> responseListener = testListener(callbackHandler, this);
     	errorListener = createErrorListener(callbackHandler);
     	CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
-    	request.setHeaders(catalyze.getUser().getAuthorizedHeaders());
-    	request.post(catalyze.getContext());
+    	request.setHeaders(user.getAuthorizedHeaders());
+    	request.post(user.catalyze.getContext());
     }  
     
     private static Response.Listener<JSONArray> testListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
