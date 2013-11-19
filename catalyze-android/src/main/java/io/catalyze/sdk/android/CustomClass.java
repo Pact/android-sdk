@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import com.android.volley.Response;
 
 /**
- * Created by mvolkhart on 8/26/13.
+ * 
  */
 public class CustomClass extends CatalyzeObject {
 
@@ -143,9 +143,13 @@ public class CustomClass extends CatalyzeObject {
 	}
 
 	/******
-	 * Perform= API call to get a custom class schema
+	 * Perform Catalze API call to get an already created custom class schema
 	 * 
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
 	 */
 	public void getSchema(CatalyzeListener<CustomClass> callbackHandler) {
 		responseListener = createListenerReturnNewInstance(callbackHandler);
@@ -157,9 +161,14 @@ public class CustomClass extends CatalyzeObject {
 	}
 
 	/**
-	 * Perform API call to add an entry to a custom class
+	 * Perform Catalyze API call to add an entry to a custom class, this entry
+	 * will have it's data saved to this custom class instance upon callback
 	 * 
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
 	 */
 	public void createEntry(CatalyzeListener<CustomClass> callbackHandler) {
 		responseListener = createListenerReturnUpdatedInstance(callbackHandler);
@@ -176,10 +185,14 @@ public class CustomClass extends CatalyzeObject {
 	}
 
 	/**
-	 * Perform API call to retrieve a custom class entry.
+	 * Perform Catalyze API call to retrieve an existing custom class entry.
 	 * 
 	 * @param entryId
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
 	 */
 	public void getEntry(String entryId, CatalyzeListener<CustomClass> callbackHandler) {
 		responseListener = createListenerReturnUpdatedInstance(callbackHandler);
@@ -197,6 +210,10 @@ public class CustomClass extends CatalyzeObject {
 	 * @param entryId
 	 *            ID of entry to update
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
 	 */
 	public void updateEntry(CatalyzeListener<CustomClass> callbackHandler) {
 		responseListener = createListenerReturnUpdatedInstance(callbackHandler);
@@ -218,6 +235,10 @@ public class CustomClass extends CatalyzeObject {
 	 * @param entryId
 	 *            ID of entry to delete
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
 	 */
 	public void deleteEntry(CatalyzeListener<CustomClass> callbackHandler) {
 		responseListener = createListenerReturnUpdatedInstance(callbackHandler);
@@ -235,6 +256,9 @@ public class CustomClass extends CatalyzeObject {
 	 *            ID of entry to delete
 	 * @param refName
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass array on
+	 *            successful callback. This custom class array will be a set of
+	 *            references to a new set of CustomClass instances
 	 */
 	public void getArray(String refName, CatalyzeListener<CustomClass[]> callbackHandler) {
 		errorListener = createErrorListener(callbackHandler);
@@ -250,6 +274,11 @@ public class CustomClass extends CatalyzeObject {
 	 * @param entryId
 	 * @param refName
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the original Custom Class instance that this
+	 *            method was called upon, after it has been updated to match the
+	 *            server response.
 	 */
 	public void addReferenceArray(String refName, String refID, CatalyzeListener<CustomClass> callbackHandler) {
 		errorListener = createErrorListener(callbackHandler);
@@ -264,20 +293,23 @@ public class CustomClass extends CatalyzeObject {
 		}
 		newArrayEntry.put(json);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(newArrayEntry, getCustomClassUrl(
-				getName(), getId(), REF, refName), createListenerReturnNewInstance(callbackHandler), errorListener);
+				getName(), getId(), REF, refName), createListenerReturnUpdatedInstance(callbackHandler), errorListener);
 		request.setHeaders(user.getAuthorizedHeaders());
 		request.put(user.catalyze.getContext());
 	}
 
 	/**
-	 * Performs api call to retrieve the referenced a referenced array instance.
-	 * The entire custom class instance referenced will be returned to the
-	 * callback handler
+	 * Performs api call to retrieve the a referenced array instance. The entire
+	 * custom class instance referenced will be returned to the callback handler
 	 * 
 	 * @param entryId
 	 * @param refName
 	 * @param refId
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. This custom class will be a new Custom Class
+	 *            instance containing the information gotten from the array of
+	 *            references in the original Custom Class
 	 */
 	public void getArrayRef(String refName, String refId, CatalyzeListener<CustomClass> callbackHandler) {
 		errorListener = createErrorListener(callbackHandler);
@@ -292,7 +324,9 @@ public class CustomClass extends CatalyzeObject {
 	 * @param entryId
 	 * @param refName
 	 * @param refId
-	 * @param callbackHandler
+	 * @param callbackHandler CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. This custom class will be a new Custom Class
+	 *            instance that contains no data. FIXME?
 	 */
 	public void deleteArrayRef(String refName, String refId, CatalyzeListener<CustomClass> callbackHandler) {
 		errorListener = createErrorListener(callbackHandler);
@@ -377,7 +411,6 @@ public class CustomClass extends CatalyzeObject {
 						ccArray[i] = new CustomClass();
 						ccArray[i].mJson = response.getJSONObject(i);
 					} catch (JSONException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
