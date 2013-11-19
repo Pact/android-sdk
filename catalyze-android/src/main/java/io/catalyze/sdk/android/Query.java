@@ -8,10 +8,11 @@ import org.json.JSONException;
 import com.android.volley.Response;
 
 /**
- * Use this class to query a custom class. To perform a query operation, first
+ * Use this class to make API calls to query a custom class, and to interact
+ * with the data results from these queries. To perform a query operation, first
  * instantiate an instance of Query with the name of the Custom Class to query
- * and an authenticated user. Next set field, searchBy, pageNumber and pageSize as
- * desired, then call execute query.
+ * and an authenticated user. Next set field, searchBy, pageNumber and pageSize
+ * as desired, then call execute query.
  */
 public class Query extends CatalyzeObject {
 
@@ -23,9 +24,12 @@ public class Query extends CatalyzeObject {
     private CatalyzeUser user;
     private String customClassName;
     private ArrayList<CustomClass> queryResults;
-    public Query(String className, Catalyze catalyze) {
+    
+
+    public Query(String className, CatalyzeUser authenticatedUser) {
         super();
         customClassName = className;
+        user = authenticatedUser;
         queryResults = new ArrayList<CustomClass>();
     }
     
@@ -88,8 +92,7 @@ public class Query extends CatalyzeObject {
 
 	/**
 	 * Run a query with the current settings of this isntance of Query
-	 * 
-	 * @param catalyze
+	 *
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a Query on successful
 	 *            callback. This Query will be a reference to this instance of

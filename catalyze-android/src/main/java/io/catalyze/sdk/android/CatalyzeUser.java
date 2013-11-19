@@ -17,9 +17,6 @@ import java.util.Map;
 import io.catalyze.sdk.android.user.Gender;
 import io.catalyze.sdk.android.user.ZipCode;
 
-/**
- * Created by mvolkhart on 8/23/13.
- */
 /***
  * This class contains methods to interact with all Catalyze User and Auth API
  * routes. An authenticated user should be created using Catalze.getUser(),
@@ -27,7 +24,6 @@ import io.catalyze.sdk.android.user.ZipCode;
  * hander.
  * 
  * 
- * @author Tyler
  * 
  */
 public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeUser> {
@@ -312,11 +308,14 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	}
 
 	/**
-	 * Authenticate this user with userName and password upon HTTP response
+	 * Use this to sign into the application.
 	 * 
 	 * @param userName
 	 * @param password
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CatalyzeUser on successful
+	 *            callback. The CatalyzeUser instance returned will contain all
+	 *            of the user info for the now logged in user
 	 * @param context
 	 */
 	protected void getAuthenticatedUser(String userName, String password,
@@ -353,10 +352,15 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	}
 
 	/***
-	 * TODO currently removes nulls Pushes any changes made to this instance of
-	 * user to server
+	 * Update a currently logged in user and associated details. Include the
+	 * fields or data elements you wish to add or update in the appropriate data
+	 * fields of this instance of CatalyzeUser.
 	 * 
-	 * @param context
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CatalyzeUser on successful
+	 *            callback. The CatalyzeUser instance returned will be a
+	 *            reference to the the same instance of CatalyzeUser that was
+	 *            used to call this method.
 	 */
 	public void update(CatalyzeListener<CatalyzeUser> callbackHandler) {
 		Map<String, String> headers = getAuthorizedHeaders();
@@ -365,10 +369,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		JSONObject json = asJson();
 		JSONObject updates = new JSONObject();
 
-		// Remove data fields from user that should not be included in update
-		// Iterator<String> keys = json.keys();
 		try {
-			// do {
 			updates.put(FIRST_NAME, json.get(FIRST_NAME));
 			updates.put(LAST_NAME, json.get(LAST_NAME));
 			updates.put(DATE_OF_BIRTH, json.get(DATE_OF_BIRTH));
@@ -381,20 +382,9 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			updates.put(EXTRAS, json.get(EXTRAS));
 			updates.put(GENDER, json.get(GENDER));
 			updates.put(ZIP_CODE, json.get(ZIP_CODE));
-			// String k = keys.next();
-			// if (!json.isNull(k)) {
-			// updates.put(k, json.get(k));
-			// }
-			// } while (keys.hasNext());
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
-		// updates.remove(USERNAME);
-		// updates.remove(ID);
-		// updates.remove(SESSION_TOKEN);
-		// updates.remove("appId");
-		// updates.remove("updatedAt");
-		// updates.remove("createdAt");
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE, updates, responseListener,
 				errorListener);
 		request.setHeaders(headers);
@@ -509,6 +499,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 
 	/**
 	 * Supervisor call to update a user
+	 * 
 	 * @param user
 	 * @param callbackHandler
 	 * @param context
@@ -633,6 +624,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 
 	/**
 	 * Callback handler for search route response
+	 * 
 	 * @param userCallback
 	 * @return
 	 */

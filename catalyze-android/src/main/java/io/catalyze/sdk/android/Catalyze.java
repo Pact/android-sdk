@@ -51,9 +51,8 @@ public class Catalyze {
 	 * @param password
 	 * @param context
 	 */
-	public Catalyze(String apiKey, String identifier, String userName,
-			String password, CatalyzeListener<CatalyzeUser> handleResponse,
-			Context context) {
+	public Catalyze(String apiKey, String identifier, String userName, String password,
+			CatalyzeListener<CatalyzeUser> handleResponse, Context context) {
 		this.apiKey = apiKey;
 		user = new CatalyzeUser(this);
 		user.getAuthenticatedUser(userName, password, handleResponse, context);
@@ -74,82 +73,120 @@ public class Catalyze {
 	}
 
 	/**
+	 * Use method to perform an API call to sign into the application.
 	 * 
 	 * @param userName
 	 * @param password
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CatalyzeUser on successful
+	 *            callback. The CatalyzeUser instance returned will contain all
+	 *            of the user info for the now logged in user
 	 */
-	public void getUser(String userName, String password,
-			CatalyzeListener<CatalyzeUser> callbackHandler) {
+	public void getUser(String userName, String password, CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user = new CatalyzeUser(this);
-		user.getAuthenticatedUser(userName, password, callbackHandler,
-				appContext);
+		user.getAuthenticatedUser(userName, password, callbackHandler, appContext);
 	}
 
 	/**
-	 * Perform API call to create a new user for this application. Will return a
-	 * CatalyzeUser to the provided callback function
+	 * Perform API call to create a new user for this application. Will return
+	 * an instance of CatalyzeUser to the provided callback function
 	 * 
 	 * @param userName
 	 * @param password
 	 * @param firstName
 	 * @param lastName
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CatalyzeUser on successful
+	 *            callback. The CatalyzeUser instance returned will contain all
+	 *            of the user info for the newly created now logged in user
 	 */
-	public void signUp(String userName, String password, String firstName,
-			String lastName, CatalyzeListener<CatalyzeUser> callbackHandler) {
+	public void signUp(String userName, String password, String firstName, String lastName,
+			CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user = new CatalyzeUser(this);
-		user.signUp(userName, password, firstName, lastName, callbackHandler,
-				appContext);
+		user.signUp(userName, password, firstName, lastName, callbackHandler, appContext);
 	}
 
 	/**
 	 * Log out the current user
 	 * 
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CatalyzeUser on successful
+	 *            callback. The CatalyzeUser instance returned will be the same
+	 *            instance used to call this method, but will no longer be
+	 *            authenticated or contain user info.
 	 */
 	public void logoutCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user.signOut(callbackHandler, appContext);
 	}
 
 	/**
-	 * Delete the user currently associated with Catalyze
+	 * Delete the user currently associated with this instance of Catalyze. Be
+	 * careful using this as it will delete the user completely from the
+	 * database.
 	 * 
 	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CatalyzeUser on successful
+	 *            callback. The CatalyzeUser instance returned will be the same
+	 *            instance used to call this method, but will no longer be
+	 *            authenticated or contain user info.
 	 */
 	public void deleteCurrentUser(CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user.delete(callbackHandler, appContext);
 	}
-	
+
 	/**
-	 * Supervisor call to get info about a user
+	 * This route can only be used if you are the supervisor of your
+	 * application. Get details about a user with the given userName.
+	 * 
 	 * @param userName
 	 * @param callbackHandler
 	 */
-	public void lookupUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler){
+	public void lookupUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user.getUserInfo(userName, callbackHandler, appContext);
 	}
-	
+
 	/**
-	 * Supervisor call to update the given user
+	 * This route can only be used if you are the supervisor of your
+	 * application. Updates a given user and associated details. Include the
+	 * fields or data elements you wish to add or update into the CatalyzeUser
+	 * you wish to update. Reccommend using lookupUser to first get CatalyzeUser
+	 * to update, as the CatalyzeUser will be pushed to server as is, meaning
+	 * any fields that are null or blank will be saved on the server as null or
+	 * blank.
+	 * 
 	 * @param user
 	 * @param callbackHandler
 	 */
-	public void updateUser(CatalyzeUser otherUser, CatalyzeListener<CatalyzeUser> callbackHandler){
+	public void updateUser(CatalyzeUser otherUser, CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user.updateUser(otherUser, callbackHandler, appContext);
 	}
-	
+
 	/**
-	 * Supervisor route to delete a user's data field
+	 * This route can only be used if you are the supervisor of your
+	 * application. Delete a specific field from the indicated user's data. This
+	 * is primarily meant to manage the data captured by the "extras" array.
+	 * Replace "fieldName" in the route with the key value that you used in the
+	 * extras array. Please do not use this to delete the username etc. As
+	 * always, Be careful using this as it will delete the data completely from
+	 * the database.
+	 * 
 	 * @param userName
 	 * @param fieldName
 	 * @param callbackHandler
 	 */
-	public void deleteAUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler){
+	public void deleteAUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler) {
 		user.deleteUserField(userName, fieldName, callbackHandler, appContext);
 	}
-	
-	public void searchForUser(String partialUsername, CatalyzeListener<String[]> callbackHandler){
+
+	/**
+	 * Get details about a user with the given username. This route will only
+	 * work if the currently logged in User is a supervisor for the given
+	 * application.
+	 * 
+	 * @param partialUsername
+	 * @param callbackHandler
+	 */
+	public void searchForUser(String partialUsername, CatalyzeListener<String[]> callbackHandler) {
 		user.searchForUser(partialUsername, callbackHandler, appContext);
 	}
 
@@ -179,5 +216,4 @@ public class Catalyze {
 		return user;
 	}
 
-	
 }
