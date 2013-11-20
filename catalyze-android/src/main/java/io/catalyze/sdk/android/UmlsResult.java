@@ -2,7 +2,10 @@ package io.catalyze.sdk.android;
 
 import org.json.JSONObject;
 
-
+/**
+ * Data wrapper class for Catalyze UMLS api responses
+ *
+ */
 public class UmlsResult extends CatalyzeObject {
 
 	private static final String DESCRIPTION = "desc";
@@ -12,7 +15,7 @@ public class UmlsResult extends CatalyzeObject {
 	private static final String OID = "oid";
 	private static final String CONCEPT = "concept";
 
-	UmlsResult(JSONObject json) {
+	protected UmlsResult(JSONObject json) {
 		super(json);
 	}
 
