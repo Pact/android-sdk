@@ -18,7 +18,7 @@ import io.catalyze.sdk.android.user.Gender;
 import io.catalyze.sdk.android.user.ZipCode;
 
 /***
- * This class contains methods to interact with all Catalyze User and Auth API
+ * This class contains methods to interact with all CatalyzeUser and Auth API
  * routes. An authenticated user should be created using Catalze.getUser(),
  * which will pass back an authenticated CatalyzeUser to the provided callback
  * hander.
@@ -117,7 +117,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	}
 
 	public CatalyzeUser setDateOfBirth(Date dateOfBirth) {
-		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		//SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 		try {
 			mJson.put(DATE_OF_BIRTH, dateOfBirth);
 			// mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
@@ -128,7 +128,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	}
 
 	public CatalyzeUser setDateOfBirth(String dateOfBirth) {
-		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		//SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 		try {
 			mJson.put(DATE_OF_BIRTH, dateOfBirth);
 			// mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
@@ -255,7 +255,6 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		try {
 			id = mJson.getString(ID);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return id;
@@ -280,15 +279,6 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 
 	private String getSessionToken() {
 		return mJson.optString(SESSION_TOKEN, null);
-	}
-
-	private CatalyzeUser setSessionToken(String sessionToken) {
-		try {
-			mJson.put(SESSION_TOKEN, sessionToken);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return this;
 	}
 
 	public Map<String, Object> getExtras() {
@@ -611,7 +601,6 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		};
 	}
 
-	// TODO
 	private Response.Listener<JSONObject> createSupervisorDeleteListener(
 			final CatalyzeListener<CatalyzeUser> userCallback) {
 		return new Response.Listener<JSONObject>() {
