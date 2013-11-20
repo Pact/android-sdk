@@ -117,7 +117,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	}
 
 	public CatalyzeUser setDateOfBirth(Date dateOfBirth) {
-		//SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		// SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 		try {
 			mJson.put(DATE_OF_BIRTH, dateOfBirth);
 			// mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
@@ -128,7 +128,7 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	}
 
 	public CatalyzeUser setDateOfBirth(String dateOfBirth) {
-		//SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		// SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 		try {
 			mJson.put(DATE_OF_BIRTH, dateOfBirth);
 			// mJson.put(DATE_OF_BIRTH, formatter.format(dateOfBirth));
@@ -457,20 +457,33 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		request.get(context);
 	}
 
-	// TODO - test
-	public void deleteField(String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	/**
+	 * Delete a specific field from the user's data. This is primarily meant to
+	 * manage the data captured by the "extras" array. Replace "fieldName" in
+	 * the route with the key value that you used in the extras array. Please do
+	 * not use this to delete the username etc. As always, Be careful using this
+	 * as it will delete the data completely from the database.
+	 * 
+	 * @param fieldName
+	 * @param callbackHandler
+	 */
+	public void deleteField(String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler) {
+		if (fieldName == null || fieldName.isEmpty()) {
+			//if fieldName is blank this will otherwise delete the user
+			return;
+		}
 		Map<String, String> headers = getAuthorizedHeaders();
-		responseListener = createSignoutListener(callbackHandler);
+		responseListener = deleteFieldListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + fieldName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.delete(context);
+		request.delete(catalyze.getContext());
 	}
 
-	// TODO Supervisor routes - delete field need testing
 	/***
-	 * Lookup user info, must be a supervisor for this route to work
+	 * This route can only be used if you are the supervisor of your
+	 * application. Get details about a user with the given username.
 	 * 
 	 * @param userName
 	 *            name of user to lookup
@@ -488,7 +501,10 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	}
 
 	/**
-	 * Supervisor call to update a user
+	 * This route can only be used if you are the supervisor of your
+	 * application. Updates a given user and associated details. Include the
+	 * fields or data elements you wish to add or update in the instance of the
+	 * CatalyzeUser. Any fields that are null or empty will be updated as such.
 	 * 
 	 * @param user
 	 * @param callbackHandler
@@ -524,10 +540,24 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		request.put(context);
 	}
 
+	/**
+	 * This route can only be used if you are the supervisor of your
+	 * application. Delete a specific field from the indicated user's data. This
+	 * is primarily meant to manage the data captured by the "extras" array.
+	 * Replace "fieldName" in the route with the key value that you used in the
+	 * extras array. Please do not use this to delete the username etc. As
+	 * always, Be careful using this as it will delete the data completely from
+	 * the database.
+	 * 
+	 * @param userName
+	 * @param fieldName
+	 * @param callbackHandler
+	 * @param context
+	 */
 	protected void deleteUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler,
 			Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
-		responseListener = createSupervisorDeleteListener(callbackHandler);
+		responseListener = createSupervisorListener(callbackHandler);
 		errorListener = createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(USER_ROUTE + "/" + userName + "/"
 				+ fieldName, null, responseListener, errorListener);
@@ -583,6 +613,15 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			}
 		};
 	}
+	
+	private Response.Listener<JSONObject> deleteFieldListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+		return new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				userCallback.onResponse(CatalyzeUser.this);
+			}
+		};
+	}
 
 	/***
 	 * Response handler to return user but not overwrite current user
@@ -597,16 +636,6 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 				CatalyzeUser user = new CatalyzeUser(response);
 				user.setUserSessionToken(getSessionToken());
 				userCallback.onResponse(user);
-			}
-		};
-	}
-
-	private Response.Listener<JSONObject> createSupervisorDeleteListener(
-			final CatalyzeListener<CatalyzeUser> userCallback) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				userCallback.onResponse(null);
 			}
 		};
 	}
