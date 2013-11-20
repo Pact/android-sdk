@@ -18,8 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by mvolkhart on 8/24/13. CatalzeRequest is an extension of This class
- * handles all Catalyze network requests
+ * This class handles all Catalyze JSON network requests. All calls are here are
+ * made asynchronously using the Android Volley library. 
+ * 
  * @param <T>
  */
 public class CatalyzeRequest<T> extends JsonRequest<T> {
@@ -34,18 +35,13 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 			Response.ErrorListener errorListener) {
 		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public CatalyzeRequest(JSONArray jsonRequest, String url, Response.Listener<T> listener,
 			Response.ErrorListener errorListener) {
 		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
 	}
-	
-	public CatalyzeRequest(String url, Response.Listener<T> listener, Response.ErrorListener errorListener){
-		super(url, null, listener, errorListener);
-		
-	}
-	
+
 	@Override
 	public Map<String, String> getHeaders() {
 		return mHeaders;
@@ -112,10 +108,10 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	/**
 	 * Return the Volley request queue or instantiate one if needed
 	 * 
-	 * @param context 
+	 * @param context
 	 * @return
 	 */
-	private RequestQueue getRequestQueue(Context context) {
+	protected static RequestQueue getRequestQueue(Context context) {
 		if (mRequestQueue == null) {
 			mRequestQueue = Volley.newRequestQueue(context);
 			return mRequestQueue;
@@ -140,6 +136,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 			return Response.error(new ParseError(e));
 		} catch (JSONException je) {
 			return Response.error(new ParseError(je));
-		} 
+		}
 	}
 }
