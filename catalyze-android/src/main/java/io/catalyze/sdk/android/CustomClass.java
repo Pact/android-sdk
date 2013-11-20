@@ -6,7 +6,11 @@ import org.json.JSONObject;
 import com.android.volley.Response;
 
 /**
- * 
+ * This class allows you to interact with the Catalyze Custom Class API routes
+ * and easily interact with the responses from these routes. To use a Custom
+ * Class, a user authenticated instance of Custom Class must first be created by
+ * calling the static method getInstance and passing in a currently
+ * authenticated user. Next set the Custom Class name by calling setName().
  */
 public class CustomClass extends CatalyzeObject {
 
@@ -205,10 +209,11 @@ public class CustomClass extends CatalyzeObject {
 
 	/**
 	 * Perform api call to update an entry in a custom class, will write data to
-	 * server as it is passed, so to do partial update first do a get.
+	 * server as it is passed, so to do partial update first do a get. This
+	 * class requires that the id be set. The id will be saved automatically if
+	 * createEntry or getEntry has been called, otherwise you can set the id
+	 * manually by calling setId.
 	 * 
-	 * @param entryId
-	 *            ID of entry to update
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a CustomClass on successful
 	 *            callback. The custom class instance returned will be a
@@ -230,10 +235,11 @@ public class CustomClass extends CatalyzeObject {
 	}
 
 	/**
-	 * Perform api call to delete an entry within a custom class
+	 * Perform api call to delete an entry within a custom class. This class
+	 * requires that the id be set. The id will be saved automatically if
+	 * createEntry or getEntry has been called, otherwise you can set the id
+	 * manually by calling setId.
 	 * 
-	 * @param entryId
-	 *            ID of entry to delete
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a CustomClass on successful
 	 *            callback. The custom class instance returned will be a
@@ -250,10 +256,11 @@ public class CustomClass extends CatalyzeObject {
 	}
 
 	/**
-	 * Perform api call to retrieve array of custom class objects
+	 * Perform api call to retrieve array of custom class objects. This class
+	 * requires that the id be set. The id will be saved automatically if
+	 * createEntry or getEntry has been called, otherwise you can set the id
+	 * manually by calling setId.
 	 * 
-	 * @param entryId
-	 *            ID of entry to delete
 	 * @param refName
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a CustomClass array on
@@ -269,9 +276,10 @@ public class CustomClass extends CatalyzeObject {
 	}
 
 	/**
-	 * Add a new reference to the array refName
+	 * Add a new reference to the array refName. This class requires that the id
+	 * be set. The id will be saved automatically if createEntry or getEntry has
+	 * been called, otherwise you can set the id manually by calling setId.
 	 * 
-	 * @param entryId
 	 * @param refName
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a CustomClass on successful
@@ -300,9 +308,11 @@ public class CustomClass extends CatalyzeObject {
 
 	/**
 	 * Performs api call to retrieve the a referenced array instance. The entire
-	 * custom class instance referenced will be returned to the callback handler
+	 * custom class instance referenced will be returned to the callback
+	 * handler. This class requires that the id be set. The id will be saved
+	 * automatically if createEntry or getEntry has been called, otherwise you
+	 * can set the id manually by calling setId.
 	 * 
-	 * @param entryId
 	 * @param refName
 	 * @param refId
 	 * @param callbackHandler
@@ -321,10 +331,10 @@ public class CustomClass extends CatalyzeObject {
 
 	/**
 	 * 
-	 * @param entryId
 	 * @param refName
 	 * @param refId
-	 * @param callbackHandler CatalyzeListener that must expect a CustomClass on successful
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
 	 *            callback. This custom class will be a new Custom Class
 	 *            instance that contains no data. FIXME?
 	 */
