@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="io.catalyze.sdk.android" >
 
+    <uses-sdk android:minSdkVersion="8"/>
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <application />
 

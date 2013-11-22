@@ -261,7 +261,7 @@ public class CustomClass extends CatalyzeObject {
 	 * createEntry or getEntry has been called, otherwise you can set the id
 	 * manually by calling setId.
 	 * 
-	 * @param refName
+	 * @param refName  
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a CustomClass array on
 	 *            successful callback. This custom class array will be a set of

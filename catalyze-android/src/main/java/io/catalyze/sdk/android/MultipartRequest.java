@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
+import io.catalyze.jarjar.org.apache.http.entity.mime.MultipartEntityBuilder;
+import io.catalyze.jarjar.org.apache.http.entity.mime.content.FileBody;
 
 import com.android.volley.*;
 
 /**
- * T is the expected return type
+ * T is the expected return type   
  * 
  * @author Tyler
  * 
@@ -43,7 +43,7 @@ public class MultipartRequest<T> extends Request<T> {
 		// If needed user the following method to change content type header
 		// multiPartBuilder.addBinaryBody("file", file, "content-", filename)
 
-		multiPartBuilder.addTextBody("phi", phi);
+		multiPartBuilder.addTextBody("phi", phi);   
 		httpEntity = multiPartBuilder.build();
 	}
 	

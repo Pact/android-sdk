@@ -15,11 +15,18 @@
  */
 
 apply plugin: 'android-library'
+apply plugin: 'eclipse'
+
+repositories {
+        mavenCentral()
+    }
 
 dependencies {
     compile project(':volley')
     compile 'com.google.guava:guava:14.0.1'
     compile 'com.neovisionaries:nv-i18n:1.5'
+    compile files('./src/main/libs/httpcore-jarjar-4.3.jar')
+    compile files('./src/main/libs/httpmime-jarjar-4.3.1.jar')
 }
 
 android {
