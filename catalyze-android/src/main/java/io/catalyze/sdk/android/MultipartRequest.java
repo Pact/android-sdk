@@ -7,13 +7,17 @@ import java.util.Map;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.android.volley.*;
+import com.android.volley.toolbox.HttpHeaderParser;
 
 /**
  * T is the expected return type
  * 
- * @author Tyler
+ * 
  * 
  * @param <T>
  */
@@ -80,6 +84,25 @@ public class MultipartRequest<T> extends Request<T> {
 
 	@Override
 	protected Response<T> parseNetworkResponse(NetworkResponse response) {
+		
+//		try {
+//			String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+//
+//			if (jsonString.charAt(0) == '{') {
+//				return (Response<T>) Response.success(new JSONObject(jsonString),
+//						HttpHeaderParser.parseCacheHeaders(response));
+//			} else {
+//				return (Response<T>) Response.success(new JSONArray(jsonString),
+//						HttpHeaderParser.parseCacheHeaders(response));
+//			}
+//		} catch (UnsupportedEncodingException e) {
+//			return Response.error(new ParseError(e));
+//		} catch (JSONException je) {
+//			//file response here?
+//			return Response.error(new ParseError(je));
+//		}
+		
+		
 		// FIXME? good chance that this will requre a bit more work when I
 		// actually try to run it
 		// may need to detect whether the response is a file or JSON, could do
