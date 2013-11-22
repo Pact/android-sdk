@@ -76,6 +76,11 @@ public class CustomClass extends CatalyzeObject {
 		}
 		return this;
 	}
+	
+	public CustomClass removeContent(String key){
+		mJson.remove(key);
+		return this;
+	}
 
 	public boolean isPHI() {
 		return mJson.optBoolean(PHI, true);
