@@ -1,1 +1,2 @@
-include ':catalyze-android', ':volley', ':CatalyzeExample'
+include ':catalyze-android:src:main'
+include ':volley'

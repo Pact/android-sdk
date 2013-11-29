@@ -289,6 +289,27 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		new JSONObject(extras);
 		return this;
 	}
+	
+	public void setExtra(String key, Object value){
+		try {
+			mJson.getJSONObject(EXTRAS).put(key, value);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Object getExtra(String key){
+		try {
+			return mJson.get(key);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void removeExtra(String key){
+		mJson.remove(key);
+	}
 
 	@Override
 	public int compareTo(CatalyzeUser user) {

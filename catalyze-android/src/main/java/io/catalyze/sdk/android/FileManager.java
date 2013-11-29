@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.Request.Method;
 
