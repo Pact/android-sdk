@@ -9,16 +9,18 @@ import com.android.volley.VolleyError;
  * 
  * 
  */
-@SuppressWarnings("serial")
 public class CatalyzeError extends VolleyError {
+	
+	/**
+	 * The UID 
+	 */
+	private static final long serialVersionUID = 6762913468935195414L;
+
+	/**
+	 * Generic constructor reserved for future use. 
+	 */
 	public CatalyzeError() {
-
-	}
-
-	// TODO expand this to have additional error reporting functionality beyond
-	// that of VolleyError
-	public CatalyzeError(VolleyError error) {
-
+		super();
 	}
 
 }

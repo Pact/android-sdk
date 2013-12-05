@@ -1,4 +1,3 @@
-
 package io.catalyze.sdk.android;
 
 import java.io.File;
@@ -13,7 +12,8 @@ public class FileManager extends CatalyzeObject {
 
 	private static final String FILE_ROUTE = Catalyze.BASE_URL + "file";
 	private static final String APP_FILE_ROUTE = Catalyze.BASE_URL + "file/app";
-	private static final String USER_FILE_ROUTE = Catalyze.BASE_URL + "file/user";
+	private static final String USER_FILE_ROUTE = Catalyze.BASE_URL
+			+ "file/user";
 	private Map<String, String> fileHeaders;
 
 	public FileManager(Catalyze catalyze) {
@@ -30,7 +30,8 @@ public class FileManager extends CatalyzeObject {
 	 * @param userCallback
 	 *            Must expect a string on success
 	 */
-	public void uploadAppFile(File file, boolean phi, CatalyzeListener<String> userCallback) {
+	public void uploadAppFile(File file, boolean phi,
+			CatalyzeListener<String> userCallback) {
 		uploadFile(APP_FILE_ROUTE, file, phi, userCallback);
 	}
 
@@ -43,14 +44,17 @@ public class FileManager extends CatalyzeObject {
 	 * @param userCallback
 	 *            Must expect a string on success
 	 */
-	public void uploadUserFile(File file, boolean phi, CatalyzeListener<String> userCallback) {
+	public void uploadUserFile(File file, boolean phi,
+			CatalyzeListener<String> userCallback) {
 		uploadFile(USER_FILE_ROUTE, file, phi, userCallback);
 	}
 
-	private void uploadFile(String url, File file, boolean phi, CatalyzeListener<String> userCallback) {
+	private void uploadFile(String url, File file, boolean phi,
+			CatalyzeListener<String> userCallback) {
 		fileHeaders.put("Content-Type", "multipart/form-data");
-		MultipartRequest<JSONObject> request = new MultipartRequest<JSONObject>(url,
-				Catalyze.createErrorListener(userCallback), createStringResponseListener(userCallback), file,
+		MultipartRequest<JSONObject> request = new MultipartRequest<JSONObject>(
+				url, Catalyze.createErrorListener(userCallback),
+				createStringResponseListener(userCallback), file,
 				Boolean.toString(phi), fileHeaders);
 		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
 	}
@@ -65,13 +69,16 @@ public class FileManager extends CatalyzeObject {
 	 *            CatalyzeListener that expects a File in response. On success a
 	 *            pointer to the File is returned to the callback handler.
 	 */
-	public void getFile(String fileID, File file, CatalyzeListener<File> userCallback) {
+	public void getFile(String fileID, File file,
+			CatalyzeListener<File> userCallback) {
 		// MultipartRequest<File> request = new
 		// MultipartRequest<File>(Method.GET, FILE_ROUTE + "/" + fileID,
 		// CatalyzeObject.createErrorListener(userCallback),
 		// createFileResponseListener(userCallback), file, fileHeaders);
-		MultipartRequest<File> request = new MultipartRequest<File>(Method.GET, FILE_ROUTE + "/" + fileID,
-				Catalyze.createErrorListener(userCallback), createFileResponseListener(userCallback), fileHeaders);
+		MultipartRequest<File> request = new MultipartRequest<File>(Method.GET,
+				FILE_ROUTE + "/" + fileID,
+				Catalyze.createErrorListener(userCallback),
+				createFileResponseListener(userCallback), fileHeaders);
 		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
 	}
 
@@ -83,11 +90,14 @@ public class FileManager extends CatalyzeObject {
 	 *            CatalyzeListener that expects a string in response. On success
 	 *            a blank string is returned to this callback handler
 	 */
-	public void deleteFile(String fileID, boolean phi, CatalyzeListener<String> userCallback) {
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(FILE_ROUTE + "/" + fileID, null,
-				createStringResponseListener(userCallback), Catalyze.createErrorListener(userCallback));
+	public void deleteFile(String fileID, boolean phi,
+			CatalyzeListener<String> userCallback) {
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE,
+				FILE_ROUTE + "/" + fileID, null,
+				createStringResponseListener(userCallback),
+				Catalyze.createErrorListener(userCallback));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.delete(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**
@@ -96,7 +106,8 @@ public class FileManager extends CatalyzeObject {
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONObject> createStringResponseListener(final CatalyzeListener<String> userCallback) {
+	private Response.Listener<JSONObject> createStringResponseListener(
+			final CatalyzeListener<String> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -111,7 +122,8 @@ public class FileManager extends CatalyzeObject {
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<File> createFileResponseListener(final CatalyzeListener<File> userCallback) {
+	private Response.Listener<File> createFileResponseListener(
+			final CatalyzeListener<File> userCallback) {
 		return new Response.Listener<File>() {
 			@Override
 			public void onResponse(File response) {

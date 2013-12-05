@@ -102,11 +102,11 @@ public class Query extends CatalyzeObject {
 	public void executeQuery(CatalyzeListener<Query> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = testListener(
 				callbackHandler, this);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
-				QUERY_ROUTE + customClassName + "/query", this.asJson(),
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.POST,
+				QUERY_ROUTE + customClassName + "/query", this.mJson,
 				responseListener, Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.post(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	private Response.Listener<JSONArray> testListener(

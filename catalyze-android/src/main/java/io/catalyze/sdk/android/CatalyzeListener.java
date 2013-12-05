@@ -16,6 +16,10 @@ import com.android.volley.Response;
  */
 public abstract class CatalyzeListener<T> implements Response.Listener<T> {
 
+	/**
+	 * A successful call to the backend API will result in this method being
+	 * called. Simply redirect to onSuccess().
+	 */
 	public void onResponse(T response) {
 		onSuccess(response);
 	}

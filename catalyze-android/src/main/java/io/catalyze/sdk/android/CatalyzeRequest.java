@@ -27,21 +27,24 @@ import com.android.volley.toolbox.Volley;
  */
 public class CatalyzeRequest<T> extends JsonRequest<T> {
 
+	public static final int GET = Request.Method.GET;
+	public static final int POST = Request.Method.POST;
+	public static final int PUT = Request.Method.PUT;
+	public static final int DELETE = Request.Method.DELETE;
+	
 	public static final String BASE_PATH = "https://api.catalyze.io/v1";
 	private Map<String, String> mHeaders = new HashMap<String, String>();
 	private static RequestQueue mRequestQueue;
 	private int mMethod;
-
-	@SuppressWarnings("deprecation")
-	public CatalyzeRequest(String url, JSONObject jsonRequest, Response.Listener<T> listener,
+	
+	public CatalyzeRequest(int method, String url, JSONObject jsonRequest, Response.Listener<T> listener,
 			Response.ErrorListener errorListener) {
-		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
+		super(method, url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
 	}
 
-	@SuppressWarnings("deprecation")
-	public CatalyzeRequest(JSONArray jsonRequest, String url, Response.Listener<T> listener,
+	public CatalyzeRequest(int method, JSONArray jsonRequest, String url, Response.Listener<T> listener,
 			Response.ErrorListener errorListener) {
-		super(url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
+		super(method, url, jsonRequest != null ? jsonRequest.toString() : null, listener, errorListener);
 	}
 
 	@Override
@@ -64,45 +67,11 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	}
 
 	/***
-	 * Add this request to Volley queue as a post request
+	 * Add this request to the Volley queue to be executed. 
 	 * 
 	 * @param context
 	 */
-	public void post(Context context) {
-		mMethod = Request.Method.POST;
-		mRequestQueue = getRequestQueue(context);
-		mRequestQueue.add(this);
-	}
-
-	/***
-	 * Add this request to Volley queue as a get request
-	 * 
-	 * @param context
-	 */
-	public void get(Context context) {
-		mMethod = Request.Method.GET;
-		mRequestQueue = getRequestQueue(context);
-		mRequestQueue.add(this);
-	}
-
-	/***
-	 * Add this request to Volley queue as a put request
-	 * 
-	 * @param context
-	 */
-	public void put(Context context) {
-		mMethod = Request.Method.PUT;
-		mRequestQueue = getRequestQueue(context);
-		mRequestQueue.add(this);
-	}
-
-	/***
-	 * Add this request to Volley queue as a delete request
-	 * 
-	 * @param context
-	 */
-	public void delete(Context context) {
-		mMethod = Request.Method.DELETE;
+	public void execute(Context context) {
 		mRequestQueue = getRequestQueue(context);
 		mRequestQueue.add(this);
 	}

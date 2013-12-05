@@ -41,11 +41,11 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void getCodesetList(CatalyzeListener<String[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
 				getUmlsUrl(CODESETS), null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.get(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**
@@ -59,11 +59,11 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void getValueSetList(CatalyzeListener<String[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
 				getUmlsUrl(VALUESETS), null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.get(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**
@@ -83,11 +83,11 @@ public class UMLS extends CatalyzeObject {
 	public void codeLookup(String codeSet, String code,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
 				getUmlsUrl(CODE, codeSet, code), null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.get(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**
@@ -107,12 +107,12 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void valueLookup(String valueSet, String code,
 			CatalyzeListener<UmlsResult> callbackHandler) {
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET,
 				getUmlsUrl(VALUE, valueSet, code), null,
 				createUmlsResultCallback(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.get(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**
@@ -129,11 +129,11 @@ public class UMLS extends CatalyzeObject {
 	public void searchByKeyword(String codeSet, String keyword,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
 				getUmlsUrl(PHRASE, codeSet, keyword), null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.get(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**
@@ -154,11 +154,11 @@ public class UMLS extends CatalyzeObject {
 	public void searchByPrefix(String codeSet, String prefix,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
 				getUmlsUrl(PREFIX, codeSet, prefix), null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.get(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**
@@ -178,11 +178,11 @@ public class UMLS extends CatalyzeObject {
 	public void searchByCodeOrConcept(String type, String codeSet, String code,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
 				getUmlsUrl(RELATED, type, codeSet, code), null,
 				responseListener, Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.get(catalyze.getContext());
+		request.execute(catalyze.getContext());
 	}
 
 	/**

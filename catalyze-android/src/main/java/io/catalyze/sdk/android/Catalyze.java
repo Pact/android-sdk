@@ -42,19 +42,55 @@ public class Catalyze {
 	 * @param context
 	 */
 	public Catalyze(String apiKey, String identifier, Context context) {
+		if (apiKey == null) {
+			throw new IllegalStateException("The API key must be non-null.");
+		} else if (identifier == null) {
+			throw new IllegalStateException("The identifier must be non-null.");
+		} else if (context == null) {
+			throw new IllegalStateException("The context must be non-null.");
+		}
 		this.apiKey = apiKey;
 		appContext = context;
 		this.identifier = identifier;
 	}
 
+	/**
+	 * Return the context associated with this instance. Cannot be changed.
+	 * 
+	 * @return The context associated with this instance
+	 */
 	protected Context getContext() {
 		return appContext;
 	}
 
+	/**
+	 * All Catalyze instances must be associated with an authenticated user via
+	 * the authenticate() method. This method returns that user.
+	 * 
+	 * @return The authenticated user
+	 * @throws IllegalStateException
+	 *             If the Catalyze instance has not already been authenticated.
+	 */
 	protected CatalyzeUser getAuthenticatedUser() {
+		if (user == null)
+			throw new IllegalStateException(
+					"No authenticated user has been assigned. Must call Catalyze.authenticate() and wait for the callback before using this instance.");
 		return user;
 	}
 
+	/**
+	 * Initializes the instance by authenticating as the user provided. This
+	 * method must be called before a Catalyze instance can be used for any
+	 * operations other than UMLS lookups.
+	 * 
+	 * @param userName
+	 *            The user to authenticate this instance as
+	 * @param password
+	 *            The user's password
+	 * @param callbackHandler
+	 *            The callback to handle the server's response. The instance is
+	 *            not active until a successful callback result is returned.
+	 */
 	public void authenticate(String userName, String password,
 			final CatalyzeListener<Catalyze> callbackHandler) {
 
@@ -77,44 +113,30 @@ public class Catalyze {
 				callbackHandler.onResponse(Catalyze.this);
 			}
 		};
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.POST,
 				CatalyzeUser.SIGNIN_URL, jsonBody, responseListener,
 				createErrorListener(callbackHandler));
 		request.setHeaders(headers);
-		request.post(this.appContext);
+		request.execute(this.appContext);
 	}
 
-	private Response.Listener<JSONObject> createSupervisorListener(
-			final CatalyzeListener<CatalyzeUser> userCallback) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CatalyzeUser user = new CatalyzeUser(Catalyze.this);
-				user.setJson(response);
-				user.setUserSessionToken(user.getSessionToken());
-				userCallback.onResponse(user);
-			}
-		};
-	}
-
-	protected void getUser(String userName,
-			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
-		Map<String, String> headers = getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = createSupervisorListener(callbackHandler);
-		Response.ErrorListener errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeUser.USER_ROUTE + "/" + userName, null,
-				responseListener, errorListener);
-		request.setHeaders(headers);
-		request.get(context);
-	}
-
+	/**
+	 * Builds the header fields needed to make an authenticated connection to
+	 * the API.
+	 * 
+	 * @return The headers in a Map.
+	 */
 	protected Map<String, String> getAuthorizedHeaders() {
 		Map<String, String> headers = this.getDefaultHeaders();
 		headers.put("Authorization", "Bearer " + user.getSessionToken());
 		return headers;
 	}
 
+	/**
+	 * Returns the API key for this Catalyze instance.
+	 * 
+	 * @return The API key
+	 */
 	protected String getAPIKey() {
 		return apiKey;
 	}
@@ -122,7 +144,7 @@ public class Catalyze {
 	/**
 	 * Returns headers required for a non-user authorized API call
 	 * 
-	 * @return
+	 * @return The Map of fields to add to the HTTP header
 	 */
 	protected Map<String, String> getDefaultHeaders() {
 		Map<String, String> headers = new HashMap<String, String>();
@@ -131,22 +153,84 @@ public class Catalyze {
 		return headers;
 	}
 
+	/**
+	 * Builds and returns a Query instance associated with this authenticated
+	 * Catalyze instance and a custom class.
+	 * 
+	 * @param className
+	 *            The custom class name to query
+	 * @return The Query instance
+	 * @throws IllegalStateException
+	 *             If the Catalyze instance has not been authenticated.
+	 */
 	public Query getQueryInstance(String className) {
+		if (user == null) {
+			throw new IllegalStateException(
+					"The Catalyze instance was not authenticated.");
+		}
 		return new Query(className, this);
 	}
 
+	/**
+	 * Returns a FileManager instance associated with this Catalyze instance
+	 * capable of uploading/downloading and deleting files that the
+	 * authenticated user can access.
+	 * 
+	 * @return The instance of FileManager associated with this Catalyze
+	 *         instance
+	 * @throws IllegalStateException
+	 *             If the Catalyze instance has not been authenticated.
+	 */
 	public FileManager getFileManagerInstance() {
+		if (user == null) {
+			throw new IllegalStateException(
+					"The Catalyze instance was not authenticated.");
+		}
 		return new FileManager(this);
 	}
 
+	/**
+	 * Builds and returns a new instance of CustomClass associated with this
+	 * Catalyze instance.
+	 * 
+	 * @param className
+	 *            The name of the custom class
+	 * @return The instance of CustomClass associated with this Catalyze
+	 *         instance
+	 * @throws IllegalStateException
+	 *             If the Catalyze instance has not been authenticated.
+	 */
 	public CustomClass getCustomClassInstance(String className) {
+		if (user == null) {
+			throw new IllegalStateException(
+					"The Catalyze instance was not authenticated.");
+		}
 		return new CustomClass(className, this);
 	}
 
+	/**
+	 * Builds and returns a new instance of CatalyzeUser associated with this
+	 * Catalyze instance.
+	 * 
+	 * @return The instance of CatalyzeUser associated with this Catalyze
+	 *         instance
+	 * @throws IllegalStateException
+	 *             If the Catalyze instance has not been authenticated.
+	 */
 	public CatalyzeUser getCatalyzeUserInstance() {
+		if (user == null) {
+			throw new IllegalStateException(
+					"The Catalyze instance was not authenticated.");
+		}
 		return new CatalyzeUser(this);
 	}
 
+	/**
+	 * Builds and returns an instance of UMLS associated with this Catalyze
+	 * instance.
+	 * 
+	 * @return An instance of UMLS
+	 */
 	public UMLS getUmlsInstance() {
 		UMLS umls = new UMLS(this);
 		return umls;
@@ -157,14 +241,16 @@ public class Catalyze {
 	 * the user passed callback handler
 	 * 
 	 * @param userCallback
-	 * @return
+	 *            The user-defined callback to send results back to
+	 * @return The listener
 	 */
 	protected static <T> Response.ErrorListener createErrorListener(
 			final CatalyzeListener<T> userCallback) {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				CatalyzeError ce = new CatalyzeError(error);
+				// Currently we just pass up volley errors but this will be extended in time
+				CatalyzeError ce = (CatalyzeError)error;
 				userCallback.onError(ce);
 			}
 		};
