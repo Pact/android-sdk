@@ -24,12 +24,11 @@ repositories {
 dependencies {
     compile project(':volley')
     compile 'com.google.guava:guava:14.0.1'
-<<<<<<< HEAD
-    compile 'com.neovisionaries:nv-i18n:1.5'
-    compile files('./src/main/libs/httpcore-jarjar-4.3.jar')
-    compile files('./src/main/libs/httpmime-jarjar-4.3.1.jar')
-=======
->>>>>>> 7a795c015848a03bee31bd6405cb09e404b96346
+
+    
+    compile files('src/main/libs/httpcore-jarjar-4.3.jar')
+    compile files('src/main/libs/httpmime-jarjar-4.3.1.jar')
+
 }
 
 android {

@@ -3,7 +3,11 @@
 # Creates the SDK JAR. Using an AAR was not feasible for deployment so we 
 # are using JARs until AAR support within Gradle and Eclipse improves. 
 #
+
+# Start by building volley and the SDK
 ./gradlew build 
+
+# Create a temp dir and move there, copy over files to put in JAR
 REPO=`pwd`
 T="$(date +%s)"
 DIR=/tmp/sdk$T/
