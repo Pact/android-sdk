@@ -42,9 +42,9 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void getCodesetList(CatalyzeListener<String[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getUmlsUrl(CODESETS), null,
-				responseListener, errorListener);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				getUmlsUrl(CODESETS), null, responseListener,
+				createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -60,9 +60,9 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void getValueSetList(CatalyzeListener<String[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getUmlsUrl(VALUESETS), null,
-				responseListener, errorListener);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				getUmlsUrl(VALUESETS), null, responseListener,
+				createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -81,11 +81,12 @@ public class UMLS extends CatalyzeObject {
 	 *            CatalyzeListener that must expect an array of UmlsResult on
 	 *            success
 	 */
-	public void codeLookup(String codeSet, String code, CatalyzeListener<UmlsResult[]> callbackHandler) {
+	public void codeLookup(String codeSet, String code,
+			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getUmlsUrl(CODE, codeSet, code), null,
-				responseListener, errorListener);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				getUmlsUrl(CODE, codeSet, code), null, responseListener,
+				createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -105,11 +106,12 @@ public class UMLS extends CatalyzeObject {
 	 *            CatalyzeListener that must expect a UmlsResult object on
 	 *            success
 	 */
-	public void valueLookup(String valueSet, String code, CatalyzeListener<UmlsResult> callbackHandler) {
-		responseListener = createUmlsResultCallback(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(getUmlsUrl(VALUE, valueSet, code), null,
-				responseListener, errorListener);
+	public void valueLookup(String valueSet, String code,
+			CatalyzeListener<UmlsResult> callbackHandler) {
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				getUmlsUrl(VALUE, valueSet, code), null,
+				createUmlsResultCallback(callbackHandler),
+				createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -121,14 +123,16 @@ public class UMLS extends CatalyzeObject {
 	 * 
 	 * @param codeSet
 	 * @param keyword
-	 * @param callbackHandler CatalyzeListener that must expect an array of UmlsResult on
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect an array of UmlsResult on
 	 *            success
 	 */
-	public void searchByKeyword(String codeSet, String keyword, CatalyzeListener<UmlsResult[]> callbackHandler) {
+	public void searchByKeyword(String codeSet, String keyword,
+			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getUmlsUrl(PHRASE, codeSet, keyword), null,
-				responseListener, errorListener);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				getUmlsUrl(PHRASE, codeSet, keyword), null, responseListener,
+				createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -140,18 +144,20 @@ public class UMLS extends CatalyzeObject {
 	 * functionality in web apps. For example while the user is typing in a drug
 	 * name this API can be called to suggest terms. Prefix search also
 	 * typicially outperforms keyword/phrase search so use it instead where it
-	 * is appropriate. 
+	 * is appropriate.
 	 * 
 	 * @param codeSet
 	 * @param prefix
-	 * @param callbackHandler CatalyzeListener that must expect an array of UmlsResult on
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect an array of UmlsResult on
 	 *            success
 	 */
-	public void searchByPrefix(String codeSet, String prefix, CatalyzeListener<UmlsResult[]> callbackHandler) {
+	public void searchByPrefix(String codeSet, String prefix,
+			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getUmlsUrl(PREFIX, codeSet, prefix), null,
-				responseListener, errorListener);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				getUmlsUrl(PREFIX, codeSet, prefix), null, responseListener,
+				createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -166,25 +172,29 @@ public class UMLS extends CatalyzeObject {
 	 * @param type
 	 * @param codeSet
 	 * @param code
-	 * @param callbackHandler CatalyzeListener that must expect an array of UmlsResult on
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect an array of UmlsResult on
 	 *            success
 	 */
 	public void searchByCodeOrConcept(String type, String codeSet, String code,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(getUmlsUrl(RELATED, type, codeSet, code),
-				null, responseListener, errorListener);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				getUmlsUrl(RELATED, type, codeSet, code), null,
+				responseListener, createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
 
 	/**
-	 * Volley response listener that expects a JSONArray and returns String array to user CatalyzeListener
+	 * Volley response listener that expects a JSONArray and returns String
+	 * array to user CatalyzeListener
+	 * 
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONArray> createListenerWithStringCallback(final CatalyzeListener<String[]> userCallback) {
+	private Response.Listener<JSONArray> createListenerWithStringCallback(
+			final CatalyzeListener<String[]> userCallback) {
 		return new Response.Listener<JSONArray>() {
 			@Override
 			public void onResponse(JSONArray response) {
@@ -202,18 +212,22 @@ public class UMLS extends CatalyzeObject {
 	}
 
 	/**
-	 * Volley response listener that expects a JSONArray and returns UmlsResult array to user CatalyzeListener
+	 * Volley response listener that expects a JSONArray and returns UmlsResult
+	 * array to user CatalyzeListener
+	 * 
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONArray> createUmlsResultArrayCallback(final CatalyzeListener<UmlsResult[]> userCallback) {
+	private Response.Listener<JSONArray> createUmlsResultArrayCallback(
+			final CatalyzeListener<UmlsResult[]> userCallback) {
 		return new Response.Listener<JSONArray>() {
 			@Override
 			public void onResponse(JSONArray response) {
 				UmlsResult[] umlsResults = new UmlsResult[response.length()];
 				for (int i = 0; i < response.length(); i++) {
 					try {
-						umlsResults[i] = new UmlsResult(response.getJSONObject(i));
+						umlsResults[i] = new UmlsResult(
+								response.getJSONObject(i));
 						umlsResults[i].mJson = response.getJSONObject(i);
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -225,11 +239,14 @@ public class UMLS extends CatalyzeObject {
 	}
 
 	/**
-	 * Volley response listener that expects a JSONObject and returns UmlsResult to user CatalyzeListener
+	 * Volley response listener that expects a JSONObject and returns UmlsResult
+	 * to user CatalyzeListener
+	 * 
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONObject> createUmlsResultCallback(final CatalyzeListener<UmlsResult> userCallback) {
+	private Response.Listener<JSONObject> createUmlsResultCallback(
+			final CatalyzeListener<UmlsResult> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -241,6 +258,7 @@ public class UMLS extends CatalyzeObject {
 
 	/**
 	 * Simple function to construct url based on args, seperated by "/"
+	 * 
 	 * @param args
 	 * @return
 	 */

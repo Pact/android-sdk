@@ -1,18 +1,16 @@
 package io.catalyze.sdk.android;
 
-import android.widget.TextView;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.google.common.base.Objects;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.common.base.Objects;
 
 /**
  * Base class for different Catalyze objects
@@ -20,9 +18,6 @@ import java.util.Map;
  */
 public abstract class CatalyzeObject{
     protected JSONObject mJson;
-    protected static TextView mResult;
-    protected Response.ErrorListener errorListener;
-    protected Response.Listener<JSONObject> responseListener;
     
 	public CatalyzeObject() {
 		this(new JSONObject());

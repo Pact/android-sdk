@@ -6,20 +6,20 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import com.android.volley.Response;
 import com.android.volley.Request.Method;
+import com.android.volley.Response;
 
 public class FileManager {
 
 	private static final String FILE_ROUTE = Catalyze.BASE_URL + "file";
 	private static final String APP_FILE_ROUTE = Catalyze.BASE_URL + "file/app";
 	private static final String USER_FILE_ROUTE = Catalyze.BASE_URL + "file/user";
-	private CatalyzeUser catalyzeUser;
+	private Catalyze catalyze;
 	private Map<String, String> fileHeaders;
 
-	public FileManager(CatalyzeUser catalyzeUser) {
-		this.catalyzeUser = catalyzeUser;
-		fileHeaders = catalyzeUser.getAuthorizedHeaders();
+	public FileManager(Catalyze catalyze) {
+		this.catalyze = catalyze;
+		fileHeaders = catalyze.getAuthorizedHeaders();
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class FileManager {
 		MultipartRequest<JSONObject> request = new MultipartRequest<JSONObject>(url,
 				CatalyzeObject.createErrorListener(userCallback), createStringResponseListener(userCallback), file,
 				Boolean.toString(phi), fileHeaders);
-		CatalyzeRequest.getRequestQueue(catalyzeUser.catalyze.getContext()).add(request);
+		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class FileManager {
 		// createFileResponseListener(userCallback), file, fileHeaders);
 		MultipartRequest<File> request = new MultipartRequest<File>(Method.GET, FILE_ROUTE + "/" + fileID,
 				CatalyzeObject.createErrorListener(userCallback), createFileResponseListener(userCallback), fileHeaders);
-		CatalyzeRequest.getRequestQueue(catalyzeUser.catalyze.getContext()).add(request);
+		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
 	}
 
 	/**
@@ -87,8 +87,8 @@ public class FileManager {
 	public void deleteFile(String fileID, boolean phi, CatalyzeListener<String> userCallback) {
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(FILE_ROUTE + "/" + fileID, null,
 				createStringResponseListener(userCallback), CatalyzeObject.createErrorListener(userCallback));
-		request.setHeaders(catalyzeUser.getAuthorizedHeaders());
-		request.delete(catalyzeUser.catalyze.getContext());
+		request.setHeaders(catalyze.getAuthorizedHeaders());
+		request.delete(catalyze.getContext());
 	}
 
 	/**

@@ -19,80 +19,81 @@ public class Query extends CatalyzeObject {
 	private static final String FIELD = "field";
 	private static final String SEARCH_BY = "searchBy";
 	private static final String PAGE_NUMBER = "pageNumber";
-    private static final String PAGE_SIZE = "pageSize";
-    private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
-    private CatalyzeUser user;
-    private String customClassName;
-    private ArrayList<CustomClass> queryResults;
-    
+	private static final String PAGE_SIZE = "pageSize";
+	private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
+	private Catalyze catalyze;
+	private String customClassName;
+	private ArrayList<CustomClass> queryResults;
 
-    public Query(String className, CatalyzeUser authenticatedUser) {
-        super();
-        customClassName = className;
-        user = authenticatedUser;
-        queryResults = new ArrayList<CustomClass>();
-    }
-    
-    /**
-     * Get the results from the last executed query.
-     * @return
-     */
-    public ArrayList<CustomClass> getResults(){
-    	return queryResults;
-    }
+	public Query(String className, Catalyze catalyze) {
+		super();
+		this.customClassName = className;
+		this.catalyze = catalyze;
+		this.queryResults = new ArrayList<CustomClass>();
+	}
 
-    public String getField() {
-        return mJson.optString(FIELD, null);
-    }
+	/**
+	 * Get the results from the last executed query.
+	 * 
+	 * @return
+	 */
+	public ArrayList<CustomClass> getResults() {
+		return queryResults;
+	}
 
-    public Query setField(String name) {
-        setSomething(FIELD, name);
-        return this;
-    }
+	public String getField() {
+		return mJson.optString(FIELD, null);
+	}
 
-    public String getSearchBy() {
-        return mJson.optString(SEARCH_BY, null);
-    }
+	public Query setField(String name) {
+		setSomething(FIELD, name);
+		return this;
+	}
 
-    public void setSearchBy(String data) {
-        setSomething(SEARCH_BY, data);
-    }
+	public String getSearchBy() {
+		return mJson.optString(SEARCH_BY, null);
+	}
 
-    public void setPageNumber(int pageNumber) {
-        try {
-            mJson.put(PAGE_NUMBER, pageNumber);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Change the name of the custom class to query.
-     * @param className
-     */
-    public void setCustomClassName(String className){
-    	customClassName = className;
-    }
+	public void setSearchBy(String data) {
+		setSomething(SEARCH_BY, data);
+	}
 
-    public void setPageSize(int pageSize) {
-        try {
-            mJson.put(PAGE_SIZE, pageSize);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+	public void setPageNumber(int pageNumber) {
+		try {
+			mJson.put(PAGE_NUMBER, pageNumber);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
 
-    private void setSomething(String key, String value) {
-        try {
-            mJson.put(key, value);
-        } catch (JSONException e) {
+	/**
+	 * Change the name of the custom class to query.
+	 * 
+	 * @param className
+	 */
+	public void setCustomClassName(String className) {
+		customClassName = className;
+	}
+
+	public void setPageSize(int pageSize) {
+		try {
+			mJson.put(PAGE_SIZE, pageSize);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void setSomething(String key, String value) {
+		try {
+			mJson.put(key, value);
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Run a query with the current settings of this isntance of Query
-	 *
+	 * 
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a Query on successful
 	 *            callback. This Query will be a reference to this instance of
@@ -100,27 +101,33 @@ public class Query extends CatalyzeObject {
 	 *            getResults will return a list containing the results form the
 	 *            last executed query
 	 */
-    public void executeQuery(CatalyzeListener<Query> callbackHandler){
-    	Response.Listener<JSONArray> responseListener = testListener(callbackHandler, this);
-    	errorListener = createErrorListener(callbackHandler);
-    	CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(QUERY_ROUTE + customClassName + "/query", this.asJson(), responseListener, errorListener);
-    	request.setHeaders(user.getAuthorizedHeaders());
-    	request.post(user.catalyze.getContext());
-    }  
-    
-    private static Response.Listener<JSONArray> testListener(final CatalyzeListener<Query> callbackHandler, final Query q) {
-        return new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-            	for(int i = 0; i < response.length(); i++){
-            		try {
-						q.queryResults.add(new CustomClass(response.getJSONObject(i)));
+	public void executeQuery(CatalyzeListener<Query> callbackHandler) {
+		Response.Listener<JSONArray> responseListener = testListener(
+				callbackHandler, this);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				QUERY_ROUTE + customClassName + "/query", this.asJson(),
+				responseListener, createErrorListener(callbackHandler));
+		request.setHeaders(catalyze.getAuthorizedHeaders());
+		request.post(catalyze.getContext());
+	}
+
+	private Response.Listener<JSONArray> testListener(
+			final CatalyzeListener<Query> callbackHandler, final Query q) {
+		return new Response.Listener<JSONArray>() {
+			@Override
+			public void onResponse(JSONArray response) {
+				for (int i = 0; i < response.length(); i++) {
+					try {
+						q.queryResults.add(new CustomClass(  
+								Query.this.customClassName,
+								Query.this.catalyze, response
+										.getJSONObject(i)));
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
-            	}
-                	callbackHandler.onSuccess(q);
-            }
+				}
+				callbackHandler.onSuccess(q);
+			}
 		};
 	}
 }

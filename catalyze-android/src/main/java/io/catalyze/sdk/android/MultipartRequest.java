@@ -1,18 +1,21 @@
 package io.catalyze.sdk.android;
 
-import java.io.*;
+import io.catalyze.jarjar.org.apache.http.entity.mime.MultipartEntityBuilder;
+import io.catalyze.jarjar.org.apache.http.entity.mime.content.FileBody;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
-import io.catalyze.jarjar.org.apache.http.entity.mime.MultipartEntityBuilder;
-import io.catalyze.jarjar.org.apache.http.entity.mime.content.FileBody;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.android.volley.*;
-import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyLog;
 
 /**
  * T is the expected return type   
