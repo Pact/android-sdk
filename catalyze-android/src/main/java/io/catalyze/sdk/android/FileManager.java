@@ -9,16 +9,15 @@ import org.json.JSONObject;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 
-public class FileManager {
+public class FileManager extends CatalyzeObject {
 
 	private static final String FILE_ROUTE = Catalyze.BASE_URL + "file";
 	private static final String APP_FILE_ROUTE = Catalyze.BASE_URL + "file/app";
 	private static final String USER_FILE_ROUTE = Catalyze.BASE_URL + "file/user";
-	private Catalyze catalyze;
 	private Map<String, String> fileHeaders;
 
 	public FileManager(Catalyze catalyze) {
-		this.catalyze = catalyze;
+		super(catalyze);
 		fileHeaders = catalyze.getAuthorizedHeaders();
 	}
 
@@ -51,7 +50,7 @@ public class FileManager {
 	private void uploadFile(String url, File file, boolean phi, CatalyzeListener<String> userCallback) {
 		fileHeaders.put("Content-Type", "multipart/form-data");
 		MultipartRequest<JSONObject> request = new MultipartRequest<JSONObject>(url,
-				CatalyzeObject.createErrorListener(userCallback), createStringResponseListener(userCallback), file,
+				Catalyze.createErrorListener(userCallback), createStringResponseListener(userCallback), file,
 				Boolean.toString(phi), fileHeaders);
 		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
 	}
@@ -72,7 +71,7 @@ public class FileManager {
 		// CatalyzeObject.createErrorListener(userCallback),
 		// createFileResponseListener(userCallback), file, fileHeaders);
 		MultipartRequest<File> request = new MultipartRequest<File>(Method.GET, FILE_ROUTE + "/" + fileID,
-				CatalyzeObject.createErrorListener(userCallback), createFileResponseListener(userCallback), fileHeaders);
+				Catalyze.createErrorListener(userCallback), createFileResponseListener(userCallback), fileHeaders);
 		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
 	}
 
@@ -86,7 +85,7 @@ public class FileManager {
 	 */
 	public void deleteFile(String fileID, boolean phi, CatalyzeListener<String> userCallback) {
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(FILE_ROUTE + "/" + fileID, null,
-				createStringResponseListener(userCallback), CatalyzeObject.createErrorListener(userCallback));
+				createStringResponseListener(userCallback), Catalyze.createErrorListener(userCallback));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.delete(catalyze.getContext());
 	}

@@ -21,14 +21,12 @@ public class Query extends CatalyzeObject {
 	private static final String PAGE_NUMBER = "pageNumber";
 	private static final String PAGE_SIZE = "pageSize";
 	private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
-	private Catalyze catalyze;
 	private String customClassName;
 	private ArrayList<CustomClass> queryResults;
 
 	public Query(String className, Catalyze catalyze) {
-		super();
+		super(catalyze);
 		this.customClassName = className;
-		this.catalyze = catalyze;
 		this.queryResults = new ArrayList<CustomClass>();
 	}
 
@@ -106,7 +104,7 @@ public class Query extends CatalyzeObject {
 				callbackHandler, this);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				QUERY_ROUTE + customClassName + "/query", this.asJson(),
-				responseListener, createErrorListener(callbackHandler));
+				responseListener, Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.post(catalyze.getContext());
 	}

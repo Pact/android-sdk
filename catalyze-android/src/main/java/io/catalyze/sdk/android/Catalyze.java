@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import android.content.Context;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 /**
  * Base class for making Catalyze.io API calls. This class must be instantiated
@@ -24,7 +25,7 @@ import com.android.volley.Response;
  * All API calls are handled asynchronously, if calls require a fixed order,
  * this must be handled outside of the Catalyze Android SDK
  */
-public class Catalyze extends CatalyzeObject {
+public class Catalyze {
 
 	protected final String apiKey;
 	private static final String ANDROID = "android";
@@ -53,10 +54,10 @@ public class Catalyze extends CatalyzeObject {
 	protected CatalyzeUser getAuthenticatedUser() {
 		return user;
 	}
-		
+
 	public void authenticate(String userName, String password,
 			final CatalyzeListener<Catalyze> callbackHandler) {
-		
+
 		Map<String, String> headers = this.getDefaultHeaders();
 		JSONObject jsonBody = new JSONObject();
 		try {
@@ -65,23 +66,26 @@ public class Catalyze extends CatalyzeObject {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-	    
-	    Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
 				Catalyze.this.user = new CatalyzeUser(Catalyze.this);
 				user.setJson(response);
-				user.setUserSessionToken(response.optString(CatalyzeUser.SESSION_TOKEN, null));
+				user.setUserSessionToken(response.optString(
+						CatalyzeUser.SESSION_TOKEN, null));
 				callbackHandler.onResponse(Catalyze.this);
 			}
 		};
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeUser.SIGNIN_URL, jsonBody, responseListener,
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeUser.SIGNIN_URL, jsonBody, responseListener,
 				createErrorListener(callbackHandler));
 		request.setHeaders(headers);
 		request.post(this.appContext);
 	}
-	
-	private Response.Listener<JSONObject> createSupervisorListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+
+	private Response.Listener<JSONObject> createSupervisorListener(
+			final CatalyzeListener<CatalyzeUser> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -92,17 +96,19 @@ public class Catalyze extends CatalyzeObject {
 			}
 		};
 	}
-	
-	protected void getUser(String userName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+
+	protected void getUser(String userName,
+			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSupervisorListener(callbackHandler);
 		Response.ErrorListener errorListener = createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeUser.USER_ROUTE + "/" + userName, null,
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeUser.USER_ROUTE + "/" + userName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
 		request.get(context);
 	}
-	
+
 	protected Map<String, String> getAuthorizedHeaders() {
 		Map<String, String> headers = this.getDefaultHeaders();
 		headers.put("Authorization", "Bearer " + user.getSessionToken());
@@ -124,26 +130,44 @@ public class Catalyze extends CatalyzeObject {
 		headers.put("Content-Type", "application/json");
 		return headers;
 	}
-	
+
 	public Query getQueryInstance(String className) {
-		return new Query( className, this);
+		return new Query(className, this);
 	}
-	
+
 	public FileManager getFileManagerInstance() {
 		return new FileManager(this);
 	}
-	
+
 	public CustomClass getCustomClassInstance(String className) {
 		return new CustomClass(className, this);
 	}
-	
+
 	public CatalyzeUser getCatalyzeUserInstance() {
 		return new CatalyzeUser(this);
 	}
-	
+
 	public UMLS getUmlsInstance() {
 		UMLS umls = new UMLS(this);
 		return umls;
 	}
-	
+
+	/**
+	 * Generic volley error callback handler, returns a CatalyzeError back to
+	 * the user passed callback handler
+	 * 
+	 * @param userCallback
+	 * @return
+	 */
+	protected static <T> Response.ErrorListener createErrorListener(
+			final CatalyzeListener<T> userCallback) {
+		return new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				CatalyzeError ce = new CatalyzeError(error);
+				userCallback.onError(ce);
+			}
+		};
+	}
+
 }

@@ -24,10 +24,9 @@ public class UMLS extends CatalyzeObject {
 	private static final String PREFIX = "prefix";
 	private static final String VALUE = "value";
 	private static final String CODE = "code";
-	private Catalyze catalyze;
 
 	public UMLS(Catalyze catalyze) {
-		this.catalyze = catalyze;
+		super(catalyze);
 	}
 
 	/**
@@ -44,7 +43,7 @@ public class UMLS extends CatalyzeObject {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				getUmlsUrl(CODESETS), null, responseListener,
-				createErrorListener(callbackHandler));
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -62,7 +61,7 @@ public class UMLS extends CatalyzeObject {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				getUmlsUrl(VALUESETS), null, responseListener,
-				createErrorListener(callbackHandler));
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -86,7 +85,7 @@ public class UMLS extends CatalyzeObject {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				getUmlsUrl(CODE, codeSet, code), null, responseListener,
-				createErrorListener(callbackHandler));
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -111,7 +110,7 @@ public class UMLS extends CatalyzeObject {
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
 				getUmlsUrl(VALUE, valueSet, code), null,
 				createUmlsResultCallback(callbackHandler),
-				createErrorListener(callbackHandler));
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -132,7 +131,7 @@ public class UMLS extends CatalyzeObject {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				getUmlsUrl(PHRASE, codeSet, keyword), null, responseListener,
-				createErrorListener(callbackHandler));
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -157,7 +156,7 @@ public class UMLS extends CatalyzeObject {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				getUmlsUrl(PREFIX, codeSet, prefix), null, responseListener,
-				createErrorListener(callbackHandler));
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -181,7 +180,7 @@ public class UMLS extends CatalyzeObject {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				getUmlsUrl(RELATED, type, codeSet, code), null,
-				responseListener, createErrorListener(callbackHandler));
+				responseListener, Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.get(catalyze.getContext());
 	}
@@ -226,7 +225,7 @@ public class UMLS extends CatalyzeObject {
 				UmlsResult[] umlsResults = new UmlsResult[response.length()];
 				for (int i = 0; i < response.length(); i++) {
 					try {
-						umlsResults[i] = new UmlsResult(
+						umlsResults[i] = new UmlsResult(UMLS.this.catalyze,
 								response.getJSONObject(i));
 						umlsResults[i].mJson = response.getJSONObject(i);
 					} catch (JSONException e) {
@@ -250,7 +249,7 @@ public class UMLS extends CatalyzeObject {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				UmlsResult umlsResults = new UmlsResult(response);
+				UmlsResult umlsResults = new UmlsResult(UMLS.this.catalyze, response);
 				userCallback.onSuccess(umlsResults);
 			}
 		};

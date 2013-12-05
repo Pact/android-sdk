@@ -8,8 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import android.content.Context;
+
 import com.google.common.base.Objects;
 
 /**
@@ -17,13 +17,18 @@ import com.google.common.base.Objects;
  *
  */
 public abstract class CatalyzeObject{
-    protected JSONObject mJson;
+	
+    protected JSONObject mJson = new JSONObject();
+    protected final Catalyze catalyze;
+    protected Context context;
     
-	public CatalyzeObject() {
-		this(new JSONObject());
+    public CatalyzeObject(Catalyze catalyze) {
+		this.catalyze = catalyze;
+		this.context = catalyze.getContext();
 	}
-
-	protected CatalyzeObject(JSONObject json) {
+    
+	protected CatalyzeObject(Catalyze catalyze, JSONObject json) {
+		this(catalyze);
 		mJson = json;
 	}
 
@@ -94,7 +99,7 @@ public abstract class CatalyzeObject{
         CatalyzeUser that = (CatalyzeUser) o;
         return Objects.equal(mJson, that.mJson);
     }
-
+    
     @Override
     public String toString() {
         return mJson.toString();
@@ -109,21 +114,5 @@ public abstract class CatalyzeObject{
         return null;
     }
 
-    /**
-	 * Generic volley error callback handler, returns a CatalyzeError back to
-	 * the user passed callback handler
-	 * 
-	 * @param userCallback
-	 * @return
-	 */
-	protected static <T> Response.ErrorListener createErrorListener(
-			final CatalyzeListener<T> userCallback) {
-		return new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				CatalyzeError ce = new CatalyzeError(error);
-				userCallback.onError(ce);
-			}
-		};
-	}
+ 
 }

@@ -15,8 +15,9 @@ public class UmlsResult extends CatalyzeObject {
 	private static final String OID = "oid";
 	private static final String CONCEPT = "concept";
 
-	protected UmlsResult(JSONObject json) {
-		super(json);
+	protected UmlsResult(Catalyze catalyze, JSONObject json) {
+		super(catalyze);
+		this.mJson = json;
 	}
 
 	public String getCode() {
