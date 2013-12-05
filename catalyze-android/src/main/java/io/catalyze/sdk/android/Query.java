@@ -20,7 +20,6 @@ public class Query extends CatalyzeObject {
 	private static final String SEARCH_BY = "searchBy";
 	private static final String PAGE_NUMBER = "pageNumber";
 	private static final String PAGE_SIZE = "pageSize";
-	private static final String QUERY_ROUTE = Catalyze.BASE_URL + "classes/";
 	private String customClassName;
 	private ArrayList<CustomClass> queryResults;
 
@@ -103,7 +102,7 @@ public class Query extends CatalyzeObject {
 		Response.Listener<JSONArray> responseListener = testListener(
 				callbackHandler, this);
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.POST,
-				QUERY_ROUTE + customClassName + "/query", this.mJson,
+				catalyze.queryUrl + customClassName + "/query", this.mJson,
 				responseListener, Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());

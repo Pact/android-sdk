@@ -27,12 +27,12 @@ import com.android.volley.toolbox.Volley;
  */
 public class CatalyzeRequest<T> extends JsonRequest<T> {
 
+	// Borrowed from volley
 	public static final int GET = Request.Method.GET;
 	public static final int POST = Request.Method.POST;
 	public static final int PUT = Request.Method.PUT;
 	public static final int DELETE = Request.Method.DELETE;
 	
-	public static final String BASE_PATH = "https://api.catalyze.io/v1";
 	private Map<String, String> mHeaders = new HashMap<String, String>();
 	private static RequestQueue mRequestQueue;
 	private int mMethod;

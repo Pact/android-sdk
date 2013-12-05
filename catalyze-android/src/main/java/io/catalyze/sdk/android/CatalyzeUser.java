@@ -26,7 +26,8 @@ import com.google.common.base.Strings;
  * 
  * 
  */
-public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeUser> {
+public class CatalyzeUser extends CatalyzeObject implements
+		Comparable<CatalyzeUser> {
 
 	// JSON user field headers
 	protected static final String USERNAME = "username";
@@ -48,15 +49,14 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
 
 	// URL s
-	protected static final String SIGNIN_URL = Catalyze.BASE_URL + "auth/signin";
-	protected static final String SIGOUT_URL = Catalyze.BASE_URL + "auth/signout";
-	protected static final String USER_ROUTE = Catalyze.BASE_URL + "user";
+	protected String signInUrl = null;
+	protected String signOutUrl = null;
+	protected String userUrl = null;
 	private String userSessionToken;
-	
-	public CatalyzeUser(Catalyze catalyze) {
-		super(catalyze);
-	}
 
+	public CatalyzeUser(Catalyze catalyze) {
+		super(catalyze);		
+	}
 
 	// Getter/Setters
 	public String getUsername() {
@@ -285,16 +285,16 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		new JSONObject(extras);
 		return this;
 	}
-	
-	public void setExtra(String key, Object value){
+
+	public void setExtra(String key, Object value) {
 		try {
 			mJson.getJSONObject(EXTRAS).put(key, value);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public Object getExtra(String key){
+
+	public Object getExtra(String key) {
 		try {
 			return mJson.get(key);
 		} catch (JSONException e) {
@@ -302,15 +302,17 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		}
 		return null;
 	}
-	
-	public void removeExtra(String key){
+
+	public void removeExtra(String key) {
 		mJson.remove(key);
 	}
 
 	@Override
 	public int compareTo(CatalyzeUser user) {
-		final String thisFullName = Strings.nullToEmpty(getFirstName()) + Strings.nullToEmpty(getLastName());
-		final String thatFullName = Strings.nullToEmpty(user.getFirstName()) + Strings.nullToEmpty(user.getLastName());
+		final String thisFullName = Strings.nullToEmpty(getFirstName())
+				+ Strings.nullToEmpty(getLastName());
+		final String thatFullName = Strings.nullToEmpty(user.getFirstName())
+				+ Strings.nullToEmpty(user.getLastName());
 		return thisFullName.compareTo(thatFullName);
 	}
 
@@ -334,10 +336,12 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			jsonBody.put(PASSWORD, password);
 		} catch (JSONException e) {
 		}
-	    
-	    Response.Listener<JSONObject> responseListener = createListener(callbackHandler);
-	    Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.POST, SIGNIN_URL, jsonBody, responseListener,
+
+		Response.Listener<JSONObject> responseListener = createListener(callbackHandler);
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.POST, signInUrl, jsonBody, responseListener,
 				errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
@@ -349,11 +353,14 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	public void getUser(CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	public void getUser(CatalyzeListener<CatalyzeUser> callbackHandler,
+			Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET, USER_ROUTE, null, responseListener,
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, userUrl, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
@@ -373,7 +380,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	public void update(CatalyzeListener<CatalyzeUser> callbackHandler) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
 		JSONObject json = this.mJson;
 		JSONObject updates = new JSONObject();
 
@@ -393,7 +401,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.PUT, USER_ROUTE, updates, responseListener,
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.PUT, userUrl, updates, responseListener,
 				errorListener);
 		request.setHeaders(headers);
 		request.execute(catalyze.getContext());
@@ -406,11 +415,14 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	protected void delete(CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	protected void delete(CatalyzeListener<CatalyzeUser> callbackHandler,
+			Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE, USER_ROUTE, null, responseListener,
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, userUrl, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
@@ -426,8 +438,9 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	protected void signUp(String userName, String password, String firstName, String lastName,
-			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	protected void signUp(String userName, String password, String firstName,
+			String lastName, CatalyzeListener<CatalyzeUser> callbackHandler,
+			Context context) {
 		this.setUsername(userName);
 		this.setFirstName(firstName);
 		this.setLastName(lastName);
@@ -442,7 +455,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	private void signUp(String password, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	private void signUp(String password,
+			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = catalyze.getDefaultHeaders();
 		JSONObject jsonBody = mJson;
 		try {
@@ -451,8 +465,10 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			throw new RuntimeException(e);
 		}
 		Response.Listener<JSONObject> responseListener = createListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.POST, USER_ROUTE, jsonBody, responseListener,
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.POST, userUrl, jsonBody, responseListener,
 				errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
@@ -465,11 +481,14 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 *            Funtion to call after HTTP response handled
 	 * @param context
 	 */
-	protected void signOut(CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	protected void signOut(CatalyzeListener<CatalyzeUser> callbackHandler,
+			Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET, SIGOUT_URL, null, responseListener,
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, signOutUrl, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
@@ -485,15 +504,18 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param fieldName
 	 * @param callbackHandler
 	 */
-	public void deleteField(String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler) {
+	public void deleteField(String fieldName,
+			CatalyzeListener<CatalyzeUser> callbackHandler) {
 		if (fieldName == null || fieldName.trim().length() == 0) {
-			//if fieldName is blank this will otherwise delete the user
+			// if fieldName is blank this will otherwise delete the user
 			return;
 		}
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = deleteFieldListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE, USER_ROUTE + "/" + fieldName, null,
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, userUrl + "/" + fieldName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
 		request.execute(catalyze.getContext());
@@ -508,11 +530,14 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	protected void getUserInfo(String userName, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	protected void getUserInfo(String userName,
+			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSupervisorListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET, USER_ROUTE + "/" + userName, null,
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, userUrl + "/" + userName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
@@ -528,7 +553,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	protected void updateUser(CatalyzeUser user, CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
+	protected void updateUser(CatalyzeUser user,
+			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 
 		JSONObject json = user.mJson;
 		JSONObject updates = new JSONObject();
@@ -551,8 +577,10 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSupervisorListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.PUT, USER_ROUTE + "/" + user.getUsername(),
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.PUT, userUrl + "/" + user.getUsername(),
 				updates, responseListener, errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
@@ -572,13 +600,15 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	protected void deleteUserField(String userName, String fieldName, CatalyzeListener<CatalyzeUser> callbackHandler,
-			Context context) {
+	protected void deleteUserField(String userName, String fieldName,
+			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSupervisorListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE, USER_ROUTE + "/" + userName + "/"
-				+ fieldName, null, responseListener, errorListener);
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, userUrl + "/" + userName + "/"
+						+ fieldName, null, responseListener, errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
 	}
@@ -591,12 +621,15 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param callbackHandler
 	 * @param context
 	 */
-	protected void searchForUser(String partialUsername, CatalyzeListener<String[]> callbackHandler, Context context) {
+	protected void searchForUser(String partialUsername,
+			CatalyzeListener<String[]> callbackHandler, Context context) {
 		Map<String, String> headers = getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSupervisorSearchListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET, 
-				USER_ROUTE + "/search/" + partialUsername, null, responseListener, errorListener);
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, userUrl + "/search/" + partialUsername,
+				null, responseListener, errorListener);
 		request.setHeaders(headers);
 		request.execute(context);
 	}
@@ -620,7 +653,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONObject> createListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+	private Response.Listener<JSONObject> createListener(
+			final CatalyzeListener<CatalyzeUser> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -631,8 +665,9 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 			}
 		};
 	}
-	
-	private Response.Listener<JSONObject> deleteFieldListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+
+	private Response.Listener<JSONObject> deleteFieldListener(
+			final CatalyzeListener<CatalyzeUser> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -647,7 +682,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONObject> createSupervisorListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+	private Response.Listener<JSONObject> createSupervisorListener(
+			final CatalyzeListener<CatalyzeUser> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -665,7 +701,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONObject> createSupervisorSearchListener(final CatalyzeListener<String[]> userCallback) {
+	private Response.Listener<JSONObject> createSupervisorSearchListener(
+			final CatalyzeListener<String[]> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -691,7 +728,8 @@ public class CatalyzeUser extends CatalyzeObject implements Comparable<CatalyzeU
 	 * @param userCallback
 	 * @return
 	 */
-	private Response.Listener<JSONObject> createSignoutListener(final CatalyzeListener<CatalyzeUser> userCallback) {
+	private Response.Listener<JSONObject> createSignoutListener(
+			final CatalyzeListener<CatalyzeUser> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {

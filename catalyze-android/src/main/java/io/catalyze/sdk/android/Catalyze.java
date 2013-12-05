@@ -32,7 +32,17 @@ public class Catalyze {
 	private final String identifier;
 	private CatalyzeUser user;
 	private Context appContext;
-	protected static final String BASE_URL = "https://api.catalyze.io/v1/";
+
+	// URLs
+	protected String baseUrl;
+	protected String customClassUrl;
+	protected String queryUrl;
+	protected String signInUrl;
+	protected String signOutUrl;
+	protected String userUrl;
+	protected String fileUrl;
+	protected String appFileUrl;
+	protected String userFileUrl;
 
 	/**
 	 * Create a Catalyze interface for making authenticated api calls
@@ -52,6 +62,28 @@ public class Catalyze {
 		this.apiKey = apiKey;
 		appContext = context;
 		this.identifier = identifier;
+
+		this.setBaseURL("https://api.catalyze.io/v1/");
+	}
+
+	/**
+	 * The version 1.0 URL is set by default but this method allows overriding
+	 * that URL in case of future upgrades/changes.
+	 * 
+	 * @param baseUrl
+	 *            The full base URL (default is 'https://api.catalyze.io/v1/')
+	 */
+	public void setBaseURL(String baseUrl) {
+		this.baseUrl = baseUrl;
+		this.signInUrl = baseUrl + "auth/signin";
+		this.signOutUrl = baseUrl + "auth/signout";
+		this.userUrl = baseUrl + "user";
+		this.queryUrl = baseUrl + "classes/";
+		this.customClassUrl = baseUrl + "classes";
+
+		this.fileUrl = baseUrl + "file";
+		this.appFileUrl = baseUrl + "file/app";
+		this.userFileUrl = baseUrl + "file/user";
 	}
 
 	/**
@@ -113,9 +145,9 @@ public class Catalyze {
 				callbackHandler.onResponse(Catalyze.this);
 			}
 		};
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.POST,
-				CatalyzeUser.SIGNIN_URL, jsonBody, responseListener,
-				createErrorListener(callbackHandler));
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.POST, this.signInUrl, jsonBody,
+				responseListener, createErrorListener(callbackHandler));
 		request.setHeaders(headers);
 		request.execute(this.appContext);
 	}
@@ -249,8 +281,9 @@ public class Catalyze {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				// Currently we just pass up volley errors but this will be extended in time
-				CatalyzeError ce = (CatalyzeError)error;
+				// Currently we just pass up volley errors but this will be
+				// extended in time
+				CatalyzeError ce = (CatalyzeError) error;
 				userCallback.onError(ce);
 			}
 		};

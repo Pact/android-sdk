@@ -15,10 +15,6 @@ import com.android.volley.Response;
  */
 public class CustomClass extends CatalyzeObject {
 
-	// URL CONSTANTS
-	private static final String CUSTOM_CLASS_URL = Catalyze.BASE_URL
-			+ "classes";
-
 	private static final String CONTENT = "content";
 	private static final String PHI = "phi";
 	private static final String PARENT_ID = "parentId";
@@ -36,6 +32,9 @@ public class CustomClass extends CatalyzeObject {
 			e.printStackTrace();
 		}
 		this.className = className;
+		
+		String base = catalyze.baseUrl;
+		
 	}
 
 	protected CustomClass(String className, Catalyze catalyze) {
@@ -161,7 +160,7 @@ public class CustomClass extends CatalyzeObject {
 		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
 		try {
 			CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-					CatalyzeRequest.POST, CUSTOM_CLASS_URL + "/" + getName(),
+					CatalyzeRequest.POST, catalyze.customClassUrl + "/" + getName(),
 					mJson.getJSONObject(CONTENT), responseListener,
 					Catalyze.createErrorListener(callbackHandler));
 			request.setHeaders(catalyze.getAuthorizedHeaders());
@@ -348,7 +347,7 @@ public class CustomClass extends CatalyzeObject {
 	 * @return
 	 */
 	private String getCustomClassUrl(String... args) {
-		String url = CUSTOM_CLASS_URL;
+		String url = catalyze.customClassUrl;
 		for (String s : args) {
 			url += "/" + s;
 		}

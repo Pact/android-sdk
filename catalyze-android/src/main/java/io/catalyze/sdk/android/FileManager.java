@@ -10,10 +10,6 @@ import com.android.volley.Response;
 
 public class FileManager extends CatalyzeObject {
 
-	private static final String FILE_ROUTE = Catalyze.BASE_URL + "file";
-	private static final String APP_FILE_ROUTE = Catalyze.BASE_URL + "file/app";
-	private static final String USER_FILE_ROUTE = Catalyze.BASE_URL
-			+ "file/user";
 	private Map<String, String> fileHeaders;
 
 	public FileManager(Catalyze catalyze) {
@@ -32,7 +28,7 @@ public class FileManager extends CatalyzeObject {
 	 */
 	public void uploadAppFile(File file, boolean phi,
 			CatalyzeListener<String> userCallback) {
-		uploadFile(APP_FILE_ROUTE, file, phi, userCallback);
+		uploadFile(catalyze.appFileUrl, file, phi, userCallback);
 	}
 
 	/**
@@ -46,7 +42,7 @@ public class FileManager extends CatalyzeObject {
 	 */
 	public void uploadUserFile(File file, boolean phi,
 			CatalyzeListener<String> userCallback) {
-		uploadFile(USER_FILE_ROUTE, file, phi, userCallback);
+		uploadFile(catalyze.userFileUrl, file, phi, userCallback);
 	}
 
 	private void uploadFile(String url, File file, boolean phi,
@@ -76,7 +72,7 @@ public class FileManager extends CatalyzeObject {
 		// CatalyzeObject.createErrorListener(userCallback),
 		// createFileResponseListener(userCallback), file, fileHeaders);
 		MultipartRequest<File> request = new MultipartRequest<File>(Method.GET,
-				FILE_ROUTE + "/" + fileID,
+				catalyze.fileUrl + "/" + fileID,
 				Catalyze.createErrorListener(userCallback),
 				createFileResponseListener(userCallback), fileHeaders);
 		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
@@ -93,7 +89,7 @@ public class FileManager extends CatalyzeObject {
 	public void deleteFile(String fileID, boolean phi,
 			CatalyzeListener<String> userCallback) {
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE,
-				FILE_ROUTE + "/" + fileID, null,
+				catalyze.fileUrl + "/" + fileID, null,
 				createStringResponseListener(userCallback),
 				Catalyze.createErrorListener(userCallback));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
