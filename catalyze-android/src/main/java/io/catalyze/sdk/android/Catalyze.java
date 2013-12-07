@@ -151,6 +151,49 @@ public class Catalyze {
 		request.setHeaders(headers);
 		request.execute(this.appContext);
 	}
+	
+	/**
+	 * Perform an API to create a new user.
+	 * 
+	 * @param userName
+	 * @param password
+	 * @param firstName
+	 * @param lastName
+	 * @param callbackHandler
+	 * @param context
+	 */
+	protected void signUp(String userName, String password, String firstName,
+			String lastName, final CatalyzeListener<CatalyzeUser> callbackHandler,
+			Context context) {
+	
+		Map<String, String> headers = this.getDefaultHeaders();
+		JSONObject jsonBody = new JSONObject();
+		try {
+			jsonBody.put(CatalyzeUser.USERNAME, userName);
+			jsonBody.put(CatalyzeUser.FIRST_NAME, firstName);
+			jsonBody.put(CatalyzeUser.LAST_NAME, lastName);
+			jsonBody.put(CatalyzeUser.PASSWORD, password);
+		} catch (JSONException e) {
+			throw new RuntimeException(e);
+		}
+		
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				CatalyzeUser user = new CatalyzeUser(Catalyze.this);
+				Catalyze.this.user = user;
+				callbackHandler.onResponse(user);
+			}
+		};
+		
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.POST, userUrl, jsonBody, responseListener,
+				errorListener);
+		request.setHeaders(headers);
+		request.execute(context);
+	}
 
 	/**
 	 * Builds the header fields needed to make an authenticated connection to
@@ -237,7 +280,7 @@ public class Catalyze {
 			throw new IllegalStateException(
 					"The Catalyze instance was not authenticated.");
 		}
-		return new CustomClass(className, this);
+		return new CustomClass(this, className);
 	}
 
 	/**

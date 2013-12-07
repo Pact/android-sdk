@@ -15,18 +15,42 @@ import com.android.volley.Response;
  */
 public class UMLS extends CatalyzeObject {
 
-	// URL constants
-	private static final String UMLS_ROUTE = "https://umls.catalyze.io/v1/umls";
-	private static final String CODESETS = "codesets";
-	private static final String VALUESETS = "valuesets";
-	private static final String RELATED = "related";
-	private static final String PHRASE = "phrase";
-	private static final String PREFIX = "prefix";
-	private static final String VALUE = "value";
-	private static final String CODE = "code";
+	// Route values, set in constructor or by setBaseUrl()
+	private String baseUrl;
+	private String codesetsUrl = "codesets";
+	private String valuesetsUrl = "valuesets";
+	private String relatedUrl = "related";
+	private String phraseUrl = "phrase";
+	private String prefixUrl = "prefix";
+	private String valueUrl = "value";
+	private String codeUrl = "code";
 
+	/**
+	 * Create a UMLS instance associated with the given Catalyze object.
+	 * 
+	 * @param catalyze
+	 *            The Catalyze instance. Does not need to be authenticated.
+	 */
 	public UMLS(Catalyze catalyze) {
 		super(catalyze);
+		this.setBaseURL("https://umls.catalyze.io/v1/umls");
+	}
+
+	/**
+	 * Update the route URLs using the provided base URL.
+	 * 
+	 * @param url
+	 *            A URL for the Catalyze API
+	 */
+	public void setBaseURL(String url) {
+		this.baseUrl = url;
+		this.codesetsUrl = url + "codesets";
+		valuesetsUrl = url + "valuesets";
+		relatedUrl = url + "related";
+		phraseUrl = url + "phrase";
+		prefixUrl = url + "prefix";
+		valueUrl = url + "value";
+		codeUrl = url + "code";
 	}
 
 	/**
@@ -41,8 +65,8 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void getCodesetList(CatalyzeListener<String[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
-				getUmlsUrl(CODESETS), null, responseListener,
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, codesetsUrl, null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.execute(catalyze.getContext());
@@ -59,8 +83,8 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void getValueSetList(CatalyzeListener<String[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
-				getUmlsUrl(VALUESETS), null, responseListener,
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, valuesetsUrl, null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.execute(catalyze.getContext());
@@ -83,8 +107,9 @@ public class UMLS extends CatalyzeObject {
 	public void codeLookup(String codeSet, String code,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
-				getUmlsUrl(CODE, codeSet, code), null, responseListener,
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, codeUrl + "/" + codeSet + "/" + code,
+				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.execute(catalyze.getContext());
@@ -107,9 +132,9 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public void valueLookup(String valueSet, String code,
 			CatalyzeListener<UmlsResult> callbackHandler) {
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET,
-				getUmlsUrl(VALUE, valueSet, code), null,
-				createUmlsResultCallback(callbackHandler),
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, valueUrl + "/" + valueSet + "/" + code,
+				null, createUmlsResultCallback(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.execute(catalyze.getContext());
@@ -129,8 +154,9 @@ public class UMLS extends CatalyzeObject {
 	public void searchByKeyword(String codeSet, String keyword,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
-				getUmlsUrl(PHRASE, codeSet, keyword), null, responseListener,
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, phraseUrl + "/" + codeSet + "/" + keyword,
+				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.execute(catalyze.getContext());
@@ -154,8 +180,9 @@ public class UMLS extends CatalyzeObject {
 	public void searchByPrefix(String codeSet, String prefix,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
-				getUmlsUrl(PREFIX, codeSet, prefix), null, responseListener,
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, prefixUrl + "/" + codeSet + "/" + prefix,
+				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.execute(catalyze.getContext());
@@ -178,9 +205,10 @@ public class UMLS extends CatalyzeObject {
 	public void searchByCodeOrConcept(String type, String codeSet, String code,
 			CatalyzeListener<UmlsResult[]> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
-				getUmlsUrl(RELATED, type, codeSet, code), null,
-				responseListener, Catalyze.createErrorListener(callbackHandler));
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, relatedUrl + "/" + type + "/" + codeSet
+						+ "/" + code, null, responseListener,
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
 		request.execute(catalyze.getContext());
 	}
@@ -249,24 +277,11 @@ public class UMLS extends CatalyzeObject {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				UmlsResult umlsResults = new UmlsResult(UMLS.this.catalyze, response);
+				UmlsResult umlsResults = new UmlsResult(UMLS.this.catalyze,
+						response);
 				userCallback.onSuccess(umlsResults);
 			}
 		};
-	}
-
-	/**
-	 * Simple function to construct url based on args, seperated by "/"
-	 * 
-	 * @param args
-	 * @return
-	 */
-	private String getUmlsUrl(String... args) {
-		String url = UMLS_ROUTE;
-		for (String s : args) {
-			url += "/" + s;
-		}
-		return url;
 	}
 
 }

@@ -24,7 +24,7 @@ public class CustomClass extends CatalyzeObject {
 
 	private String className;
 
-	protected CustomClass(String className, Catalyze catalyze, JSONObject json) {
+	protected CustomClass(Catalyze catalyze, String className, JSONObject json) {
 		super(catalyze);
 		try {
 			mJson.put(CONTENT, json);
@@ -32,13 +32,13 @@ public class CustomClass extends CatalyzeObject {
 			e.printStackTrace();
 		}
 		this.className = className;
-		
+
 		String base = catalyze.baseUrl;
-		
+
 	}
 
-	protected CustomClass(String className, Catalyze catalyze) {
-		this(className, catalyze, new JSONObject());
+	protected CustomClass(Catalyze catalyze, String className) {
+		this(catalyze, className, new JSONObject());
 	}
 
 	public void setName(String className) {
@@ -160,8 +160,9 @@ public class CustomClass extends CatalyzeObject {
 		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
 		try {
 			CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-					CatalyzeRequest.POST, catalyze.customClassUrl + "/" + getName(),
-					mJson.getJSONObject(CONTENT), responseListener,
+					CatalyzeRequest.POST, catalyze.customClassUrl + "/"
+							+ getName(), mJson.getJSONObject(CONTENT),
+					responseListener,
 					Catalyze.createErrorListener(callbackHandler));
 			request.setHeaders(catalyze.getAuthorizedHeaders());
 			request.execute(catalyze.getContext());
@@ -183,8 +184,9 @@ public class CustomClass extends CatalyzeObject {
 	public void getEntry(String entryId,
 			CatalyzeListener<CustomClass> callbackHandler) {
 		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET,
-				getCustomClassUrl(getName(), entryId), null, responseListener,
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, getCustomClassUrl(getName(), entryId),
+				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());
@@ -207,9 +209,9 @@ public class CustomClass extends CatalyzeObject {
 		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
 		CatalyzeRequest<JSONObject> request;
 		try {
-			request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.PUT,getCustomClassUrl(
-					getName(), getId()), mJson.getJSONObject(CONTENT),
-					responseListener,
+			request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.PUT,
+					getCustomClassUrl(getName(), getId()),
+					mJson.getJSONObject(CONTENT), responseListener,
 					Catalyze.createErrorListener(callbackHandler));
 			request.setHeaders(catalyze.getAuthorizedHeaders());
 			request.execute(catalyze.getContext());
@@ -232,8 +234,9 @@ public class CustomClass extends CatalyzeObject {
 	 */
 	public void deleteEntry(CatalyzeListener<CustomClass> callbackHandler) {
 		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE,
-				getCustomClassUrl(getName(), getId()), null, responseListener,
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, getCustomClassUrl(getName(), getId()),
+				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());
@@ -253,9 +256,9 @@ public class CustomClass extends CatalyzeObject {
 	 */
 	public void getArray(String refName,
 			CatalyzeListener<CustomClass[]> callbackHandler) {
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.GET,
-				getCustomClassUrl(getName(), getId(), REF, refName), null,
-				createArrayListener(callbackHandler),
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, getCustomClassUrl(getName(), getId(), REF,
+						refName), null, createArrayListener(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());
@@ -286,9 +289,9 @@ public class CustomClass extends CatalyzeObject {
 			e.printStackTrace();
 		}
 		newArrayEntry.put(json);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.PUT,
-				newArrayEntry, getCustomClassUrl(getName(), getId(), REF,
-						refName),
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.PUT, newArrayEntry, getCustomClassUrl(
+						getName(), getId(), REF, refName),
 				createListenerReturnUpdatedInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
@@ -312,9 +315,10 @@ public class CustomClass extends CatalyzeObject {
 	 */
 	public void getArrayRef(String refName, String refId,
 			CatalyzeListener<CustomClass> callbackHandler) {
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.GET,
-				getCustomClassUrl(getName(), getId(), REF, refName, refId),
-				null, createListenerReturnNewInstance(callbackHandler),
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, getCustomClassUrl(getName(), getId(), REF,
+						refName, refId), null,
+				createListenerReturnNewInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());
@@ -331,9 +335,10 @@ public class CustomClass extends CatalyzeObject {
 	 */
 	public void deleteArrayRef(String refName, String refId,
 			CatalyzeListener<CustomClass> callbackHandler) {
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE,
-				getCustomClassUrl(getName(), getId(), REF, refName, refId),
-				null, createListenerReturnNewInstance(callbackHandler),
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, getCustomClassUrl(getName(), getId(),
+						REF, refName, refId), null,
+				createListenerReturnNewInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());
@@ -368,8 +373,8 @@ public class CustomClass extends CatalyzeObject {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				CustomClass cc = new CustomClass(CustomClass.this.className,
-						CustomClass.this.catalyze, response);
+				CustomClass cc = new CustomClass(CustomClass.this.catalyze,
+						CustomClass.this.className, response);
 				callbackHandler.onSuccess(cc);
 			}
 		};
@@ -410,9 +415,8 @@ public class CustomClass extends CatalyzeObject {
 				CustomClass[] ccArray = new CustomClass[response.length()];
 				for (int i = 0; i < response.length(); i++) {
 					try {
-						ccArray[i] = new CustomClass(
+						ccArray[i] = new CustomClass(CustomClass.this.catalyze,
 								CustomClass.this.className,
-								CustomClass.this.catalyze,
 								response.getJSONObject(i));
 					} catch (JSONException e) {
 						e.printStackTrace();

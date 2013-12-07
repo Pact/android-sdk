@@ -12,7 +12,7 @@ public class FileManager extends CatalyzeObject {
 
 	private Map<String, String> fileHeaders;
 
-	public FileManager(Catalyze catalyze) {
+	protected FileManager(Catalyze catalyze) {
 		super(catalyze);
 		fileHeaders = catalyze.getAuthorizedHeaders();
 	}

@@ -101,9 +101,10 @@ public class Query extends CatalyzeObject {
 	public void executeQuery(CatalyzeListener<Query> callbackHandler) {
 		Response.Listener<JSONArray> responseListener = testListener(
 				callbackHandler, this);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(CatalyzeRequest.POST,
-				catalyze.queryUrl + customClassName + "/query", this.mJson,
-				responseListener, Catalyze.createErrorListener(callbackHandler));
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.POST, catalyze.queryUrl + customClassName
+						+ "/query", this.mJson, responseListener,
+				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());
 	}
@@ -115,9 +116,8 @@ public class Query extends CatalyzeObject {
 			public void onResponse(JSONArray response) {
 				for (int i = 0; i < response.length(); i++) {
 					try {
-						q.queryResults.add(new CustomClass(  
-								Query.this.customClassName,
-								Query.this.catalyze, response
+						q.queryResults.add(new CustomClass(Query.this.catalyze,
+								Query.this.customClassName, response
 										.getJSONObject(i)));
 					} catch (JSONException e) {
 						e.printStackTrace();
