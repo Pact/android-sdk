@@ -15,6 +15,7 @@ import com.android.volley.Response;
  */
 public class CustomClass extends CatalyzeObject {
 
+	// Field constants
 	private static final String CONTENT = "content";
 	private static final String PHI = "phi";
 	private static final String PARENT_ID = "parentId";
@@ -22,8 +23,20 @@ public class CustomClass extends CatalyzeObject {
 	private static final String ID = "id";
 	private static final String REF = "ref";
 
+	// The name of this custom class
 	private String className;
 
+	/**
+	 * Create a custom class instance associated to a Catalyze instance. Use
+	 * provided JSON data to initialize the object's content.
+	 * 
+	 * @param catalyze
+	 *            The authenticated Catalyze instance
+	 * @param className
+	 *            The name of this instance's custom class
+	 * @param json
+	 *            The data to populate the instance's content with
+	 */
 	protected CustomClass(Catalyze catalyze, String className, JSONObject json) {
 		super(catalyze);
 		try {
@@ -32,24 +45,54 @@ public class CustomClass extends CatalyzeObject {
 			e.printStackTrace();
 		}
 		this.className = className;
-
-		String base = catalyze.baseUrl;
-
 	}
 
+	/**
+	 * Create a custom class instance associated to a Catalyze instance.
+	 * 
+	 * @param catalyze
+	 *            The authenticated Catalyze instance
+	 * @param className
+	 *            The name of this instance's custom class
+	 */
 	protected CustomClass(Catalyze catalyze, String className) {
 		this(catalyze, className, new JSONObject());
 	}
 
-	public void setName(String className) {
-		this.className = className;
-	}
-
+	/**
+	 * Gets the name of this instance's custom class.
+	 * 
+	 * @return The custom class name
+	 */
 	public String getName() {
 		return className;
 	}
 
-	public Object getContent(String key) {
+	/**
+	 * Allows access to the underlying JSON in the custom class.
+	 * 
+	 * @return The JSON content of this intance.
+	 */
+	public JSONObject getContent() {
+		JSONObject json = null;
+		try {
+			json = this.mJson.getJSONObject(CONTENT);
+		} catch (JSONException je) {
+			je.printStackTrace();
+		}
+		return json;
+
+	}
+
+	/**
+	 * Helper method to retrieve part of the instance's content by key. Not sure
+	 * is we need this. Marked as private for now.
+	 * 
+	 * @param key
+	 *            The key of the desired data
+	 * @return The data associated with this key
+	 */
+	private Object getContent(String key) {
 		Object value = mJson.opt(key);
 		if (value instanceof JSONArray) {
 			return handleJSONArray((JSONArray) value);
@@ -59,25 +102,51 @@ public class CustomClass extends CatalyzeObject {
 		return value;
 	}
 
-	public CustomClass putContent(String key, Object value) {
+	/**
+	 * Not sure if we need this. Marked as private for now.
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	private void putContent(String key, Object value) {
 		try {
 			mJson.getJSONObject(CONTENT).put(key, value);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return this;
 	}
 
-	public CustomClass removeContent(String key) {
+	/**
+	 * Not sure we need this. Marked as private for now.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	private CustomClass removeContent(String key) {
 		mJson.remove(key);
 		return this;
 	}
 
-	public boolean isPHI() {
+	/**
+	 * Used to determine if this instance may contain Protected Health
+	 * Information (PHI).
+	 * 
+	 * @return true - when the class's data may contain PHI, else false
+	 */
+	public boolean containsPHI() {
 		return mJson.optBoolean(PHI, true);
 	}
 
-	public CustomClass setPHI(boolean phi) {
+	/**
+	 * Sets if the custom class can contain PHI or not. Marked as private for
+	 * now.
+	 * 
+	 * Should this be possible from the API?
+	 * 
+	 * @param phi
+	 * @return
+	 */
+	private CustomClass setPHI(boolean phi) {
 		try {
 			mJson.put(PHI, phi);
 		} catch (JSONException e) {
@@ -255,10 +324,28 @@ public class CustomClass extends CatalyzeObject {
 	 *            references to a new set of CustomClass instances
 	 */
 	public void getArray(String refName,
-			CatalyzeListener<CustomClass[]> callbackHandler) {
+			final CatalyzeListener<CustomClass[]> callbackHandler) {
+
+		Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
+			@Override
+			public void onResponse(JSONArray response) {
+				CustomClass[] ccArray = new CustomClass[response.length()];
+				for (int i = 0; i < response.length(); i++) {
+					try {
+						ccArray[i] = new CustomClass(CustomClass.this.catalyze,
+								CustomClass.this.className,
+								response.getJSONObject(i));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+				callbackHandler.onSuccess(ccArray);
+			}
+		};
+
 		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
 				CatalyzeRequest.GET, getCustomClassUrl(getName(), getId(), REF,
-						refName), null, createArrayListener(callbackHandler),
+						refName), null, listener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute(catalyze.getContext());
@@ -396,33 +483,6 @@ public class CustomClass extends CatalyzeObject {
 			public void onResponse(JSONObject response) {
 				CustomClass.this.mJson = response;
 				callbackHandler.onSuccess(CustomClass.this);
-			}
-		};
-	}
-
-	/**
-	 * Handle volley response when response will be a JSONArray
-	 * 
-	 * @param callbackHandler
-	 * @param cc
-	 * @return
-	 */
-	private Response.Listener<JSONArray> createArrayListener(
-			final CatalyzeListener<CustomClass[]> callbackHandler) {
-		return new Response.Listener<JSONArray>() {
-			@Override
-			public void onResponse(JSONArray response) {
-				CustomClass[] ccArray = new CustomClass[response.length()];
-				for (int i = 0; i < response.length(); i++) {
-					try {
-						ccArray[i] = new CustomClass(CustomClass.this.catalyze,
-								CustomClass.this.className,
-								response.getJSONObject(i));
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-				}
-				callbackHandler.onSuccess(ccArray);
 			}
 		};
 	}

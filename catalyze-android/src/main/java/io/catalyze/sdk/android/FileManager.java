@@ -8,16 +8,29 @@ import org.json.JSONObject;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 
+/**
+ * The FileManager allows for the upload and download of files to the Catalyze
+ * backend file store.
+ * 
+ * @author uphoff
+ * 
+ */
 public class FileManager extends CatalyzeObject {
 
-	private Map<String, String> fileHeaders;
-
+	/**
+	 * Create a new instance associated with the authenticated Catalyze
+	 * instance.
+	 * 
+	 * @param catalyze
+	 *            An authenticated connection to the API
+	 */
 	protected FileManager(Catalyze catalyze) {
 		super(catalyze);
-		fileHeaders = catalyze.getAuthorizedHeaders();
 	}
 
 	/**
+	 * This method provides the ability to upload a file associated with the
+	 * current app.
 	 * 
 	 * @param file
 	 *            File to upload
@@ -32,6 +45,8 @@ public class FileManager extends CatalyzeObject {
 	}
 
 	/**
+	 * This method provides the ability to upload a file associated with the
+	 * authenticated user.
 	 * 
 	 * @param file
 	 *            File to upload
@@ -45,8 +60,21 @@ public class FileManager extends CatalyzeObject {
 		uploadFile(catalyze.userFileUrl, file, phi, userCallback);
 	}
 
+	/**
+	 * Helper method to upload either an app file or user file.
+	 * 
+	 * @param url
+	 *            The URL: app file or user file URL
+	 * @param file
+	 *            The file to upload
+	 * @param phi
+	 *            If the file may have PHI
+	 * @param userCallback
+	 *            The user-defined callback to handle results
+	 */
 	private void uploadFile(String url, File file, boolean phi,
 			CatalyzeListener<String> userCallback) {
+		Map<String, String> fileHeaders = catalyze.getAuthorizedHeaders();
 		fileHeaders.put("Content-Type", "multipart/form-data");
 		MultipartRequest<JSONObject> request = new MultipartRequest<JSONObject>(
 				url, Catalyze.createErrorListener(userCallback),
@@ -56,6 +84,8 @@ public class FileManager extends CatalyzeObject {
 	}
 
 	/**
+	 * Retrieves a file from the backend. The authenticated user must be the
+	 * owner of the file or have sufficient permissions to read the file.
 	 * 
 	 * @param fileID
 	 *            ID of file to retrieve
@@ -66,19 +96,24 @@ public class FileManager extends CatalyzeObject {
 	 *            pointer to the File is returned to the callback handler.
 	 */
 	public void getFile(String fileID, File file,
-			CatalyzeListener<File> userCallback) {
-		// MultipartRequest<File> request = new
-		// MultipartRequest<File>(Method.GET, FILE_ROUTE + "/" + fileID,
-		// CatalyzeObject.createErrorListener(userCallback),
-		// createFileResponseListener(userCallback), file, fileHeaders);
+			final CatalyzeListener<File> userCallback) {
+		Response.Listener<File> responseListener = new Response.Listener<File>() {
+			@Override
+			public void onResponse(File response) {
+				// Return file to user
+				userCallback.onSuccess(response);
+			}
+		};
+		Map<String, String> fileHeaders = catalyze.getAuthorizedHeaders();
 		MultipartRequest<File> request = new MultipartRequest<File>(Method.GET,
 				catalyze.fileUrl + "/" + fileID,
-				Catalyze.createErrorListener(userCallback),
-				createFileResponseListener(userCallback), fileHeaders);
+				Catalyze.createErrorListener(userCallback), responseListener,
+				fileHeaders);
 		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
 	}
 
 	/**
+	 * Provides the ability to delete a file on the backend.
 	 * 
 	 * @param fileID
 	 *            ID of file to delete
@@ -88,8 +123,8 @@ public class FileManager extends CatalyzeObject {
 	 */
 	public void deleteFile(String fileID, boolean phi,
 			CatalyzeListener<String> userCallback) {
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.DELETE,
-				catalyze.fileUrl + "/" + fileID, null,
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, catalyze.fileUrl + "/" + fileID, null,
 				createStringResponseListener(userCallback),
 				Catalyze.createErrorListener(userCallback));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
@@ -100,7 +135,8 @@ public class FileManager extends CatalyzeObject {
 	 * Volley callback handler that returns a string
 	 * 
 	 * @param userCallback
-	 * @return
+	 *            The callback created by the user
+	 * @return The callback listener
 	 */
 	private Response.Listener<JSONObject> createStringResponseListener(
 			final CatalyzeListener<String> userCallback) {
@@ -108,23 +144,6 @@ public class FileManager extends CatalyzeObject {
 			@Override
 			public void onResponse(JSONObject response) {
 				userCallback.onSuccess(response.toString());
-			}
-		};
-	}
-
-	/**
-	 * Volley callbaack handler that returns a file pointer
-	 * 
-	 * @param userCallback
-	 * @return
-	 */
-	private Response.Listener<File> createFileResponseListener(
-			final CatalyzeListener<File> userCallback) {
-		return new Response.Listener<File>() {
-			@Override
-			public void onResponse(File response) {
-				// Return file to user
-				userCallback.onSuccess(response);
 			}
 		};
 	}

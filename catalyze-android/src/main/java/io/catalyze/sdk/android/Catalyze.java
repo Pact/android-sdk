@@ -14,42 +14,77 @@ import com.android.volley.VolleyError;
 /**
  * Base class for making Catalyze.io API calls. This class must be instantiated
  * with an API key and Application identifier before any api calls can be made.
- * Once Catalyze has been instantiated it can be used to generate an
- * authenticated CatalyzeUser instance that will be associated with this
- * instance of Catalyze.
+ * Once Catalyze has been instantiated it must be authenticated to retrieve a
+ * CatalyzeUser instance that will be associated with this instance of Catalyze.
+ * Once authenticated the instance can be used.
  * 
  * Any API routes being performed must be provided a CatalyzeListener. Upon
  * completion of API request the provided CatalyzeListener will be called with
  * either a success or error response.
  * 
  * All API calls are handled asynchronously, if calls require a fixed order,
- * this must be handled outside of the Catalyze Android SDK
+ * this must be handled outside of the Catalyze Android SDK (handled by app
+ * logic).
  */
 public class Catalyze {
 
-	protected final String apiKey;
+	// Const defining the API key prefix
 	private static final String ANDROID = "android";
+
+	// The API key for the app, set in constructor
+	private final String apiKey;
+
+	// The name of this app
 	private final String identifier;
+	
+	// The authenticated user. Cannot be used until the instance is authenticated. 
 	private CatalyzeUser user;
+	
+	// The app context. Cannot be changed although that may be a needed feature. 
 	private Context appContext;
 
-	// URLs
+	/**
+	 * URLs: The fields below define the route URLS for the operations supported
+	 * by the API.
+	 */
+
+	// Base URL of the app.
 	protected String baseUrl;
+
+	// URL of route for custom class operations
 	protected String customClassUrl;
+
+	// URL of route for query operations
 	protected String queryUrl;
+
+	// URL of route for sign in (log in)
 	protected String signInUrl;
+
+	// URL of route for sign out (log out)
 	protected String signOutUrl;
+
+	// URL of route for user operations
 	protected String userUrl;
+
+	// URL of route for file operations
 	protected String fileUrl;
+
+	// URL of route for application-related file operations
 	protected String appFileUrl;
+
+	// URL of route for user-related file operations
 	protected String userFileUrl;
 
 	/**
-	 * Create a Catalyze interface for making authenticated api calls
+	 * Create a Catalyze interface for making authenticated api calls.
 	 * 
 	 * @param apiKey
+	 *            The app's API key
 	 * @param identifier
+	 *            The name of the app
 	 * @param context
+	 *            The context to associate with for performing network
+	 *            operations.
 	 */
 	public Catalyze(String apiKey, String identifier, Context context) {
 		if (apiKey == null) {
@@ -60,7 +95,7 @@ public class Catalyze {
 			throw new IllegalStateException("The context must be non-null.");
 		}
 		this.apiKey = apiKey;
-		appContext = context;
+		this.appContext = context;
 		this.identifier = identifier;
 
 		this.setBaseURL("https://api.catalyze.io/v1/");
@@ -151,21 +186,20 @@ public class Catalyze {
 		request.setHeaders(headers);
 		request.execute(this.appContext);
 	}
-	
+
 	/**
 	 * Perform an API to create a new user.
 	 * 
-	 * @param userName
-	 * @param password
-	 * @param firstName
-	 * @param lastName
-	 * @param callbackHandler
-	 * @param context
+	 * @param userName The user name. Should be an email address.
+	 * @param password The user's password.
+	 * @param firstName The user's first name.
+	 * @param lastName The user's last name.
+	 * @param callbackHandler The call back to report back success or failure. 
 	 */
-	protected void signUp(String userName, String password, String firstName,
-			String lastName, final CatalyzeListener<CatalyzeUser> callbackHandler,
-			Context context) {
-	
+	public void signUp(String userName, String password, String firstName,
+			String lastName,
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
+
 		Map<String, String> headers = this.getDefaultHeaders();
 		JSONObject jsonBody = new JSONObject();
 		try {
@@ -176,7 +210,7 @@ public class Catalyze {
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
@@ -185,14 +219,14 @@ public class Catalyze {
 				callbackHandler.onResponse(user);
 			}
 		};
-		
+
 		Response.ErrorListener errorListener = Catalyze
 				.createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
 				CatalyzeRequest.POST, userUrl, jsonBody, responseListener,
 				errorListener);
 		request.setHeaders(headers);
-		request.execute(context);
+		request.execute(this.appContext);
 	}
 
 	/**

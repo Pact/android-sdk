@@ -18,9 +18,15 @@ import com.google.common.base.Objects;
  */
 public abstract class CatalyzeObject {
 
+	// Core data storage is in JSON as that's what the API talks
 	protected JSONObject mJson = new JSONObject();
+
+	// The Catalyze instance associated with this object
 	protected final Catalyze catalyze;
-	protected Context context;
+
+	// Initially null indicating that the catalyze attribute's Context should be
+	// used
+	private Context context = null;
 
 	/**
 	 * Creates an instance attached to an authenticated Catalyze instance.
@@ -41,7 +47,6 @@ public abstract class CatalyzeObject {
 		}
 
 		this.catalyze = catalyze;
-		this.context = catalyze.getContext();
 	}
 
 	/**
@@ -72,10 +77,25 @@ public abstract class CatalyzeObject {
 	}
 
 	/**
+	 * Gets the Context associated with this instance. Will use the default
+	 * Catalyze instance Context unless set explicitly in setContext().
+	 * 
+	 * @return The associated Context
+	 */
+	public Context getContext() {
+		// If context is not set, use the catalyze context
+		if (this.context == null) {
+			return this.catalyze.getContext();
+		}
+		return context; // Else return the assigned context
+	}
+
+	/**
 	 * Provides the ability to overwrite the current JSON. Used in the results
 	 * returned from update operations.
 	 * 
-	 * @param json The new JSON to use
+	 * @param json
+	 *            The new JSON to use
 	 */
 	protected void setJson(JSONObject json) {
 		mJson = json;
@@ -84,7 +104,8 @@ public abstract class CatalyzeObject {
 	/**
 	 * Helper method for handling JSON data.
 	 * 
-	 * @param object The object to process
+	 * @param object
+	 *            The object to process
 	 * @return A key-value map from the JSON data
 	 */
 	protected Map<String, Object> handleJSONObject(JSONObject object) {
@@ -92,19 +113,20 @@ public abstract class CatalyzeObject {
 
 		Iterator iter = object.keys();
 		while (iter.hasNext()) {
-		
+
 			Object key = iter.next();
 			if (!(key instanceof String)) {
 				throw new IllegalStateException("Non-String key in JSONObject.");
 			}
-			
-			String keyStr = (String)key;
+
+			String keyStr = (String) key;
 			try {
 				Object value = object.get(keyStr);
 				if (value instanceof JSONArray) {
 					handleJSONArray((JSONArray) value);
 				} else if (value instanceof JSONObject) {
-					retVal.put(keyStr, handleJSONObject(object.getJSONObject(keyStr)));
+					retVal.put(keyStr,
+							handleJSONObject(object.getJSONObject(keyStr)));
 				} else {
 					retVal.put(keyStr, value);
 				}
@@ -118,7 +140,8 @@ public abstract class CatalyzeObject {
 	/**
 	 * Helper method for manipulating JSON array data.
 	 * 
-	 * @param array The array to process
+	 * @param array
+	 *            The array to process
 	 * @return Objects extracted from the input array
 	 */
 	protected Object[] handleJSONArray(JSONArray array) {
@@ -141,7 +164,7 @@ public abstract class CatalyzeObject {
 	}
 
 	/**
-	 * Use the JSON's hash. 
+	 * Use the JSON's hash.
 	 */
 	@Override
 	public int hashCode() {
@@ -174,10 +197,13 @@ public abstract class CatalyzeObject {
 	}
 
 	/**
-	 * A better formatted JSON String representation than the default toString().
+	 * A better formatted JSON String representation than the default
+	 * toString().
 	 * 
-	 * @param indentSpaces Number of spaces to indent on each level.
-	 * @return A Formatted String indented and useful for user presentation of JSON. 
+	 * @param indentSpaces
+	 *            Number of spaces to indent on each level.
+	 * @return A Formatted String indented and useful for user presentation of
+	 *         JSON.
 	 */
 	public String toString(int indentSpaces) {
 		try {

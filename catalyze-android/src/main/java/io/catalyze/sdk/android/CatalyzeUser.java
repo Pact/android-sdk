@@ -12,10 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-
 import com.android.volley.Response;
-import com.google.common.base.Strings;
 
 /***
  * 
@@ -46,14 +43,14 @@ public class CatalyzeUser extends CatalyzeObject implements
 	// URLs
 	protected String signOutUrl = null;
 	protected String userUrl = null;
-	
+
 	// The authenticated session token
 	private String userSessionToken;
 
 	public CatalyzeUser(Catalyze catalyze) {
-		super(catalyze);		
+		super(catalyze);
 	}
-	
+
 	// Getter/Setters
 	public String getUsername() {
 		return mJson.optString(USERNAME, null);
@@ -319,9 +316,18 @@ public class CatalyzeUser extends CatalyzeObject implements
 	 *            reference to the the same instance of CatalyzeUser that was
 	 *            used to call this method.
 	 */
-	public void update(CatalyzeListener<CatalyzeUser> callbackHandler) {
-		Map<String, String> headers = getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = createListener(callbackHandler);
+	public void update(final CatalyzeListener<CatalyzeUser> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				CatalyzeUser user = CatalyzeUser.this;
+				user.setJson(response);
+				user.setUserSessionToken(getSessionToken());
+				callbackHandler.onResponse(user);
+			}
+		};
+
 		Response.ErrorListener errorListener = Catalyze
 				.createErrorListener(callbackHandler);
 		JSONObject json = this.mJson;
@@ -347,7 +353,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.PUT, userUrl, updates, responseListener,
 				errorListener);
 		request.setHeaders(headers);
-		request.execute(catalyze.getContext());
+		request.execute(this.getContext());
 	}
 
 	/**
@@ -355,11 +361,9 @@ public class CatalyzeUser extends CatalyzeObject implements
 	 * user info
 	 * 
 	 * @param callbackHandler
-	 * @param context
 	 */
-	public void delete(CatalyzeListener<CatalyzeUser> callbackHandler,
-			Context context) {
-		Map<String, String> headers = getAuthorizedHeaders();
+	public void delete(CatalyzeListener<CatalyzeUser> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
 		Response.ErrorListener errorListener = Catalyze
 				.createErrorListener(callbackHandler);
@@ -367,21 +371,17 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.DELETE, userUrl, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
-		request.execute(context);
+		request.execute(this.getContext());
 	}
-
-	
 
 	/**
 	 * Sign out this user
 	 * 
 	 * @param callbackHandler
 	 *            Funtion to call after HTTP response handled
-	 * @param context
 	 */
-	public void signOut(CatalyzeListener<CatalyzeUser> callbackHandler,
-			Context context) {
-		Map<String, String> headers = getAuthorizedHeaders();
+	public void signOut(CatalyzeListener<CatalyzeUser> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
 		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
 		Response.ErrorListener errorListener = Catalyze
 				.createErrorListener(callbackHandler);
@@ -389,7 +389,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.GET, signOutUrl, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
-		request.execute(context);
+		request.execute(this.getContext());
 	}
 
 	/**
@@ -403,20 +403,27 @@ public class CatalyzeUser extends CatalyzeObject implements
 	 * @param callbackHandler
 	 */
 	public void deleteField(String fieldName,
-			CatalyzeListener<CatalyzeUser> callbackHandler) {
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
 		if (fieldName == null || fieldName.trim().length() == 0) {
 			// if fieldName is blank this will otherwise delete the user
 			return;
 		}
-		Map<String, String> headers = getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = deleteFieldListener(callbackHandler);
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				callbackHandler.onResponse(CatalyzeUser.this);
+			}
+		};
+
 		Response.ErrorListener errorListener = Catalyze
 				.createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
 				CatalyzeRequest.DELETE, userUrl + "/" + fieldName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(catalyze.getContext());
+		request.execute(this.getContext());
 	}
 
 	/***
@@ -426,21 +433,28 @@ public class CatalyzeUser extends CatalyzeObject implements
 	 * @param userName
 	 *            name of user to lookup
 	 * @param callbackHandler
-	 * @param context
 	 */
 	public void getUser(String userName,
-			CatalyzeListener<CatalyzeUser> callbackHandler, Context context) {
-		Map<String, String> headers = getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = createSupervisorListener(callbackHandler);
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				CatalyzeUser user = new CatalyzeUser(CatalyzeUser.this.catalyze);
+				user.setJson(response);
+				user.setUserSessionToken(getSessionToken());
+				callbackHandler.onResponse(user);
+			}
+		};
+
 		Response.ErrorListener errorListener = Catalyze
 				.createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
 				CatalyzeRequest.GET, userUrl + "/" + userName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(context);
+		request.execute(this.getContext());
 	}
-
 
 	/**
 	 * Supervisor route, returns array of strings containing all users with
@@ -448,91 +462,11 @@ public class CatalyzeUser extends CatalyzeObject implements
 	 * 
 	 * @param partialUsername
 	 * @param callbackHandler
-	 * @param context
 	 */
 	public void search(String partialUsername,
-			CatalyzeListener<String[]> callbackHandler, Context context) {
-		Map<String, String> headers = getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = createSupervisorSearchListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze
-				.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.GET, userUrl + "/search/" + partialUsername,
-				null, responseListener, errorListener);
-		request.setHeaders(headers);
-		request.execute(context);
-	}
-
-	/**
-	 * Return HTTP headers needed for authorized api calls
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getAuthorizedHeaders() {
-		Map<String, String> headers = catalyze.getDefaultHeaders();
-		headers.put("Authorization", "Bearer " + getSessionToken());
-		return headers;
-	}
-
-	// User response handlers
-
-	/**
-	 * Create response handler that a user object based on the server response
-	 * 
-	 * @param userCallback
-	 * @return
-	 */
-	private Response.Listener<JSONObject> createListener(
-			final CatalyzeListener<CatalyzeUser> userCallback) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CatalyzeUser user = CatalyzeUser.this;
-				user.setJson(response);
-				user.setUserSessionToken(getSessionToken());
-				userCallback.onResponse(user);
-			}
-		};
-	}
-
-	private Response.Listener<JSONObject> deleteFieldListener(
-			final CatalyzeListener<CatalyzeUser> userCallback) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				userCallback.onResponse(CatalyzeUser.this);
-			}
-		};
-	}
-
-	/***
-	 * Response handler to return user but not overwrite current user
-	 * 
-	 * @param userCallback
-	 * @return
-	 */
-	private Response.Listener<JSONObject> createSupervisorListener(
-			final CatalyzeListener<CatalyzeUser> userCallback) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CatalyzeUser user = new CatalyzeUser(CatalyzeUser.this.catalyze);
-				user.setJson(response);
-				user.setUserSessionToken(getSessionToken());
-				userCallback.onResponse(user);
-			}
-		};
-	}
-
-	/**
-	 * Callback handler for search route response
-	 * 
-	 * @param userCallback
-	 * @return
-	 */
-	private Response.Listener<JSONObject> createSupervisorSearchListener(
-			final CatalyzeListener<String[]> userCallback) {
-		return new Response.Listener<JSONObject>() {
+			final CatalyzeListener<String[]> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
 				String[] stringResults = new String[0];
@@ -545,9 +479,17 @@ public class CatalyzeUser extends CatalyzeObject implements
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				userCallback.onResponse(stringResults);
+				callbackHandler.onResponse(stringResults);
 			}
 		};
+
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, userUrl + "/search/" + partialUsername,
+				null, responseListener, errorListener);
+		request.setHeaders(headers);
+		request.execute(this.getContext());
 	}
 
 	/**

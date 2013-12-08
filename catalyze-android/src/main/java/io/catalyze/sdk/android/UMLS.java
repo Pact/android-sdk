@@ -171,8 +171,8 @@ public class UMLS extends CatalyzeObject {
 	 * typicially outperforms keyword/phrase search so use it instead where it
 	 * is appropriate.
 	 * 
-	 * @param codeSet
-	 * @param prefix
+	 * @param codeSet The UMLS code set (e.g. SNOMEDCT, LOINC, etc)
+	 * @param prefix The search prefix, not case sensitive
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect an array of UmlsResult on
 	 *            success
@@ -218,7 +218,8 @@ public class UMLS extends CatalyzeObject {
 	 * array to user CatalyzeListener
 	 * 
 	 * @param userCallback
-	 * @return
+	 *            The user-defined callback
+	 * @return The volley listener
 	 */
 	private Response.Listener<JSONArray> createListenerWithStringCallback(
 			final CatalyzeListener<String[]> userCallback) {
@@ -243,7 +244,8 @@ public class UMLS extends CatalyzeObject {
 	 * array to user CatalyzeListener
 	 * 
 	 * @param userCallback
-	 * @return
+	 *            The user-defined callback
+	 * @return The volley listener
 	 */
 	private Response.Listener<JSONArray> createUmlsResultArrayCallback(
 			final CatalyzeListener<UmlsResult[]> userCallback) {
@@ -270,7 +272,8 @@ public class UMLS extends CatalyzeObject {
 	 * to user CatalyzeListener
 	 * 
 	 * @param userCallback
-	 * @return
+	 *            The user-defined callback
+	 * @return The volley listener
 	 */
 	private Response.Listener<JSONObject> createUmlsResultCallback(
 			final CatalyzeListener<UmlsResult> userCallback) {

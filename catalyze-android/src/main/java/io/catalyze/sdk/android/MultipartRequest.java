@@ -18,7 +18,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyLog;
 
 /**
- * T is the expected return type   
+ * A specialized request for handling Multipart binary data.
+ * 
+ * T is the expected return type
  * 
  * 
  * 
@@ -26,13 +28,15 @@ import com.android.volley.VolleyLog;
  */
 public class MultipartRequest<T> extends Request<T> {
 
-	private MultipartEntityBuilder multiPartBuilder = MultipartEntityBuilder.create();
+	private MultipartEntityBuilder multiPartBuilder = MultipartEntityBuilder
+			.create();
 	private Map<String, String> mHeaders = new HashMap<String, String>();
 	private final Response.Listener<T> mListener;
 	private HttpEntity httpEntity;
 
 	/**
 	 * MultipartRequest constructor to upload file
+	 * 
 	 * @param url
 	 * @param errorListener
 	 * @param listener
@@ -41,7 +45,8 @@ public class MultipartRequest<T> extends Request<T> {
 	 * @param fileHeaders
 	 */
 	public MultipartRequest(String url, Response.ErrorListener errorListener,
-			Response.Listener<T> listener, File file, String phi, Map<String, String> fileHeaders) {
+			Response.Listener<T> listener, File file, String phi,
+			Map<String, String> fileHeaders) {
 		super(Method.POST, url, errorListener);
 		mHeaders = fileHeaders;
 		mListener = listener;
@@ -50,19 +55,21 @@ public class MultipartRequest<T> extends Request<T> {
 		// If needed user the following method to change content type header
 		// multiPartBuilder.addBinaryBody("file", file, "content-", filename)
 
-		multiPartBuilder.addTextBody("phi", phi);   
+		multiPartBuilder.addTextBody("phi", phi);
 		httpEntity = multiPartBuilder.build();
 	}
-	
+
 	/**
 	 * MultipartRequest constructor to download or delete file
-	 * @param method
-	 * @param url
-	 * @param errorListener
-	 * @param listener
-	 * @param fileHeaders
+	 * 
+	 * @param method The HTTP method
+	 * @param url The URL of the request's endpoint
+	 * @param errorListener The callback for errors
+	 * @param listener The callback for success
+	 * @param fileHeaders The key-value pairs to add to the HTTP header
 	 */
-	public MultipartRequest(int method, String url, Response.ErrorListener errorListener,
+	public MultipartRequest(int method, String url,
+			Response.ErrorListener errorListener,
 			Response.Listener<T> listener, Map<String, String> fileHeaders) {
 		super(method, url, errorListener);
 		mHeaders = fileHeaders;
@@ -87,25 +94,25 @@ public class MultipartRequest<T> extends Request<T> {
 
 	@Override
 	protected Response<T> parseNetworkResponse(NetworkResponse response) {
-		
-//		try {
-//			String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-//
-//			if (jsonString.charAt(0) == '{') {
-//				return (Response<T>) Response.success(new JSONObject(jsonString),
-//						HttpHeaderParser.parseCacheHeaders(response));
-//			} else {
-//				return (Response<T>) Response.success(new JSONArray(jsonString),
-//						HttpHeaderParser.parseCacheHeaders(response));
-//			}
-//		} catch (UnsupportedEncodingException e) {
-//			return Response.error(new ParseError(e));
-//		} catch (JSONException je) {
-//			//file response here?
-//			return Response.error(new ParseError(je));
-//		}
-		
-		
+
+		// try {
+		// String jsonString = new String(response.data,
+		// HttpHeaderParser.parseCharset(response.headers));
+		//
+		// if (jsonString.charAt(0) == '{') {
+		// return (Response<T>) Response.success(new JSONObject(jsonString),
+		// HttpHeaderParser.parseCacheHeaders(response));
+		// } else {
+		// return (Response<T>) Response.success(new JSONArray(jsonString),
+		// HttpHeaderParser.parseCacheHeaders(response));
+		// }
+		// } catch (UnsupportedEncodingException e) {
+		// return Response.error(new ParseError(e));
+		// } catch (JSONException je) {
+		// //file response here?
+		// return Response.error(new ParseError(je));
+		// }
+
 		// FIXME? good chance that this will requre a bit more work when I
 		// actually try to run it
 		// may need to detect whether the response is a file or JSON, could do
