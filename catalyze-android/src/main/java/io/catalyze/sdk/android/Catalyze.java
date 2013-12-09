@@ -36,11 +36,12 @@ public class Catalyze {
 
 	// The name of this app
 	private final String identifier;
-	
-	// The authenticated user. Cannot be used until the instance is authenticated. 
+
+	// The authenticated user. Cannot be used until the instance is
+	// authenticated.
 	private CatalyzeUser user;
-	
-	// The app context. Cannot be changed although that may be a needed feature. 
+
+	// The app context. Cannot be changed although that may be a needed feature.
 	private Context appContext;
 
 	/**
@@ -131,6 +132,18 @@ public class Catalyze {
 	}
 
 	/**
+	 * The instance is authenticated off the user is non-null. The session token
+	 * may have expired for the user but this test must be checked through an
+	 * API call to the backed and should be handled by program logic (handling
+	 * of CatalyzeErrors on callbacks),
+	 * 
+	 * @return Returns true iff the user has been authenticated
+	 */
+	public boolean isAuthenticated() {
+		return user == null;
+	}
+
+	/**
 	 * All Catalyze instances must be associated with an authenticated user via
 	 * the authenticate() method. This method returns that user.
 	 * 
@@ -175,7 +188,7 @@ public class Catalyze {
 			public void onResponse(JSONObject response) {
 				Catalyze.this.user = new CatalyzeUser(Catalyze.this);
 				user.setJson(response);
-				user.setUserSessionToken(response.optString(
+				user.setSessionToken(response.optString(
 						CatalyzeUser.SESSION_TOKEN, null));
 				callbackHandler.onResponse(Catalyze.this);
 			}
@@ -188,13 +201,31 @@ public class Catalyze {
 	}
 
 	/**
+	 * Sign out this authenticated CatalyzeUser.
+	 * 
+	 * @param callbackHandler
+	 *            Funtion to call after HTTP response handled
+	 */
+	public void signOut(CatalyzeListener<CatalyzeUser> callbackHandler) {
+		if (user == null)
+			throw new IllegalStateException(
+					"No authenticated user has been assigned. Must call Catalyze.authenticate() and wait for the callback before using this instance.");
+		user.signOut(callbackHandler);
+	}
+
+	/**
 	 * Perform an API to create a new user.
 	 * 
-	 * @param userName The user name. Should be an email address.
-	 * @param password The user's password.
-	 * @param firstName The user's first name.
-	 * @param lastName The user's last name.
-	 * @param callbackHandler The call back to report back success or failure. 
+	 * @param userName
+	 *            The user name. Should be an email address.
+	 * @param password
+	 *            The user's password.
+	 * @param firstName
+	 *            The user's first name.
+	 * @param lastName
+	 *            The user's last name.
+	 * @param callbackHandler
+	 *            The call back to report back success or failure.
 	 */
 	public void signUp(String userName, String password, String firstName,
 			String lastName,
