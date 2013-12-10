@@ -64,6 +64,15 @@ public abstract class CatalyzeObject {
 	}
 
 	/**
+	 * Gets the Catalyze instance associated with this object.
+	 * 
+	 * @return The Catalyze instance
+	 */
+	public Catalyze getCatalyze() {
+		return this.catalyze;
+	}
+
+	/**
 	 * By default all CatalyzeObject inherit the context of the authenticated
 	 * Catalyze instance. This is not desirable in some cases so this setter
 	 * allows CatalyzeObjects to be set to contexts on a case-by-case basis. The

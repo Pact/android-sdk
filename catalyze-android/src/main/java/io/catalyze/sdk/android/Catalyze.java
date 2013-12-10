@@ -172,7 +172,7 @@ public class Catalyze {
 	 *            not active until a successful callback result is returned.
 	 */
 	public void authenticate(String userName, String password,
-			final CatalyzeListener<Catalyze> callbackHandler) {
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
 
 		Map<String, String> headers = this.getDefaultHeaders();
 		JSONObject jsonBody = new JSONObject();
@@ -190,7 +190,7 @@ public class Catalyze {
 				user.setJson(response);
 				user.setSessionToken(response.optString(
 						CatalyzeUser.SESSION_TOKEN, null));
-				callbackHandler.onResponse(Catalyze.this);
+				callbackHandler.onResponse(Catalyze.this.user);
 			}
 		};
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(

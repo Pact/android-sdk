@@ -145,7 +145,7 @@ public class UMLS extends CatalyzeObject {
 	 * first 20 matching results will be returned. Value set searches are not
 	 * currently supported.
 	 * 
-	 * @param codeSet
+	 * @param codeSet The UMLS code set (e.g. SNOMEDCT, LOINC, etc)
 	 * @param keyword
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect an array of UmlsResult on
