@@ -29,7 +29,7 @@ public abstract class CatalyzeListener<T> implements Response.Listener<T> {
 	 * 
 	 * @param response
 	 */
-	public abstract void onError(CatalyzeError response);
+	public abstract void onError(CatalyzeException response);
 
 	/**
 	 * Handle success response from Catalyze API call

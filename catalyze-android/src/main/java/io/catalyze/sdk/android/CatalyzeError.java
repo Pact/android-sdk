@@ -1,89 +1,62 @@
 package io.catalyze.sdk.android;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
-import com.android.volley.VolleyError;
-
 /**
- * CatalyzeError will be returned to the onError method of the user callback
- * handler if an error is encountered during a Catalyze API call. CatalyzeError
- * will contain the information about whatever error has occurred
+ * On an API call failure the Catalyze API will return one or more error
+ * entries. Multiple things can cause errors on a single request, for example
+ * submitting form data with incorrectly formatted City, State and Zip Code
+ * values. This class provides a wrapped version of these types of errors.
  * 
+ * @author uphoff
  * 
  */
-public class CatalyzeError extends Exception {
+public class CatalyzeError {
+
+	// The Catalyze-internal code for this error
+	private int code;
+
+	// A message describing the error, suitable for display to a user
+	private String message;
 
 	/**
-	 * The UID
+	 * Create an instance and populate the internally defined error code and
+	 * descriptive message.
+	 * 
+	 * @param code
+	 *            The code as defined by the Catalyze API
+	 * @param message
+	 *            The message reported back from the Catalyze API describing
+	 *            this error
 	 */
-	private static final long serialVersionUID = 6762913468935195414L;
-
-	// Encapsulated VolleyError
-	private VolleyError volleyError = null;
+	protected CatalyzeError(int code, String message) {
+		this.code = code;
+		this.message = message;
+	}
 
 	/**
-	 * Create a new exception baded on a VolleyError (or subclass).
+	 * Gets the error code as defined by the Catalyze API.
+	 * 
+	 * @return
 	 */
-	protected CatalyzeError(VolleyError error) {
-		this.volleyError = error;
+	public int getCode() {
+		return code;
 	}
 
-	@Override
-	public void printStackTrace() {
-		volleyError.printStackTrace();
-	}
-
-	@Override
+	/**
+	 * Gets the message. Suitable for display to the user.
+	 * 
+	 * @return The message
+	 */
 	public String getMessage() {
-		return volleyError.getMessage();
+		return message;
 	}
 
-	@Override
-	public String getLocalizedMessage() {
-		return volleyError.getLocalizedMessage();
-	}
-
-	@Override
-	public Throwable getCause() {
-		return volleyError.getCause();
-	}
-
-	@Override
-	public Throwable initCause(Throwable cause) {
-		return volleyError.initCause(cause);
-	}
-
-	@Override
+	/**
+	 * Return a JSON-parsable version of the error.
+	 * 
+	 * @return The error as a JSON string
+	 */
 	public String toString() {
-		return volleyError.toString();
-	}
-
-	@Override
-	public void printStackTrace(PrintStream s) {
-		volleyError.printStackTrace(s);
-	}
-
-	@Override
-	public void printStackTrace(PrintWriter s) {
-		volleyError.printStackTrace(s);
-	}
-
-	@Override
-	public Throwable fillInStackTrace() {
-		if (volleyError != null)   
-			return volleyError.fillInStackTrace();
-		else return new Exception().fillInStackTrace();
-	}
-
-	@Override
-	public StackTraceElement[] getStackTrace() {
-		return volleyError.getStackTrace();
-	}
-
-	@Override
-	public void setStackTrace(StackTraceElement[] stackTrace) {
-		volleyError.setStackTrace(stackTrace);
+		return "{\"code\":" + code + ",\"message\":\"" + message + "\"}";
 	}
 
 }

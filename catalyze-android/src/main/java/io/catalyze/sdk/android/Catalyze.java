@@ -405,7 +405,7 @@ public class Catalyze {
 			public void onErrorResponse(VolleyError error) {
 				// Currently we just pass up volley errors but this will be
 				// extended in time
-				CatalyzeError ce = new CatalyzeError(error);
+				CatalyzeException ce = new CatalyzeException(error);
 				userCallback.onError(ce);
 				Log.e("Catalyze" , "Catalyze error.", error);
 			}
