@@ -35,7 +35,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	
 	private Map<String, String> mHeaders = new HashMap<String, String>();
 	private static RequestQueue mRequestQueue;
-	private int mMethod;
 	
 	public CatalyzeRequest(int method, String url, JSONObject jsonRequest, Response.Listener<T> listener,
 			Response.ErrorListener errorListener) {
@@ -50,11 +49,6 @@ public class CatalyzeRequest<T> extends JsonRequest<T> {
 	@Override
 	public Map<String, String> getHeaders() {
 		return mHeaders;
-	}
-
-	@Override
-	public int getMethod() {
-		return mMethod;
 	}
 
 	/**

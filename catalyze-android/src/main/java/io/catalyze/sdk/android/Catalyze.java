@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -31,11 +32,18 @@ public class Catalyze {
 	// Const defining the API key prefix
 	private static final String ANDROID = "android";
 
-	// The API key for the app, set in constructor
-	private final String apiKey;
+	/**
+	 * The API key of the application. This is generated in the Catalyze
+	 * Developer Portal. You must set it in your app's onCreate() method before
+	 * using the SDK.
+	 */
+	public static String API_KEY;
 
-	// The name of this app
-	private final String identifier;
+	/**
+	 * The identifier (name) of the application. You must set it in your app's
+	 * onCreate() method before using the SDK.
+	 */
+	public static String IDENTIFIER;
 
 	// The authenticated user. Cannot be used until the instance is
 	// authenticated.
@@ -87,17 +95,15 @@ public class Catalyze {
 	 *            The context to associate with for performing network
 	 *            operations.
 	 */
-	public Catalyze(String apiKey, String identifier, Context context) {
-		if (apiKey == null) {
+	protected Catalyze(Context context) {
+		if (Catalyze.API_KEY == null) {
 			throw new IllegalStateException("The API key must be non-null.");
-		} else if (identifier == null) {
+		} else if (Catalyze.IDENTIFIER == null) {
 			throw new IllegalStateException("The identifier must be non-null.");
 		} else if (context == null) {
 			throw new IllegalStateException("The context must be non-null.");
 		}
-		this.apiKey = apiKey;
 		this.appContext = context;
-		this.identifier = identifier;
 
 		this.setBaseURL("https://api.catalyze.io/v1/");
 	}
@@ -171,10 +177,12 @@ public class Catalyze {
 	 *            The callback to handle the server's response. The instance is
 	 *            not active until a successful callback result is returned.
 	 */
-	public void authenticate(String userName, String password,
-			final CatalyzeListener<CatalyzeUser> callbackHandler) {
+	public static void authenticate(String userName, String password,
+			Context context, final CatalyzeListener<Catalyze> callbackHandler) {
 
-		Map<String, String> headers = this.getDefaultHeaders();
+		final Catalyze catalyze = new Catalyze(context);
+
+		Map<String, String> headers = catalyze.getDefaultHeaders();
 		JSONObject jsonBody = new JSONObject();
 		try {
 			jsonBody.put(CatalyzeUser.USERNAME, userName);
@@ -186,18 +194,22 @@ public class Catalyze {
 		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				Catalyze.this.user = new CatalyzeUser(Catalyze.this);
+				CatalyzeUser user = new CatalyzeUser(catalyze);
 				user.setJson(response);
 				user.setSessionToken(response.optString(
 						CatalyzeUser.SESSION_TOKEN, null));
-				callbackHandler.onResponse(Catalyze.this.user);
+				catalyze.user = user;
+				callbackHandler.onResponse(catalyze);
 			}
 		};
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.POST, this.signInUrl, jsonBody,
+				CatalyzeRequest.POST, catalyze.signInUrl, jsonBody,
 				responseListener, createErrorListener(callbackHandler));
 		request.setHeaders(headers);
-		request.execute(this.appContext);
+		
+		Log.i("Catalyze", headers.toString());  
+		
+		request.execute(context);
 	}
 
 	/**
@@ -227,11 +239,12 @@ public class Catalyze {
 	 * @param callbackHandler
 	 *            The call back to report back success or failure.
 	 */
-	public void signUp(String userName, String password, String firstName,
-			String lastName,
-			final CatalyzeListener<CatalyzeUser> callbackHandler) {
+	public static void signUp(String userName, String password, String firstName,
+			String lastName, Context context, final CatalyzeListener<Catalyze> callbackHandler) {
 
-		Map<String, String> headers = this.getDefaultHeaders();
+		final Catalyze catalyze = new Catalyze(context);
+		
+		Map<String, String> headers = catalyze.getDefaultHeaders();
 		JSONObject jsonBody = new JSONObject();
 		try {
 			jsonBody.put(CatalyzeUser.USERNAME, userName);
@@ -245,19 +258,19 @@ public class Catalyze {
 		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				CatalyzeUser user = new CatalyzeUser(Catalyze.this);
-				Catalyze.this.user = user;
-				callbackHandler.onResponse(user);
+				CatalyzeUser user = new CatalyzeUser(catalyze);
+				catalyze.user = user;
+				callbackHandler.onResponse(catalyze);
 			}
 		};
 
 		Response.ErrorListener errorListener = Catalyze
 				.createErrorListener(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.POST, userUrl, jsonBody, responseListener,
+				CatalyzeRequest.POST, catalyze.userUrl, jsonBody, responseListener,
 				errorListener);
 		request.setHeaders(headers);
-		request.execute(this.appContext);
+		request.execute(context);
 	}
 
 	/**
@@ -278,7 +291,7 @@ public class Catalyze {
 	 * @return The API key
 	 */
 	protected String getAPIKey() {
-		return apiKey;
+		return Catalyze.API_KEY;
 	}
 
 	/**
@@ -288,7 +301,8 @@ public class Catalyze {
 	 */
 	protected Map<String, String> getDefaultHeaders() {
 		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("X-Api-Key", ANDROID + " " + identifier + " " + getAPIKey());
+		headers.put("X-Api-Key", ANDROID + " " + Catalyze.IDENTIFIER + " "
+				+ getAPIKey());
 		headers.put("Content-Type", "application/json");
 		return headers;
 	}
@@ -384,15 +398,16 @@ public class Catalyze {
 	 *            The user-defined callback to send results back to
 	 * @return The listener
 	 */
-	protected static <T> Response.ErrorListener createErrorListener(
-			final CatalyzeListener<T> userCallback) {
+	protected static <T> Response.ErrorListener createErrorListener(    
+			final CatalyzeListener<T> userCallback) {    
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				// Currently we just pass up volley errors but this will be
 				// extended in time
-				CatalyzeError ce = (CatalyzeError) error;
+				CatalyzeError ce = new CatalyzeError(error);
 				userCallback.onError(ce);
+				Log.e("Catalyze" , "Catalyze error.", error);
 			}
 		};
 	}

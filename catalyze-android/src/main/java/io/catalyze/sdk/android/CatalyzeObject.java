@@ -41,11 +41,7 @@ public abstract class CatalyzeObject {
 		if (catalyze == null) {
 			throw new IllegalStateException(
 					"Trying to create a CatalyzeObject with a null Catalyze reference.");
-		} else if (catalyze.isAuthenticated()) {
-			throw new IllegalStateException(
-					"Trying to create a CatalyzeObject from a Catalyze instance that has no authenticated user. Must call Catalyze.authenticate() before using the Catalyze instance.");
-		}
-
+		} 
 		this.catalyze = catalyze;
 	}
 
