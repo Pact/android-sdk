@@ -31,7 +31,7 @@ public class CatalyzeException extends Exception {
 
 	private int httpCode = -1;
 
-	private CatalyzeError[] errors = null;
+	private CatalyzeError[] errors = new CatalyzeError[0];
 
 	/**
 	 * Create a new exception baded on a VolleyError (or subclass).
@@ -39,8 +39,8 @@ public class CatalyzeException extends Exception {
 	protected CatalyzeException(VolleyError error) {
 		this.volleyError = error;
 
+		// Check for API error information
 		NetworkResponse response = error.networkResponse;
-
 		if (response != null) {
 			this.httpCode = response.statusCode;
 			JSONObject errorJson = null;
@@ -78,7 +78,23 @@ public class CatalyzeException extends Exception {
 
 	@Override
 	public String getMessage() {
-		return volleyError.getMessage();
+		if (httpCode == -1) {
+			// In this case rely on Volley, don't know what happened
+			return volleyError.getMessage();
+		} else {
+			// Here rely on the API's error response to tell us what went wrong
+			String message = "The Catalyze API returned HTTP code " + httpCode
+					+ " with ";
+			if (this.errors.length == 0) {
+				message += " no error messages. Bummer.";
+			} else {
+				message += " " + errors.length + " error message(s):";
+				for (int i = 0; i < errors.length; i++ ) {
+					message += "\n" + errors[i].getMessage()  + " (Code "+ errors[i].getCode() + ")"; 
+				}
+			}
+			return message;
+		}
 	}
 
 	@Override
