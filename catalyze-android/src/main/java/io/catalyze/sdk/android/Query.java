@@ -27,6 +27,16 @@ public class Query extends CatalyzeObject {
 		super(catalyze);
 		this.customClassName = className;
 		this.queryResults = new ArrayList<CustomClass>();
+
+		// Set default settings (return the first ten items in a custom class). 
+		try {
+			this.mJson.put(FIELD, "");
+			this.mJson.put(SEARCH_BY, "");
+			this.mJson.put(PAGE_NUMBER, "1");
+			this.mJson.put(PAGE_SIZE, "10");
+		} catch (JSONException jse) {
+			jse.printStackTrace();
+		}
 	}
 
 	/**
@@ -36,6 +46,15 @@ public class Query extends CatalyzeObject {
 	 */
 	public ArrayList<CustomClass> getResults() {
 		return queryResults;
+	}
+
+	/**
+	 * Get the name of the custom class related to this query.
+	 * 
+	 * @return The custom class name.
+	 */
+	public String getCustomClassName() {
+		return this.customClassName;
 	}
 
 	public String getField() {

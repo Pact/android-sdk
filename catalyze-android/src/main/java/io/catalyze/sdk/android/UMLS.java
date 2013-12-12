@@ -16,7 +16,6 @@ import com.android.volley.Response;
 public class UMLS extends CatalyzeObject {
 
 	// Route values, set in constructor or by setBaseUrl()
-	private String baseUrl;
 	private String codesetsUrl = "codesets";
 	private String valuesetsUrl = "valuesets";
 	private String relatedUrl = "related";
@@ -43,7 +42,6 @@ public class UMLS extends CatalyzeObject {
 	 *            A URL for the Catalyze API
 	 */
 	public void setBaseURL(String url) {
-		this.baseUrl = url;
 		this.codesetsUrl = url + "codesets";
 		valuesetsUrl = url + "valuesets";
 		relatedUrl = url + "related";
@@ -158,7 +156,7 @@ public class UMLS extends CatalyzeObject {
 				CatalyzeRequest.GET, phraseUrl + "/" + codeSet + "/" + keyword,
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
-		request.setHeaders(catalyze.getDefaultHeaders());
+		request.setHeaders(catalyze.getDefaultHeaders());   
 		request.execute(catalyze.getContext());
 	}
 

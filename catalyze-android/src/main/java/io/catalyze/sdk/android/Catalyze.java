@@ -346,7 +346,7 @@ public class Catalyze {
 
 	/**
 	 * Builds and returns a new instance of CustomClass associated with this
-	 * Catalyze instance.
+	 * Catalyze instance. The JSON content is set to '{}'. 
 	 * 
 	 * @param className
 	 *            The name of the custom class
@@ -356,6 +356,24 @@ public class Catalyze {
 	 *             If the Catalyze instance has not been authenticated.
 	 */
 	public CustomClass getCustomClassInstance(String className) {
+		
+		return this.getCustomClassInstance(className, "{}");
+	}
+	
+	/**
+	 * Builds and returns a new instance of CustomClass associated with this
+	 * Catalyze instance.
+	 * 
+	 * @param className
+	 *            The name of the custom class
+	 * @param json
+	 * 				The JSON content to use for this instance
+	 * @return The instance of CustomClass associated with this Catalyze
+	 *         instance
+	 * @throws IllegalStateException
+	 *             If the Catalyze instance has not been authenticated.
+	 */
+	public CustomClass getCustomClassInstance(String className, String json) {
 		if (user == null) {
 			throw new IllegalStateException(
 					"The Catalyze instance was not authenticated.");
@@ -404,11 +422,9 @@ public class Catalyze {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				// Currently we just pass up volley errors but this will be
-				// extended in time
 				CatalyzeException ce = new CatalyzeException(error);
 				userCallback.onError(ce);
-				Log.e("Catalyze" , "Catalyze error.", error);
+				Log.e("Catalyze" , "Catalyze error.", ce);
 			}
 		};
 	}
