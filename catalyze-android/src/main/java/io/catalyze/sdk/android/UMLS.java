@@ -33,7 +33,7 @@ public class UMLS extends CatalyzeObject {
 	 */
 	public UMLS(Catalyze catalyze) {
 		super(catalyze);
-		this.setBaseURL("https://umls.catalyze.io/v1/umls");
+		this.setBaseURL("https://umls.catalyze.io/v1/umls/");
 	}
 
 	/**

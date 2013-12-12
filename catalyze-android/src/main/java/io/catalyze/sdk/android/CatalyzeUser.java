@@ -3,6 +3,7 @@ package io.catalyze.sdk.android;
 import io.catalyze.sdk.android.user.Gender;
 import io.catalyze.sdk.android.user.ZipCode;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +33,11 @@ import com.android.volley.Response;
 public class CatalyzeUser extends CatalyzeObject implements
 		Comparable<CatalyzeUser> {
 
+	/**    
+	 * 
+	 */
+	private static final long serialVersionUID = 4152351948089497620L;
+	
 	// JSON user field headers
 	protected static final String USERNAME = "username";
 	protected static final String PASSWORD = "password";
