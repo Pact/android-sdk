@@ -157,7 +157,7 @@ public class Catalyze {
 	 * @throws IllegalStateException
 	 *             If the Catalyze instance has not already been authenticated.
 	 */
-	protected CatalyzeUser getAuthenticatedUser() {
+	public CatalyzeUser getAuthenticatedUser() {
 		if (user == null)
 			throw new IllegalStateException(
 					"No authenticated user has been assigned. Must call Catalyze.authenticate() and wait for the callback before using this instance.");
