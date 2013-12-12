@@ -125,7 +125,7 @@ public class Query extends CatalyzeObject {
 						+ "/query", this.mJson, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	private Response.Listener<JSONArray> testListener(

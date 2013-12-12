@@ -1,5 +1,8 @@
 package io.catalyze.sdk.android;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,17 +20,13 @@ import com.google.common.base.Objects;
  * Base class for different Catalyze objects
  * 
  */
-public abstract class CatalyzeObject {
+public abstract class CatalyzeObject implements Serializable {
 
 	// Core data storage is in JSON as that's what the API talks
-	protected JSONObject mJson = new JSONObject();
+	protected transient JSONObject mJson = new JSONObject();
 
 	// The Catalyze instance associated with this object
 	protected final Catalyze catalyze;
-
-	// Initially null indicating that the catalyze attribute's Context should be
-	// used
-	private Context context = null;
 
 	/**
 	 * Creates an instance attached to an authenticated Catalyze instance.
@@ -42,7 +41,7 @@ public abstract class CatalyzeObject {
 		if (catalyze == null) {
 			throw new IllegalStateException(
 					"Trying to create a CatalyzeObject with a null Catalyze reference.");
-		} 
+		}
 		this.catalyze = catalyze;
 	}
 
@@ -67,33 +66,6 @@ public abstract class CatalyzeObject {
 	 */
 	public Catalyze getCatalyze() {
 		return this.catalyze;
-	}
-
-	/**
-	 * By default all CatalyzeObject inherit the context of the authenticated
-	 * Catalyze instance. This is not desirable in some cases so this setter
-	 * allows CatalyzeObjects to be set to contexts on a case-by-case basis. The
-	 * original Catalyze context cannot be changed.
-	 * 
-	 * @param context
-	 *            The new context to use for this instance
-	 */
-	public void setContext(Context context) {
-		this.context = context;
-	}
-
-	/**
-	 * Gets the Context associated with this instance. Will use the default
-	 * Catalyze instance Context unless set explicitly in setContext().
-	 * 
-	 * @return The associated Context
-	 */
-	public Context getContext() {
-		// If context is not set, use the catalyze context
-		if (this.context == null) {
-			return this.catalyze.getContext();
-		}
-		return context; // Else return the assigned context
 	}
 
 	/**
@@ -218,6 +190,30 @@ public abstract class CatalyzeObject {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void writeObject(ObjectOutputStream oos) throws IOException {
+		// default serialization
+		oos.defaultWriteObject();
+		// write the object
+		byte[] json = this.mJson.toString().getBytes();
+		oos.writeInt(json.length);
+		oos.write(json);
+	}
+
+	private void readObject(ObjectInputStream ois)
+			throws ClassNotFoundException, IOException {
+		// default deserialization
+		ois.defaultReadObject();
+
+		byte[] bytes = new byte[ois.readInt()];
+		ois.read(bytes, 0, bytes.length);
+		try {
+			this.mJson = new JSONObject(new String(bytes));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

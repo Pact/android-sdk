@@ -28,7 +28,7 @@ import com.android.volley.VolleyError;
  * this must be handled outside of the Catalyze Android SDK (handled by app
  * logic).
  */
-public class Catalyze {
+public class Catalyze implements Serializable{
 
 	// Const defining the API key prefix
 	private static final String ANDROID = "android";
@@ -51,7 +51,7 @@ public class Catalyze {
 	private CatalyzeUser user;
 
 	// The app context. Cannot be changed although that may be a needed feature.
-	private Context appContext;
+	//private Context appContext;
 
 	/**
 	 * URLs: The fields below define the route URLS for the operations supported
@@ -104,7 +104,7 @@ public class Catalyze {
 		} else if (context == null) {
 			throw new IllegalStateException("The context must be non-null.");
 		}
-		this.appContext = context;
+		//this.appContext = context;
 
 		this.setBaseURL("https://api.catalyze.io/v1/");
 	}
@@ -134,9 +134,9 @@ public class Catalyze {
 	 * 
 	 * @return The context associated with this instance
 	 */
-	protected Context getContext() {
-		return appContext;
-	}
+	//protected Context getContext() {
+	//	return appContext;
+	//}
 
 	/**
 	 * The instance is authenticated off the user is non-null. The session token
@@ -356,8 +356,14 @@ public class Catalyze {
 	 *             If the Catalyze instance has not been authenticated.
 	 */
 	public CustomClass getCustomClassInstance(String className) {
-		
-		return this.getCustomClassInstance(className, "{}");
+		JSONObject obj = new JSONObject();
+		try {
+			obj = new JSONObject("{}");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return this.getCustomClassInstance(className, obj);
 	}
 	
 	/**
@@ -373,12 +379,12 @@ public class Catalyze {
 	 * @throws IllegalStateException
 	 *             If the Catalyze instance has not been authenticated.
 	 */
-	public CustomClass getCustomClassInstance(String className, String json) {
+	public CustomClass getCustomClassInstance(String className, JSONObject json) {
 		if (user == null) {
 			throw new IllegalStateException(
 					"The Catalyze instance was not authenticated.");
 		}
-		return new CustomClass(this, className);
+		return new CustomClass(this, className, json);
 	}
 
 	/**

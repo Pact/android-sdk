@@ -80,7 +80,7 @@ public class FileManager extends CatalyzeObject {
 				url, Catalyze.createErrorListener(userCallback),
 				createStringResponseListener(userCallback), file,
 				Boolean.toString(phi), fileHeaders);
-		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
+		CatalyzeRequest.getRequestQueue(userCallback.getContext()).add(request);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class FileManager extends CatalyzeObject {
 				catalyze.fileUrl + "/" + fileID,
 				Catalyze.createErrorListener(userCallback), responseListener,
 				fileHeaders);
-		CatalyzeRequest.getRequestQueue(catalyze.getContext()).add(request);
+		CatalyzeRequest.getRequestQueue(userCallback.getContext()).add(request);
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class FileManager extends CatalyzeObject {
 				createStringResponseListener(userCallback),
 				Catalyze.createErrorListener(userCallback));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(userCallback.getContext());
 	}
 
 	/**

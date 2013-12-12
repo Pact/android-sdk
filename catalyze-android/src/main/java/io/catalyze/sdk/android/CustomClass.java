@@ -1,5 +1,7 @@
 package io.catalyze.sdk.android;
 
+import java.io.Serializable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,8 +15,11 @@ import com.android.volley.Response;
  * calling the static method getInstance and passing in a currently
  * authenticated user. Next set the Custom Class name by calling setName().
  */
-public class CustomClass extends CatalyzeObject {
+public class CustomClass extends CatalyzeObject implements Serializable {
 
+	// UID
+	private static final long serialVersionUID = -5178734838731452308L;
+	
 	// Field constants
 	private static final String CONTENT = "content";
 	private static final String PHI = "phi";
@@ -212,7 +217,7 @@ public class CustomClass extends CatalyzeObject {
 				CatalyzeRequest.GET, getCustomClassUrl(getName()), null,
 				responseListener, Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -234,7 +239,7 @@ public class CustomClass extends CatalyzeObject {
 					responseListener,
 					Catalyze.createErrorListener(callbackHandler));
 			request.setHeaders(catalyze.getAuthorizedHeaders());
-			request.execute(catalyze.getContext());
+			request.execute(callbackHandler.getContext());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -258,7 +263,7 @@ public class CustomClass extends CatalyzeObject {
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -283,7 +288,7 @@ public class CustomClass extends CatalyzeObject {
 					mJson.getJSONObject(CONTENT), responseListener,
 					Catalyze.createErrorListener(callbackHandler));
 			request.setHeaders(catalyze.getAuthorizedHeaders());
-			request.execute(catalyze.getContext());
+			request.execute(callbackHandler.getContext());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -308,7 +313,7 @@ public class CustomClass extends CatalyzeObject {
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -348,7 +353,7 @@ public class CustomClass extends CatalyzeObject {
 						refName), null, listener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -382,7 +387,7 @@ public class CustomClass extends CatalyzeObject {
 				createListenerReturnUpdatedInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -408,7 +413,7 @@ public class CustomClass extends CatalyzeObject {
 				createListenerReturnNewInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -428,7 +433,7 @@ public class CustomClass extends CatalyzeObject {
 				createListenerReturnNewInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**

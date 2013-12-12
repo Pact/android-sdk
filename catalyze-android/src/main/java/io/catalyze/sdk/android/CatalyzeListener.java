@@ -1,5 +1,7 @@
 package io.catalyze.sdk.android;
 
+import android.content.Context;
+
 import com.android.volley.Response;
 
 /**
@@ -15,6 +17,28 @@ import com.android.volley.Response;
  * @param <T>
  */
 public abstract class CatalyzeListener<T> implements Response.Listener<T> {
+
+	private Context context;
+
+	/**
+	 * The listener must be provided with a context to execute under (this is
+	 * used beneath the Catalyze SDK by Volley).
+	 * 
+	 * @param context
+	 *            The context for linking to background operations.
+	 */
+	public CatalyzeListener(Context context) {
+		this.context = context;
+	}
+
+	/**
+	 * The context associated with this callback.
+	 * 
+	 * @return The Context
+	 */
+	public Context getContext() {
+		return context;
+	}
 
 	/**
 	 * A successful call to the backend API will result in this method being

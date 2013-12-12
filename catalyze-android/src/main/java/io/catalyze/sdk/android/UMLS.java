@@ -67,7 +67,7 @@ public class UMLS extends CatalyzeObject {
 				CatalyzeRequest.GET, codesetsUrl, null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class UMLS extends CatalyzeObject {
 				CatalyzeRequest.GET, valuesetsUrl, null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class UMLS extends CatalyzeObject {
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class UMLS extends CatalyzeObject {
 				null, createUmlsResultCallback(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -143,7 +143,8 @@ public class UMLS extends CatalyzeObject {
 	 * first 20 matching results will be returned. Value set searches are not
 	 * currently supported.
 	 * 
-	 * @param codeSet The UMLS code set (e.g. SNOMEDCT, LOINC, etc)
+	 * @param codeSet
+	 *            The UMLS code set (e.g. SNOMEDCT, LOINC, etc)
 	 * @param keyword
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect an array of UmlsResult on
@@ -156,8 +157,8 @@ public class UMLS extends CatalyzeObject {
 				CatalyzeRequest.GET, phraseUrl + "/" + codeSet + "/" + keyword,
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
-		request.setHeaders(catalyze.getDefaultHeaders());   
-		request.execute(catalyze.getContext());
+		request.setHeaders(catalyze.getDefaultHeaders());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -169,8 +170,10 @@ public class UMLS extends CatalyzeObject {
 	 * typicially outperforms keyword/phrase search so use it instead where it
 	 * is appropriate.
 	 * 
-	 * @param codeSet The UMLS code set (e.g. SNOMEDCT, LOINC, etc)
-	 * @param prefix The search prefix, not case sensitive
+	 * @param codeSet
+	 *            The UMLS code set (e.g. SNOMEDCT, LOINC, etc)
+	 * @param prefix
+	 *            The search prefix, not case sensitive
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect an array of UmlsResult on
 	 *            success
@@ -183,7 +186,7 @@ public class UMLS extends CatalyzeObject {
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -208,7 +211,7 @@ public class UMLS extends CatalyzeObject {
 						+ "/" + code, null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(catalyze.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**

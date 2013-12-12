@@ -31,7 +31,7 @@ import com.android.volley.Response;
  * 
  */
 public class CatalyzeUser extends CatalyzeObject implements
-		Comparable<CatalyzeUser> {
+		Comparable<CatalyzeUser>, Serializable {
 
 	/**    
 	 * 
@@ -576,7 +576,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.PUT, catalyze.userUrl, updates,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(this.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -594,7 +594,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.DELETE, catalyze.userUrl, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(this.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -613,7 +613,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.GET, catalyze.signOutUrl, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(this.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -647,7 +647,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.DELETE, catalyze.userUrl + "/" + fieldName,
 				null, responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(this.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/***
@@ -676,7 +676,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.GET, catalyze.userUrl + "/" + userName, null,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(this.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -713,7 +713,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 						+ partialUsername, null, responseListener,
 				errorListener);
 		request.setHeaders(headers);
-		request.execute(this.getContext());
+		request.execute(callbackHandler.getContext());
 	}
 
 	/**
