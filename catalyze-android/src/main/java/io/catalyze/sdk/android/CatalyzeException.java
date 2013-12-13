@@ -7,15 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
 
 /**
  * CatalyzeException will be returned to the onError method of the user callback
- * handler if an error is encountered during a Catalyze API call. CatalyzeException
- * will contain the information about whatever error has occurred
+ * handler if an error is encountered during a Catalyze API call.
+ * CatalyzeException will contain the information about whatever error has
+ * occurred
  * 
  * 
  */
@@ -52,80 +51,35 @@ public class CatalyzeException extends Exception {
 
 			if (errorJson != null) {
 				// There's JSON data: process it
-				try {
-					JSONArray errors = errorJson.getJSONArray("errors");
-
+				JSONArray jsonErrors = errorJson.optJSONArray("errors");
+				if (jsonErrors != null) {
 					// Turn JSON into CatalyzeError instances
-					this.errors = new CatalyzeError[errors.length()];
-					for (int i = 0; i < errors.length(); i++) {
-						JSONObject json = errors.getJSONObject(i);
-						this.errors[i] = new CatalyzeError(json.getInt("code"),
-								json.getString("message"));
+					this.errors = new CatalyzeError[jsonErrors.length()];
+					for (int i = 0; i < jsonErrors.length(); i++) {
+						try {
+							JSONObject json = jsonErrors.getJSONObject(i);
+							this.errors[i] = new CatalyzeError(
+									json.getInt("code"),
+									json.getString("message"));
+						} catch (JSONException jse) {
+
+							String message = "Unknown error.";
+							try {
+								// Might be a string, try it
+								message = jsonErrors.getString(i);
+							} catch (JSONException je) {
+								// ignore bad messages
+							}
+
+							// Create a fallback. This should not happen once
+							// error reporting is consistent
+							this.errors[i] = new CatalyzeError(-1, message);
+						}
+
 					}
-				} catch (JSONException e) {
-					Log.e("Catalyze",
-							"Error in Error Handling (really, there is an error in the error handling)!",
-							e);
 				}
 			}
 		}
-	}
-
-	@Override
-	public void printStackTrace() {
-		volleyError.printStackTrace();
-	}
-
-	@Override
-	public String getMessage() {
-		if (httpCode == -1) {
-			// In this case rely on Volley, don't know what happened
-			return volleyError.getMessage();
-		} else {
-			// Here rely on the API's error response to tell us what went wrong
-			String message = "The Catalyze API returned HTTP code " + httpCode
-					+ " with ";
-			if (this.errors.length == 0) {
-				message += " no error messages. Bummer.";
-			} else {
-				message += " " + errors.length + " error message(s):";
-				for (int i = 0; i < errors.length; i++) {
-					message += "\n" + errors[i].getMessage() + " (Code "
-							+ errors[i].getCode() + ")";
-				}
-			}
-			return message;
-		}
-	}
-
-	@Override
-	public String getLocalizedMessage() {
-		return volleyError.getLocalizedMessage();
-	}
-
-	@Override
-	public Throwable getCause() {
-		return volleyError.getCause();
-	}
-
-	@Override
-	public Throwable initCause(Throwable cause) {
-		return volleyError.initCause(cause);
-	}
-
-	@Override
-	public String toString() {
-		return volleyError.toString();
-	}
-
-	@Override
-	public void printStackTrace(PrintStream s) {
-		volleyError.printStackTrace(s);
-	}
-
-	@Override
-	public void printStackTrace(PrintWriter s) {
-		volleyError.printStackTrace(s);
 	}
 
 	@Override
@@ -137,13 +91,8 @@ public class CatalyzeException extends Exception {
 	}
 
 	@Override
-	public StackTraceElement[] getStackTrace() {
-		return volleyError.getStackTrace();
-	}
-
-	@Override
-	public void setStackTrace(StackTraceElement[] stackTrace) {
-		volleyError.setStackTrace(stackTrace);
+	public Throwable getCause() {
+		return volleyError.getCause();
 	}
 
 	/**
@@ -169,6 +118,70 @@ public class CatalyzeException extends Exception {
 	 */
 	public int getHttpCode() {
 		return httpCode;
+	}
+
+	@Override
+	public String getLocalizedMessage() {
+		return volleyError.getLocalizedMessage();
+	}
+
+	@Override
+	public String getMessage() {
+		if (httpCode == -1) {
+			// In this case rely on Volley, don't know what happened
+			return volleyError.getMessage();
+		} else {
+			// Here rely on the API's error response to tell us what went wrong
+			String message = "The Catalyze API returned HTTP code " + httpCode
+					+ " with ";
+			if (this.errors.length == 0) {
+				message += " no error messages. Bummer.";
+			} else {
+				message += " " + errors.length + " error message(s):";
+				for (int i = 0; i < errors.length; i++) {
+					if (errors[i] != null) {
+						message += "\n" + errors[i].getMessage() + " (Code "
+								+ errors[i].getCode() + ")";
+					}
+				}
+			}
+			return message;
+		}
+	}
+
+	@Override
+	public StackTraceElement[] getStackTrace() {
+		return volleyError.getStackTrace();
+	}
+
+	@Override
+	public Throwable initCause(Throwable cause) {
+		return volleyError.initCause(cause);
+	}
+
+	@Override
+	public void printStackTrace() {
+		volleyError.printStackTrace();
+	}
+
+	@Override
+	public void printStackTrace(PrintStream s) {
+		volleyError.printStackTrace(s);
+	}
+
+	@Override
+	public void printStackTrace(PrintWriter s) {
+		volleyError.printStackTrace(s);
+	}
+
+	@Override
+	public void setStackTrace(StackTraceElement[] stackTrace) {
+		volleyError.setStackTrace(stackTrace);
+	}
+
+	@Override
+	public String toString() {
+		return volleyError.toString();
 	}
 
 }

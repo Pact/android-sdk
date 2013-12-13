@@ -6,6 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.android.volley.Response;
 
 /**
@@ -19,9 +21,9 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 
 	// UID
 	private static final long serialVersionUID = -5178734838731452308L;
-	
+
 	// Field constants
-	private static final String CONTENT = "content";
+	protected static final String CONTENT = "content";
 	private static final String PHI = "phi";
 	private static final String PARENT_ID = "parentId";
 	private static final String SCHEMA = "schema";
@@ -30,27 +32,6 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 
 	// The name of this custom class
 	private String className;
-
-	/**
-	 * Create a custom class instance associated to a Catalyze instance. Use
-	 * provided JSON data to initialize the object's content.
-	 * 
-	 * @param catalyze
-	 *            The authenticated Catalyze instance
-	 * @param className
-	 *            The name of this instance's custom class
-	 * @param json
-	 *            The data to populate the instance's content with
-	 */
-	protected CustomClass(Catalyze catalyze, String className, JSONObject json) {
-		super(catalyze);
-		try {
-			mJson.put(CONTENT, json);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		this.className = className;
-	}
 
 	/**
 	 * Create a custom class instance associated to a Catalyze instance.
@@ -65,71 +46,54 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 	}
 
 	/**
-	 * Gets the name of this instance's custom class.
+	 * Create a custom class instance associated to a Catalyze instance. Use
+	 * provided JSON data to initialize the object's content.
 	 * 
-	 * @return The custom class name
+	 * @param catalyze
+	 *            The authenticated Catalyze instance
+	 * @param className
+	 *            The name of this instance's custom class
+	 * @param json
+	 *            The data to populate the instance's content with
 	 */
-	public String getName() {
-		return className;
+	protected CustomClass(Catalyze catalyze, String className, JSONObject json) {
+		super(catalyze);
+		mJson = json;
+		this.className = className;
 	}
 
 	/**
-	 * Allows access to the underlying JSON in the custom class.
+	 * Add a new reference to the array refName. This class requires that the id
+	 * be set. The id will be saved automatically if createEntry or getEntry has
+	 * been called, otherwise you can set the id manually by calling setId.
 	 * 
-	 * @return The JSON content of this intance.
+	 * @param refName
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the original Custom Class instance that this
+	 *            method was called upon, after it has been updated to match the
+	 *            server response.
 	 */
-	public JSONObject getContent() {
-		JSONObject json = null;
+	public void addReferenceArray(String refName, String refID,
+			CatalyzeListener<CustomClass> callbackHandler) {
+		JSONArray newArrayEntry = new JSONArray();
+		JSONObject json = new JSONObject();
 		try {
-			json = this.mJson.getJSONObject(CONTENT);
-		} catch (JSONException je) {
-			je.printStackTrace();
-		}
-		return json;
-
-	}
-
-	/**
-	 * Helper method to retrieve part of the instance's content by key. Not sure
-	 * is we need this. Marked as private for now.
-	 * 
-	 * @param key
-	 *            The key of the desired data
-	 * @return The data associated with this key
-	 */
-	private Object getContent(String key) {
-		Object value = mJson.opt(key);
-		if (value instanceof JSONArray) {
-			return handleJSONArray((JSONArray) value);
-		} else if (value instanceof JSONObject) {
-			return handleJSONObject((JSONObject) value);
-		}
-		return value;
-	}
-
-	/**
-	 * Not sure if we need this. Marked as private for now.
-	 * 
-	 * @param key
-	 * @param value
-	 */
-	private void putContent(String key, Object value) {
-		try {
-			mJson.getJSONObject(CONTENT).put(key, value);
+			json.put("type", "__ref");
+			json.put("class", refName);
+			json.put("id", refID);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Not sure we need this. Marked as private for now.
-	 * 
-	 * @param key
-	 * @return
-	 */
-	private CustomClass removeContent(String key) {
-		mJson.remove(key);
-		return this;
+		newArrayEntry.put(json);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.PUT, newArrayEntry, getCustomClassUrl(
+						getName(), getId(), REF, refName),
+				createListenerReturnUpdatedInstance(callbackHandler),
+				Catalyze.createErrorListener(callbackHandler));
+		request.setHeaders(catalyze.getAuthorizedHeaders());
+		request.execute();
 	}
 
 	/**
@@ -140,84 +104,6 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 	 */
 	public boolean containsPHI() {
 		return mJson.optBoolean(PHI, true);
-	}
-
-	/**
-	 * Sets if the custom class can contain PHI or not. Marked as private for
-	 * now.
-	 * 
-	 * Should this be possible from the API?
-	 * 
-	 * @param phi
-	 * @return
-	 */
-	private CustomClass setPHI(boolean phi) {
-		try {
-			mJson.put(PHI, phi);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return this;
-	}
-
-	public String getParentId() {
-		String id = "";
-		try {
-			id = mJson.get(PARENT_ID).toString();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return id;
-	}
-
-	CustomClass setParentId(String id) {
-		try {
-			mJson.put(PARENT_ID, id);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return this;
-	}
-
-	public String getId() {
-		String id = "";
-		try {
-			id = mJson.getString(ID);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return id;
-	}
-
-	CustomClass setId(String id) {
-		try {
-			mJson.put(ID, id);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return this;
-	}
-
-	public boolean isSchema() {
-		return mJson.optBoolean(SCHEMA, false);
-	}
-
-	/******
-	 * Perform Catalze API call to get an already created custom class schema
-	 * 
-	 * @param callbackHandler
-	 *            CatalyzeListener that must expect a CustomClass on successful
-	 *            callback. The custom class instance returned will be a
-	 *            reference to the the same instance of custom class that was
-	 *            used to call this method
-	 */
-	public void getSchema(CatalyzeListener<CustomClass> callbackHandler) {
-		Response.Listener<JSONObject> responseListener = createListenerReturnNewInstance(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.GET, getCustomClassUrl(getName()), null,
-				responseListener, Catalyze.createErrorListener(callbackHandler));
-		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -233,65 +119,41 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 	public void createEntry(CatalyzeListener<CustomClass> callbackHandler) {
 		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
 		try {
+			JSONObject newJson = new JSONObject("{\"content\":"
+					+ mJson.getJSONObject(CONTENT) + "}");
+
+			Log.i("Catalyze", "New: " + newJson.toString());
+
 			CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-					CatalyzeRequest.POST, catalyze.customClassUrl + "/"
-							+ getName(), mJson.getJSONObject(CONTENT),
-					responseListener,
+					CatalyzeRequest.POST, getCustomClassUrl(getName()),
+					newJson, responseListener,
 					Catalyze.createErrorListener(callbackHandler));
 			request.setHeaders(catalyze.getAuthorizedHeaders());
-			request.execute(callbackHandler.getContext());
+
+			request.execute();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Perform Catalyze API call to retrieve an existing custom class entry.
 	 * 
-	 * @param entryId
+	 * @param refName
+	 * @param refId
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a CustomClass on successful
-	 *            callback. The custom class instance returned will be a
-	 *            reference to the the same instance of custom class that was
-	 *            used to call this method
+	 *            callback. This custom class will be a new Custom Class
+	 *            instance that contains no data. FIXME?
 	 */
-	public void getEntry(String entryId,
+	public void deleteArrayRef(String refName, String refId,
 			CatalyzeListener<CustomClass> callbackHandler) {
-		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.GET, getCustomClassUrl(getName(), entryId),
-				null, responseListener,
+				CatalyzeRequest.DELETE, getCustomClassUrl(getName(), getId(),
+						REF, refName, refId), null,
+				createListenerReturnNewInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
-	}
-
-	/**
-	 * Perform api call to update an entry in a custom class, will write data to
-	 * server as it is passed, so to do partial update first do a get. This
-	 * class requires that the id be set. The id will be saved automatically if
-	 * createEntry or getEntry has been called, otherwise you can set the id
-	 * manually by calling setId.
-	 * 
-	 * @param callbackHandler
-	 *            CatalyzeListener that must expect a CustomClass on successful
-	 *            callback. The custom class instance returned will be a
-	 *            reference to the the same instance of custom class that was
-	 *            used to call this method
-	 */
-	public void updateEntry(CatalyzeListener<CustomClass> callbackHandler) {
-		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
-		CatalyzeRequest<JSONObject> request;
-		try {
-			request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.PUT,
-					getCustomClassUrl(getName(), getId()),
-					mJson.getJSONObject(CONTENT), responseListener,
-					Catalyze.createErrorListener(callbackHandler));
-			request.setHeaders(catalyze.getAuthorizedHeaders());
-			request.execute(callbackHandler.getContext());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		request.execute();
 	}
 
 	/**
@@ -308,12 +170,20 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 	 */
 	public void deleteEntry(CatalyzeListener<CustomClass> callbackHandler) {
 		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
+
+		try {
+			Log.i("Catalyze", "Delete: "
+					+ mJson.getJSONObject(CONTENT).toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
 				CatalyzeRequest.DELETE, getCustomClassUrl(getName(), getId()),
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**
@@ -353,41 +223,7 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 						refName), null, listener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
-	}
-
-	/**
-	 * Add a new reference to the array refName. This class requires that the id
-	 * be set. The id will be saved automatically if createEntry or getEntry has
-	 * been called, otherwise you can set the id manually by calling setId.
-	 * 
-	 * @param refName
-	 * @param callbackHandler
-	 *            CatalyzeListener that must expect a CustomClass on successful
-	 *            callback. The custom class instance returned will be a
-	 *            reference to the original Custom Class instance that this
-	 *            method was called upon, after it has been updated to match the
-	 *            server response.
-	 */
-	public void addReferenceArray(String refName, String refID,
-			CatalyzeListener<CustomClass> callbackHandler) {
-		JSONArray newArrayEntry = new JSONArray();
-		JSONObject json = new JSONObject();
-		try {
-			json.put("type", "__ref");
-			json.put("class", refName);
-			json.put("id", refID);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		newArrayEntry.put(json);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.PUT, newArrayEntry, getCustomClassUrl(
-						getName(), getId(), REF, refName),
-				createListenerReturnUpdatedInstance(callbackHandler),
-				Catalyze.createErrorListener(callbackHandler));
-		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**
@@ -413,27 +249,213 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 				createListenerReturnNewInstance(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**
+	 * Allows access to the underlying JSON in the custom class.
 	 * 
-	 * @param refName
-	 * @param refId
+	 * @return The JSON content of this intance.
+	 */
+	public JSONObject getContent() {
+		JSONObject json = null;
+		try {
+			json = this.mJson.getJSONObject(CONTENT);
+		} catch (JSONException je) {
+			je.printStackTrace();
+		}
+		return json;
+
+	}
+
+	/**
+	 * Perform Catalyze API call to retrieve an existing custom class entry.
+	 * 
+	 * @param entryId
 	 * @param callbackHandler
 	 *            CatalyzeListener that must expect a CustomClass on successful
-	 *            callback. This custom class will be a new Custom Class
-	 *            instance that contains no data. FIXME?
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
 	 */
-	public void deleteArrayRef(String refName, String refId,
+	public void getEntry(String entryId,
 			CatalyzeListener<CustomClass> callbackHandler) {
+		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.DELETE, getCustomClassUrl(getName(), getId(),
-						REF, refName, refId), null,
-				createListenerReturnNewInstance(callbackHandler),
+				CatalyzeRequest.GET, getCustomClassUrl(getName(), entryId),
+				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
+	}
+
+	/**
+	 * Gets the ID of this custom class.
+	 * 
+	 * @return
+	 */
+	public String getId() {
+		String id = "";
+		try {
+			id = mJson.getString(ID);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return id;
+	}
+
+	/**
+	 * Gets the name of this instance's custom class.
+	 * 
+	 * @return The custom class name
+	 */
+	public String getName() {
+		return className;
+	}
+
+	/**
+	 * For retrieving the parent ID of a custom class parent in a hierarchy.
+	 * 
+	 * @return The ID of the parent
+	 */
+	public String getParentId() {
+		String id = "";
+		try {
+			id = mJson.get(PARENT_ID).toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return id;
+	}
+
+	/******
+	 * Perform Catalze API call to get an already created custom class schema
+	 * 
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
+	 */
+	public void getSchema(CatalyzeListener<CustomClass> callbackHandler) {
+		Response.Listener<JSONObject> responseListener = createListenerReturnNewInstance(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, getCustomClassUrl(getName()), null,
+				responseListener, Catalyze.createErrorListener(callbackHandler));
+		request.setHeaders(catalyze.getAuthorizedHeaders());
+		request.execute();
+	}
+
+	/**
+	 * If this entry is a schema definition, not an entry.
+	 * 
+	 * @return true iff this is a schema definition 
+	 */
+	public boolean isSchema() {
+		return mJson.optBoolean(SCHEMA, false);
+	}
+
+	/**
+	 * Sets the parent ID. Used for creating custom class hierarchies.
+	 * 
+	 * @param id
+	 *            The ID of the parent
+	 */
+	public void setParentId(String id) {
+		try {
+			mJson.put(PARENT_ID, id);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets if the custom class instance can contain PHI or not.
+	 * 
+	 * Be careful how you use this method. Don't changing something to not being
+	 * PHI unless you are sure about the contents.
+	 * 
+	 * @param phi
+	 * @return
+	 */
+	public CustomClass setPHI(boolean phi) {
+		try {
+			mJson.put(PHI, phi);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return this;
+	}
+
+	/**
+	 * Perform api call to update an entry in a custom class, will write data to
+	 * server as it is passed, so to do partial update first do a get. This
+	 * class requires that the id be set. The id will be saved automatically if
+	 * createEntry or getEntry has been called, otherwise you can set the id
+	 * manually by calling setId.
+	 * 
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect a CustomClass on successful
+	 *            callback. The custom class instance returned will be a
+	 *            reference to the the same instance of custom class that was
+	 *            used to call this method
+	 */
+	public void updateEntry(CatalyzeListener<CustomClass> callbackHandler) {
+		Response.Listener<JSONObject> responseListener = createListenerReturnUpdatedInstance(callbackHandler);
+		CatalyzeRequest<JSONObject> request;
+
+		try {
+			Log.i("Catalyze", "Update: "
+					+ mJson.getJSONObject(CONTENT).toString());
+
+			request = new CatalyzeRequest<JSONObject>(CatalyzeRequest.PUT,
+					getCustomClassUrl(getName(), getId()),
+					mJson.getJSONObject(CONTENT), responseListener,
+					Catalyze.createErrorListener(callbackHandler));
+			request.setHeaders(catalyze.getAuthorizedHeaders());
+			request.execute();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Volley response handler for custom class, takes the JSONObject response
+	 * and sets the CustomClasses json to this then returns it to user callback
+	 * handler
+	 * 
+	 * @param callbackHandler The catalyze handler
+	 * @return The volley handler
+	 */
+	private Response.Listener<JSONObject> createListenerReturnNewInstance(
+			final CatalyzeListener<CustomClass> callbackHandler) {
+		return new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				CustomClass cc = new CustomClass(CustomClass.this.catalyze,
+						CustomClass.this.className, response);
+				callbackHandler.onSuccess(cc);
+			}
+		};
+	}
+
+	/**
+	 * Volley response handler for custom class, takes the JSONObject response
+	 * and sets the CustomClasses JSON to this then returns it to user callback
+	 * handler.
+	 * 
+	 * @param callbackHandler The Catalyze handler
+	 * @return The volley listener
+	 */
+	private Response.Listener<JSONObject> createListenerReturnUpdatedInstance(
+			final CatalyzeListener<CustomClass> callbackHandler) {
+		return new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				CustomClass.this.mJson = response;
+				callbackHandler.onSuccess(CustomClass.this);
+			}
+		};
 	}
 
 	/**
@@ -452,44 +474,17 @@ public class CustomClass extends CatalyzeObject implements Serializable {
 	}
 
 	/**
-	 * Volley response handler for custom class, takes the JSONObject response
-	 * and sets the CustomClasses json to this then returns it to user callback
-	 * handler
+	 * Set the ID of this custom class. Should not be called from the SDK.
 	 * 
-	 * @param callbackHandler
-	 * @param cc
-	 * @return
+	 * @param id
+	 *            The new ID.
 	 */
-	private Response.Listener<JSONObject> createListenerReturnNewInstance(
-			final CatalyzeListener<CustomClass> callbackHandler) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CustomClass cc = new CustomClass(CustomClass.this.catalyze,
-						CustomClass.this.className, response);
-				callbackHandler.onSuccess(cc);
-			}
-		};
-	}
-
-	/**
-	 * Volley response handler for custom class, takes the JSONObject response
-	 * and sets the CustomClasses json to this then returns it to user callback
-	 * handler
-	 * 
-	 * @param callbackHandler
-	 * @param cc
-	 * @return
-	 */
-	private Response.Listener<JSONObject> createListenerReturnUpdatedInstance(
-			final CatalyzeListener<CustomClass> callbackHandler) {
-		return new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CustomClass.this.mJson = response;
-				callbackHandler.onSuccess(CustomClass.this);
-			}
-		};
+	protected void setId(String id) {
+		try {
+			mJson.put(ID, id);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

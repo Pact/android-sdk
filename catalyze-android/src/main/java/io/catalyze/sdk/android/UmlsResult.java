@@ -8,6 +8,12 @@ import org.json.JSONObject;
  */
 public class UmlsResult extends CatalyzeObject {
 
+	/**
+	 * UID
+	 */
+	private static final long serialVersionUID = 4659873670773688366L;
+	
+	// Field names
 	private static final String DESCRIPTION = "desc";
 	private static final String CODE = "code";
 	private static final String VOCAB = "vocab";
@@ -39,12 +45,12 @@ public class UmlsResult extends CatalyzeObject {
 	}
 
 	/**
-	 * Get the vocabulary of this entry (e.g. SNOMEDCT, LOINC, etc).
+	 * Get the concept code of this entry.
 	 * 
-	 * @return The vocabulary name
+	 * @return The concept code
 	 */
-	public String getVocab() {
-		return mJson.optString(VOCAB, null);
+	public String getConcept() {
+		return mJson.optString(CONCEPT, null);
 	}
 
 	/**
@@ -57,15 +63,6 @@ public class UmlsResult extends CatalyzeObject {
 	}
 
 	/**
-	 * Get the type of data (value set).
-	 * 
-	 * @return The type of data
-	 */
-	public String getValueset() {
-		return mJson.optString(VALUESET, null);
-	}
-
-	/**
 	 * Return the object identifier (OID) of this entry.
 	 * 
 	 * @return The OID
@@ -75,12 +72,21 @@ public class UmlsResult extends CatalyzeObject {
 	}
 
 	/**
-	 * Get the concept code of this entry.
+	 * Get the type of data (value set).
 	 * 
-	 * @return The concept code
+	 * @return The type of data
 	 */
-	public String getConcept() {
-		return mJson.optString(CONCEPT, null);
+	public String getValueset() {
+		return mJson.optString(VALUESET, null);
+	}
+
+	/**
+	 * Get the vocabulary of this entry (e.g. SNOMEDCT, LOINC, etc).
+	 * 
+	 * @return The vocabulary name
+	 */
+	public String getVocab() {
+		return mJson.optString(VOCAB, null);
 	}
 
 }

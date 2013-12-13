@@ -23,11 +23,9 @@ repositories {
 
 dependencies {
     compile project(':volley')
-    compile 'com.google.guava:guava:14.0.1'
-
     
-    compile files('src/main/libs/httpcore-jarjar-4.3.jar')
-    compile files('src/main/libs/httpmime-jarjar-4.3.1.jar')
+    compile files('src/main/libs/httpcore-4.3.jar')
+    compile files('src/main/libs/httpmime-4.3.1.jar')
 
 }
 

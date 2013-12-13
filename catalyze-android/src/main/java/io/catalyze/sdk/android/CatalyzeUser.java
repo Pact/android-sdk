@@ -71,75 +71,90 @@ public class CatalyzeUser extends CatalyzeObject implements
 	}
 
 	/**
-	 * Returns the username of the user.
-	 * 
-	 * @return The username
+	 * Compare by user ID, a unique value defined by the API. 
 	 */
-	public String getUsername() {
-		return mJson.optString(USERNAME, null);
+	@Override
+	public int compareTo(CatalyzeUser user) {
+		return this.getId().compareTo(user.getId());
 	}
 
 	/**
-	 * Sets the username of the user locally. Call CatalyzeUser.update() to
-	 * update on the backend.
+	 * Call the delete user api route, will also clear session data and current
+	 * user info
 	 * 
-	 * @param username
-	 *            The new username
+	 * @param callbackHandler
 	 */
-	public void setUsername(String username) {
-		try {
-			mJson.put(USERNAME, username);
-		} catch (JSONException e) {
-			e.printStackTrace();
+	public void delete(CatalyzeListener<CatalyzeUser> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, catalyze.userUrl, null,
+				responseListener, errorListener);
+		request.setHeaders(headers);
+		request.execute();
+	}
+
+	/**
+	 * Delete a specific field from the user's data. This is primarily meant to
+	 * manage the data captured by the "extras" array. Replace "fieldName" in
+	 * the route with the key value that you used in the extras array. Please do
+	 * not use this to delete the username etc. As always, Be careful using this
+	 * as it will delete the data completely from the database.
+	 * 
+	 * @param fieldName
+	 * @param callbackHandler
+	 */
+	public void deleteField(String fieldName,
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
+		if (fieldName == null || fieldName.trim().length() == 0) {
+			// if fieldName is blank this will otherwise delete the user
+			return;
 		}
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				callbackHandler.onResponse(CatalyzeUser.this);
+			}
+		};
+
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.DELETE, catalyze.userUrl + "/" + fieldName,
+				null, responseListener, errorListener);
+		request.setHeaders(headers);
+		request.execute();
 	}
 
 	/**
-	 * Returns the first name of the user.
+	 * Returns the age of the user.
 	 * 
-	 * @return The first name
+	 * @return The user's age
 	 */
-	public String getFirstName() {
-		return mJson.optString(FIRST_NAME, null);
+	public int getAge() {
+		return mJson.optInt(AGE, 0);
 	}
 
 	/**
-	 * Sets the first name of the user locally. Call CatalyzeUser.update() to
-	 * update on the backend.
+	 * Returns the city portion of the user's address.
 	 * 
-	 * @param firstName
-	 *            The new first name
+	 * @return The city
 	 */
-	public void setFirstName(String firstName) {
-		try {
-			mJson.put(FIRST_NAME, firstName);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+	public String getCity() {
+		return mJson.optString(CITY, null);
 	}
 
 	/**
-	 * Returns the user's last name.
+	 * Gets the country portion of the user's address.
 	 * 
-	 * @return The last name
+	 * @return The country
 	 */
-	public String getLastName() {
-		return mJson.optString(LAST_NAME, null);
-	}
-
-	/**
-	 * Sets the last name of the user locally. Call CatalyzeUser.update() to
-	 * update on the backend.
-	 * 
-	 * @param lastName
-	 *            The new last name
-	 */
-	public void setLastName(String lastName) {
-		try {
-			mJson.put(LAST_NAME, lastName);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+	public String getCountry() {
+		return mJson.optString(COUNTRY, null);
 	}
 
 	/**
@@ -162,191 +177,44 @@ public class CatalyzeUser extends CatalyzeObject implements
 	}
 
 	/**
-	 * Sets the data of birth of the user locally. Call CatalyzeUser.update() to
-	 * update on the backend.
+	 * Return the extra associated with this key. Returns null if there is no
+	 * matching key.
 	 * 
-	 * @param dateOfBirth
-	 *            The new birth date
+	 * @param key
+	 *            The extra key to find
+	 * @return The value of the extra or null if no such key exists
 	 */
-	public void setDateOfBirth(Date dateOfBirth) {
+	public Object getExtra(String key) {
 		try {
-			mJson.put(DATE_OF_BIRTH, dateOfBirth.toString());
+
+			// Extras may not exist, check first
+			JSONObject extras = mJson.optJSONObject(EXTRAS);
+			if (extras != null) {
+				return extras.get(key);
+			}
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		return null; // If there were no extras at all
 	}
 
 	/**
-	 * Returns the age of the user.
+	 * Return a Map of the user-defined extras for this object.
 	 * 
-	 * @return The user's age
+	 * @return The extras
 	 */
-	public int getAge() {
-		return mJson.optInt(AGE, 0);
+	public Map<String, Object> getExtras() {
+		return handleJSONObject(mJson.optJSONObject(EXTRAS));
 	}
 
 	/**
-	 * Sets the age of the user locally. Call CatalyzeUser.update() to update on
-	 * the backend.
+	 * Returns the first name of the user.
 	 * 
-	 * @param age
-	 *            The new age.
+	 * @return The first name
 	 */
-	public void setAge(int age) {
-		try {
-			mJson.put(AGE, age);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Returns the user's phone number. Currently free-form.
-	 * 
-	 * @return The phone number
-	 */
-	public String getPhoneNumber() {
-		return mJson.optString(PHONE_NUMBER, null);
-	}
-
-	/**
-	 * Sets the phone number (currently free-form) of the user locally. Call
-	 * CatalyzeUser.update() to update on the backend.
-	 * 
-	 * @param phoneNumber
-	 *            The new phone number.
-	 */
-	public void setPhoneNumber(String phoneNumber) {
-		try {
-			mJson.put(PHONE_NUMBER, phoneNumber);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Returns the street portion of the user's address.
-	 * 
-	 * @return The street
-	 */
-	public String getStreet() {
-		return mJson.optString(STREET, null);
-	}
-
-	/**
-	 * Sets the street portion of the user's address locally. Call
-	 * CatalyzeUser.update() to update on the backend.
-	 * 
-	 * @param street
-	 *            The new street
-	 */
-	public CatalyzeUser setStreet(String street) {
-		try {
-			mJson.put(STREET, street);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return this;
-	}
-
-	/**
-	 * Returns the city portion of the user's address.
-	 * 
-	 * @return The city
-	 */
-	public String getCity() {
-		return mJson.optString(CITY, null);
-	}
-
-	/**
-	 * Sets the city portion of the user's address locally. Call
-	 * CatalyzeUser.update() to update on the backend.
-	 * 
-	 * @param city
-	 *            The new city
-	 */
-	public void setCity(String city) {
-		try {
-			mJson.put(CITY, city);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Returns the state portion of the user's address.
-	 * 
-	 * @return The state
-	 */
-	public String getState() {
-		return mJson.optString(STATE, null);
-	}
-
-	/**
-	 * Sets the state portion of the user's address locally. Call
-	 * CatalyzeUser.update() to update on the backend.
-	 * 
-	 * @param state
-	 *            The new state
-	 */
-	public void setState(String state) {
-		try {
-			mJson.put(STATE, state);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Gets the zip code portion of the user's address.
-	 * 
-	 * @return The zip code
-	 */
-	public ZipCode getZipCode() {
-		String fromJson = mJson.optString(ZIP_CODE, null);
-		if (fromJson != null) {
-			return new ZipCode(fromJson);
-		}
-		return null;
-	}
-
-	/**
-	 * Sets the zip code portion of the user's address locally. Call
-	 * CatalyzeUser.update() to update on the backend.
-	 * 
-	 * @param zipCode
-	 *            The new zip code
-	 */
-	public void setZipCode(ZipCode zipCode) {
-		try {
-			mJson.put(ZIP_CODE, zipCode.toString());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Gets the country portion of the user's address.
-	 * 
-	 * @return The country
-	 */
-	public String getCountry() {
-		return mJson.optString(COUNTRY, null);
-	}
-
-	/**
-	 * Sets the country portion of the user's address locally. Call
-	 * CatalyzeUser.update() to update on the backend.
-	 * 
-	 * @param country
-	 *            The new country
-	 */
-	public void setCountry(String country) {
-		try {
-			mJson.put(COUNTRY, country);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+	public String getFirstName() {
+		return mJson.optString(FIRST_NAME, null);
 	}
 
 	/**
@@ -360,21 +228,6 @@ public class CatalyzeUser extends CatalyzeObject implements
 			return Gender.fromString(fromJson);
 		}
 		return null;
-	}
-
-	/**
-	 * Sets the user's gender locally. Call CatalyzeUser.update() to update on
-	 * the backend.
-	 * 
-	 * @param gender
-	 *            The gender
-	 */
-	public void setGender(Gender gender) {
-		try {
-			mJson.put(GENDER, gender.toString());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -393,17 +246,21 @@ public class CatalyzeUser extends CatalyzeObject implements
 	}
 
 	/**
-	 * Helper method. Not callable from the SDK as the ID cannot be changed.
+	 * Returns the user's last name.
 	 * 
-	 * @param id
-	 *            The new ID.
+	 * @return The last name
 	 */
-	void setId(String id) {
-		try {
-			mJson.put(ID, id);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+	public String getLastName() {
+		return mJson.optString(LAST_NAME, null);
+	}
+
+	/**
+	 * Returns the user's phone number. Currently free-form.
+	 * 
+	 * @return The phone number
+	 */
+	public String getPhoneNumber() {
+		return mJson.optString(PHONE_NUMBER, null);
 	}
 
 	/**
@@ -417,36 +274,185 @@ public class CatalyzeUser extends CatalyzeObject implements
 	}
 
 	/**
-	 * Sets the session token. Not callable from the SDK. This is handled
-	 * automatically.
+	 * Returns the state portion of the user's address.
 	 * 
-	 * @param sessionToken
-	 *            The new session token.
+	 * @return The state
 	 */
-	protected void setSessionToken(String sessionToken) {
-		this.sessionToken = sessionToken;
+	public String getState() {
+		return mJson.optString(STATE, null);
 	}
 
 	/**
-	 * Return a Map of the user-defined extras for this object.
+	 * Returns the street portion of the user's address.
 	 * 
-	 * @return The extras
+	 * @return The street
 	 */
-	public Map<String, Object> getExtras() {
-		return handleJSONObject(mJson.optJSONObject(EXTRAS));
+	public String getStreet() {
+		return mJson.optString(STREET, null);
+	}
+
+	/***
+	 * This route can only be used if you are the supervisor of your
+	 * application. Get details about a user with the given username.
+	 * 
+	 * @param userName
+	 *            name of user to lookup
+	 * @param callbackHandler
+	 */
+	public void getUser(String userName,
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				CatalyzeUser user = new CatalyzeUser(CatalyzeUser.this.catalyze);
+				user.setJson(response);
+				callbackHandler.onResponse(user);
+			}
+		};
+
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, catalyze.userUrl + "/" + userName, null,
+				responseListener, errorListener);
+		request.setHeaders(headers);
+		request.execute();
 	}
 
 	/**
-	 * Sets the user-defined extras. Allows for adding additional fields, values
-	 * (e.g. adding another phone number or address). Call CatalyzeUser.update()
-	 * to update on the backend.
+	 * Returns the username of the user.
 	 * 
-	 * @param extras
-	 *            The new extras. Overwrites the old extras.
+	 * @return The username
 	 */
-	public void setExtras(Map<String, Object> extras) {
+	public String getUsername() {
+		return mJson.optString(USERNAME, null);
+	}
+
+	/**
+	 * Gets the zip code portion of the user's address.
+	 * 
+	 * @return The zip code
+	 */
+	public ZipCode getZipCode() {
+		String fromJson = mJson.optString(ZIP_CODE, null);
+		if (fromJson != null) {
+			return new ZipCode(fromJson);
+		}
+		return null;
+	}
+
+	/**
+	 * Remove an extra identified by key and return the value.
+	 * 
+	 * @param key
+	 *            The key to remove from the user extras
+	 * @return The value of the item removed or null if nothing was removed (or
+	 *         null was set as the value).
+	 */
+	public Object removeExtra(String key) {
+
+		// Extras may not exist, check first
+		JSONObject extras = mJson.optJSONObject(EXTRAS);
+		if (extras != null) {
+			return extras.remove(key);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Supervisor route, returns array of strings containing all users with
+	 * 'partialUsername' as part of username to callback
+	 * 
+	 * @param partialUsername
+	 * @param callbackHandler
+	 */
+	public void search(String partialUsername,
+			final CatalyzeListener<String[]> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				String[] stringResults = new String[0];
+				try {
+					JSONArray results = response.getJSONArray("results");
+					stringResults = new String[results.length()];
+					for (int i = 0; i < results.length(); i++) {
+						stringResults[i] = results.getString(i);
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				callbackHandler.onResponse(stringResults);
+			}
+		};
+
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, catalyze.userUrl + "/search/"
+						+ partialUsername, null, responseListener,
+				errorListener);
+		request.setHeaders(headers);
+		request.execute();
+	}
+
+	/**
+	 * Sets the age of the user locally. Call CatalyzeUser.update() to update on
+	 * the backend.
+	 * 
+	 * @param age
+	 *            The new age.
+	 */
+	public void setAge(int age) {
 		try {
-			mJson.put(EXTRAS, new JSONObject(extras));
+			mJson.put(AGE, age);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the city portion of the user's address locally. Call
+	 * CatalyzeUser.update() to update on the backend.
+	 * 
+	 * @param city
+	 *            The new city
+	 */
+	public void setCity(String city) {
+		try {
+			mJson.put(CITY, city);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the country portion of the user's address locally. Call
+	 * CatalyzeUser.update() to update on the backend.
+	 * 
+	 * @param country
+	 *            The new country
+	 */
+	public void setCountry(String country) {
+		try {
+			mJson.put(COUNTRY, country);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the data of birth of the user locally. Call CatalyzeUser.update() to
+	 * update on the backend.
+	 * 
+	 * @param dateOfBirth
+	 *            The new birth date
+	 */
+	public void setDateOfBirth(Date dateOfBirth) {
+		try {
+			mJson.put(DATE_OF_BIRTH, dateOfBirth.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -480,53 +486,140 @@ public class CatalyzeUser extends CatalyzeObject implements
 	}
 
 	/**
-	 * Return the extra associated with this key. Returns null if there is no
-	 * matching key.
+	 * Sets the user-defined extras. Allows for adding additional fields, values
+	 * (e.g. adding another phone number or address). Call CatalyzeUser.update()
+	 * to update on the backend.
 	 * 
-	 * @param key
-	 *            The extra key to find
-	 * @return The value of the extra or null if no such key exists
+	 * @param extras
+	 *            The new extras. Overwrites the old extras.
 	 */
-	public Object getExtra(String key) {
+	public void setExtras(Map<String, Object> extras) {
 		try {
-
-			// Extras may not exist, check first
-			JSONObject extras = mJson.optJSONObject(EXTRAS);
-			if (extras != null) {
-				return extras.get(key);
-			}
-
+			mJson.put(EXTRAS, new JSONObject(extras));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return null; // If there were no extras at all
 	}
 
 	/**
-	 * Remove an extra identified by key and return the value.
+	 * Sets the first name of the user locally. Call CatalyzeUser.update() to
+	 * update on the backend.
 	 * 
-	 * @param key
-	 *            The key to remove from the user extras
-	 * @return The value of the item removed or null if nothing was removed (or
-	 *         null was set as the value).
+	 * @param firstName
+	 *            The new first name
 	 */
-	public Object removeExtra(String key) {
-
-		// Extras may not exist, check first
-		JSONObject extras = mJson.optJSONObject(EXTRAS);
-		if (extras != null) {
-			return extras.remove(key);
+	public void setFirstName(String firstName) {
+		try {
+			mJson.put(FIRST_NAME, firstName);
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
-
-		return null;
 	}
 
 	/**
-	 * Compare by user ID, a unique value defined by the API. 
+	 * Sets the user's gender locally. Call CatalyzeUser.update() to update on
+	 * the backend.
+	 * 
+	 * @param gender
+	 *            The gender
 	 */
-	@Override
-	public int compareTo(CatalyzeUser user) {
-		return this.getId().compareTo(user.getId());
+	public void setGender(Gender gender) {
+		try {
+			mJson.put(GENDER, gender.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the last name of the user locally. Call CatalyzeUser.update() to
+	 * update on the backend.
+	 * 
+	 * @param lastName
+	 *            The new last name
+	 */
+	public void setLastName(String lastName) {
+		try {
+			mJson.put(LAST_NAME, lastName);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the phone number (currently free-form) of the user locally. Call
+	 * CatalyzeUser.update() to update on the backend.
+	 * 
+	 * @param phoneNumber
+	 *            The new phone number.
+	 */
+	public void setPhoneNumber(String phoneNumber) {
+		try {
+			mJson.put(PHONE_NUMBER, phoneNumber);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the state portion of the user's address locally. Call
+	 * CatalyzeUser.update() to update on the backend.
+	 * 
+	 * @param state
+	 *            The new state
+	 */
+	public void setState(String state) {
+		try {
+			mJson.put(STATE, state);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the street portion of the user's address locally. Call
+	 * CatalyzeUser.update() to update on the backend.
+	 * 
+	 * @param street
+	 *            The new street
+	 */
+	public CatalyzeUser setStreet(String street) {
+		try {
+			mJson.put(STREET, street);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return this;
+	}
+
+	/**
+	 * Sets the username of the user locally. Call CatalyzeUser.update() to
+	 * update on the backend.
+	 * 
+	 * @param username
+	 *            The new username
+	 */
+	public void setUsername(String username) {
+		try {
+			mJson.put(USERNAME, username);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Sets the zip code portion of the user's address locally. Call
+	 * CatalyzeUser.update() to update on the backend.
+	 * 
+	 * @param zipCode
+	 *            The new zip code
+	 */
+	public void setZipCode(ZipCode zipCode) {
+		try {
+			mJson.put(ZIP_CODE, zipCode.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/***
@@ -576,144 +669,7 @@ public class CatalyzeUser extends CatalyzeObject implements
 				CatalyzeRequest.PUT, catalyze.userUrl, updates,
 				responseListener, errorListener);
 		request.setHeaders(headers);
-		request.execute(callbackHandler.getContext());
-	}
-
-	/**
-	 * Call the delete user api route, will also clear session data and current
-	 * user info
-	 * 
-	 * @param callbackHandler
-	 */
-	public void delete(CatalyzeListener<CatalyzeUser> callbackHandler) {
-		Map<String, String> headers = catalyze.getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze
-				.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.DELETE, catalyze.userUrl, null,
-				responseListener, errorListener);
-		request.setHeaders(headers);
-		request.execute(callbackHandler.getContext());
-	}
-
-	/**
-	 * Sign out this user. This is called only from an authenticated Catalyze
-	 * object.
-	 * 
-	 * @param callbackHandler
-	 *            Method to call after HTTP response handled
-	 */
-	protected void signOut(CatalyzeListener<CatalyzeUser> callbackHandler) {
-		Map<String, String> headers = catalyze.getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
-		Response.ErrorListener errorListener = Catalyze
-				.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.GET, catalyze.signOutUrl, null,
-				responseListener, errorListener);
-		request.setHeaders(headers);
-		request.execute(callbackHandler.getContext());
-	}
-
-	/**
-	 * Delete a specific field from the user's data. This is primarily meant to
-	 * manage the data captured by the "extras" array. Replace "fieldName" in
-	 * the route with the key value that you used in the extras array. Please do
-	 * not use this to delete the username etc. As always, Be careful using this
-	 * as it will delete the data completely from the database.
-	 * 
-	 * @param fieldName
-	 * @param callbackHandler
-	 */
-	public void deleteField(String fieldName,
-			final CatalyzeListener<CatalyzeUser> callbackHandler) {
-		if (fieldName == null || fieldName.trim().length() == 0) {
-			// if fieldName is blank this will otherwise delete the user
-			return;
-		}
-		Map<String, String> headers = catalyze.getAuthorizedHeaders();
-
-		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				callbackHandler.onResponse(CatalyzeUser.this);
-			}
-		};
-
-		Response.ErrorListener errorListener = Catalyze
-				.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.DELETE, catalyze.userUrl + "/" + fieldName,
-				null, responseListener, errorListener);
-		request.setHeaders(headers);
-		request.execute(callbackHandler.getContext());
-	}
-
-	/***
-	 * This route can only be used if you are the supervisor of your
-	 * application. Get details about a user with the given username.
-	 * 
-	 * @param userName
-	 *            name of user to lookup
-	 * @param callbackHandler
-	 */
-	public void getUser(String userName,
-			final CatalyzeListener<CatalyzeUser> callbackHandler) {
-		Map<String, String> headers = catalyze.getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CatalyzeUser user = new CatalyzeUser(CatalyzeUser.this.catalyze);
-				user.setJson(response);
-				callbackHandler.onResponse(user);
-			}
-		};
-
-		Response.ErrorListener errorListener = Catalyze
-				.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.GET, catalyze.userUrl + "/" + userName, null,
-				responseListener, errorListener);
-		request.setHeaders(headers);
-		request.execute(callbackHandler.getContext());
-	}
-
-	/**
-	 * Supervisor route, returns array of strings containing all users with
-	 * 'partialUsername' as part of username to callback
-	 * 
-	 * @param partialUsername
-	 * @param callbackHandler
-	 */
-	public void search(String partialUsername,
-			final CatalyzeListener<String[]> callbackHandler) {
-		Map<String, String> headers = catalyze.getAuthorizedHeaders();
-		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				String[] stringResults = new String[0];
-				try {
-					JSONArray results = response.getJSONArray("results");
-					stringResults = new String[results.length()];
-					for (int i = 0; i < results.length(); i++) {
-						stringResults[i] = results.getString(i);
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				callbackHandler.onResponse(stringResults);
-			}
-		};
-
-		Response.ErrorListener errorListener = Catalyze
-				.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.GET, catalyze.userUrl + "/search/"
-						+ partialUsername, null, responseListener,
-				errorListener);
-		request.setHeaders(headers);
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**
@@ -734,5 +690,49 @@ public class CatalyzeUser extends CatalyzeObject implements
 				userCallback.onResponse(CatalyzeUser.this);
 			}
 		};
+	}
+
+	/**
+	 * Sets the session token. Not callable from the SDK. This is handled
+	 * automatically.
+	 * 
+	 * @param sessionToken
+	 *            The new session token.
+	 */
+	protected void setSessionToken(String sessionToken) {
+		this.sessionToken = sessionToken;
+	}
+
+	/**
+	 * Sign out this user. This is called only from an authenticated Catalyze
+	 * object.
+	 * 
+	 * @param callbackHandler
+	 *            Method to call after HTTP response handled
+	 */
+	protected void signOut(CatalyzeListener<CatalyzeUser> callbackHandler) {
+		Map<String, String> headers = catalyze.getAuthorizedHeaders();
+		Response.Listener<JSONObject> responseListener = createSignoutListener(callbackHandler);
+		Response.ErrorListener errorListener = Catalyze
+				.createErrorListener(callbackHandler);
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, catalyze.signOutUrl, null,
+				responseListener, errorListener);
+		request.setHeaders(headers);
+		request.execute();
+	}
+
+	/**
+	 * Helper method. Not callable from the SDK as the ID cannot be changed.
+	 * 
+	 * @param id
+	 *            The new ID.
+	 */
+	void setId(String id) {
+		try {
+			mJson.put(ID, id);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -40,6 +40,13 @@ public abstract class CatalyzeListener<T> implements Response.Listener<T> {
 		return context;
 	}
 
+	/***
+	 * Handle error response from Catalyze API call
+	 * 
+	 * @param response
+	 */
+	public abstract void onError(CatalyzeException response);
+
 	/**
 	 * A successful call to the backend API will result in this method being
 	 * called. Simply redirect to onSuccess().
@@ -47,13 +54,6 @@ public abstract class CatalyzeListener<T> implements Response.Listener<T> {
 	public void onResponse(T response) {
 		onSuccess(response);
 	}
-
-	/***
-	 * Handle error response from Catalyze API call
-	 * 
-	 * @param response
-	 */
-	public abstract void onError(CatalyzeException response);
 
 	/**
 	 * Handle success response from Catalyze API call

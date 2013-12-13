@@ -1,7 +1,5 @@
 package io.catalyze.sdk.android.user;
 
-import com.google.common.base.Strings;
-
 /**
  * Provides a reference as to the gender of a {@link io.catalyze.sdk.sdk.android.Person}.
  */
@@ -21,7 +19,7 @@ public enum Gender {
      * @return the {@link Gender} the provided string represents or {@code null} if the string is not valid.
      */
     public static Gender fromString(String value) {
-        if (!Strings.isNullOrEmpty(value)) {
+        if (value != null && value.length() > 0) {
             for (Gender g : Gender.values()) {
                 if (value.equals(g.toString())) {
                     return g;

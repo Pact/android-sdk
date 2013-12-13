@@ -16,6 +16,11 @@ import com.android.volley.Response;
  */
 public class Query extends CatalyzeObject {
 
+	/**
+	 * UID
+	 */
+	private static final long serialVersionUID = -9121968191350735246L;
+	
 	private static final String FIELD = "field";
 	private static final String SEARCH_BY = "searchBy";
 	private static final String PAGE_NUMBER = "pageNumber";
@@ -30,80 +35,12 @@ public class Query extends CatalyzeObject {
 
 		// Set default settings (return the first ten items in a custom class). 
 		try {
-			this.mJson.put(FIELD, "");
-			this.mJson.put(SEARCH_BY, "");
+			//this.mJson.put(FIELD, "");
+			//this.mJson.put(SEARCH_BY, "");
 			this.mJson.put(PAGE_NUMBER, "1");
 			this.mJson.put(PAGE_SIZE, "10");
 		} catch (JSONException jse) {
 			jse.printStackTrace();
-		}
-	}
-
-	/**
-	 * Get the results from the last executed query.
-	 * 
-	 * @return
-	 */
-	public ArrayList<CustomClass> getResults() {
-		return queryResults;
-	}
-
-	/**
-	 * Get the name of the custom class related to this query.
-	 * 
-	 * @return The custom class name.
-	 */
-	public String getCustomClassName() {
-		return this.customClassName;
-	}
-
-	public String getField() {
-		return mJson.optString(FIELD, null);
-	}
-
-	public Query setField(String name) {
-		setSomething(FIELD, name);
-		return this;
-	}
-
-	public String getSearchBy() {
-		return mJson.optString(SEARCH_BY, null);
-	}
-
-	public void setSearchBy(String data) {
-		setSomething(SEARCH_BY, data);
-	}
-
-	public void setPageNumber(int pageNumber) {
-		try {
-			mJson.put(PAGE_NUMBER, pageNumber);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Change the name of the custom class to query.
-	 * 
-	 * @param className
-	 */
-	public void setCustomClassName(String className) {
-		customClassName = className;
-	}
-
-	public void setPageSize(int pageSize) {
-		try {
-			mJson.put(PAGE_SIZE, pageSize);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void setSomething(String key, String value) {
-		try {
-			mJson.put(key, value);
-		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -125,7 +62,75 @@ public class Query extends CatalyzeObject {
 						+ "/query", this.mJson, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
+	}
+
+	/**
+	 * Get the name of the custom class related to this query.
+	 * 
+	 * @return The custom class name.
+	 */
+	public String getCustomClassName() {
+		return this.customClassName;
+	}
+
+	public String getField() {
+		return mJson.optString(FIELD, null);
+	}
+
+	/**
+	 * Get the results from the last executed query.
+	 * 
+	 * @return
+	 */
+	public ArrayList<CustomClass> getResults() {
+		return queryResults;
+	}
+
+	public String getSearchBy() {
+		return mJson.optString(SEARCH_BY, null);
+	}
+
+	/**
+	 * Change the name of the custom class to query.
+	 * 
+	 * @param className
+	 */
+	public void setCustomClassName(String className) {
+		customClassName = className;
+	}
+
+	public Query setField(String name) {
+		setSomething(FIELD, name);
+		return this;
+	}
+
+	public void setPageNumber(int pageNumber) {
+		try {
+			mJson.put(PAGE_NUMBER, pageNumber);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void setPageSize(int pageSize) {
+		try {
+			mJson.put(PAGE_SIZE, pageSize);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void setSearchBy(String data) {
+		setSomething(SEARCH_BY, data);
+	}
+
+	private void setSomething(String key, String value) {
+		try {
+			mJson.put(key, value);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private Response.Listener<JSONArray> testListener(

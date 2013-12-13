@@ -15,6 +15,11 @@ import com.android.volley.Response;
  */
 public class UMLS extends CatalyzeObject {
 
+	/**
+	 * UID
+	 */
+	private static final long serialVersionUID = 1149651658802961670L;
+	
 	// Route values, set in constructor or by setBaseUrl()
 	private String codesetsUrl = "codesets";
 	private String valuesetsUrl = "valuesets";
@@ -33,59 +38,6 @@ public class UMLS extends CatalyzeObject {
 	public UMLS(Catalyze catalyze) {
 		super(catalyze);
 		this.setBaseURL("https://umls.catalyze.io/v1/umls/");
-	}
-
-	/**
-	 * Update the route URLs using the provided base URL.
-	 * 
-	 * @param url
-	 *            A URL for the Catalyze API
-	 */
-	public void setBaseURL(String url) {
-		this.codesetsUrl = url + "codesets";
-		valuesetsUrl = url + "valuesets";
-		relatedUrl = url + "related";
-		phraseUrl = url + "phrase";
-		prefixUrl = url + "prefix";
-		valueUrl = url + "value";
-		codeUrl = url + "code";
-	}
-
-	/**
-	 * Perform an api call to get a list the UMLS codesets currently supported
-	 * by Catalyze UMLS The current API only supports a subset of UMLS data. Use
-	 * this command to return a list of supported codesets (AKA "vocabularies"
-	 * or "RSABs").
-	 * 
-	 * @param callbackHandler
-	 *            User CatalyzeListener that must expect an array of Strings on
-	 *            successd
-	 */
-	public void getCodesetList(CatalyzeListener<String[]> callbackHandler) {
-		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
-				CatalyzeRequest.GET, codesetsUrl, null, responseListener,
-				Catalyze.createErrorListener(callbackHandler));
-		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(callbackHandler.getContext());
-	}
-
-	/**
-	 * Perform an api call to get a list the UMLS values currently supported by
-	 * Catalyze UMLS The current API only supports a subset of available value
-	 * sets in CCDA. Use this command to return a list of supported value sets.
-	 * 
-	 * @param callbackHandler
-	 *            User CatalyzeListener that must expect an array of Strings on
-	 *            success
-	 */
-	public void getValueSetList(CatalyzeListener<String[]> callbackHandler) {
-		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
-				CatalyzeRequest.GET, valuesetsUrl, null, responseListener,
-				Catalyze.createErrorListener(callbackHandler));
-		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(callbackHandler.getContext());
 	}
 
 	/**
@@ -110,32 +62,69 @@ public class UMLS extends CatalyzeObject {
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**
-	 * Perform api call, which given a codeset and a code, returns the full
-	 * detailed information about this UMLS entry. The value of {code} can also
-	 * be an abbreviated code description/value as returned in prefix search
-	 * results. Codes are not necessarily unique so an array of matches is
-	 * returned. A good rule of thumb when processing multiple results is to use
-	 * the result with the longest 'desc' value. By design this is not part of
-	 * the API.
+	 * Perform an api call to get a list the UMLS codesets currently supported
+	 * by Catalyze UMLS The current API only supports a subset of UMLS data. Use
+	 * this command to return a list of supported codesets (AKA "vocabularies"
+	 * or "RSABs").
 	 * 
-	 * @param valueSet
-	 * @param code
 	 * @param callbackHandler
-	 *            CatalyzeListener that must expect a UmlsResult object on
-	 *            success
+	 *            User CatalyzeListener that must expect an array of Strings on
+	 *            successd
 	 */
-	public void valueLookup(String valueSet, String code,
-			CatalyzeListener<UmlsResult> callbackHandler) {
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.GET, valueUrl + "/" + valueSet + "/" + code,
-				null, createUmlsResultCallback(callbackHandler),
+	public void getCodesetList(CatalyzeListener<String[]> callbackHandler) {
+		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, codesetsUrl, null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
+	}
+
+	/**
+	 * Perform an api call to get a list the UMLS values currently supported by
+	 * Catalyze UMLS The current API only supports a subset of available value
+	 * sets in CCDA. Use this command to return a list of supported value sets.
+	 * 
+	 * @param callbackHandler
+	 *            User CatalyzeListener that must expect an array of Strings on
+	 *            success
+	 */
+	public void getValueSetList(CatalyzeListener<String[]> callbackHandler) {
+		Response.Listener<JSONArray> responseListener = createListenerWithStringCallback(callbackHandler);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, valuesetsUrl, null, responseListener,
+				Catalyze.createErrorListener(callbackHandler));
+		request.setHeaders(catalyze.getDefaultHeaders());
+		request.execute();
+	}
+
+	/**
+	 * Perform api call which finds other entries that are related to the
+	 * specified code either by concept or code. Finding by concept returns all
+	 * entries within the broader concept that the code falls under. Finding
+	 * related items by code will return other entries in UMLS with the same
+	 * code for the codeset.
+	 * 
+	 * @param type
+	 * @param codeSet
+	 * @param code
+	 * @param callbackHandler
+	 *            CatalyzeListener that must expect an array of UmlsResult on
+	 *            success
+	 */
+	public void searchByCodeOrConcept(String type, String codeSet, String code,
+			CatalyzeListener<UmlsResult[]> callbackHandler) {
+		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
+		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
+				CatalyzeRequest.GET, relatedUrl + "/" + type + "/" + codeSet
+						+ "/" + code, null, responseListener,
+				Catalyze.createErrorListener(callbackHandler));
+		request.setHeaders(catalyze.getDefaultHeaders());
+		request.execute();
 	}
 
 	/**
@@ -158,7 +147,7 @@ public class UMLS extends CatalyzeObject {
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**
@@ -186,32 +175,48 @@ public class UMLS extends CatalyzeObject {
 				null, responseListener,
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**
-	 * Perform api call which finds other entries that are related to the
-	 * specified code either by concept or code. Finding by concept returns all
-	 * entries within the broader concept that the code falls under. Finding
-	 * related items by code will return other entries in UMLS with the same
-	 * code for the codeset.
+	 * Update the route URLs using the provided base URL.
 	 * 
-	 * @param type
-	 * @param codeSet
+	 * @param url
+	 *            A URL for the Catalyze API
+	 */
+	public void setBaseURL(String url) {
+		this.codesetsUrl = url + "codesets";
+		valuesetsUrl = url + "valuesets";
+		relatedUrl = url + "related";
+		phraseUrl = url + "phrase";
+		prefixUrl = url + "prefix";
+		valueUrl = url + "value";
+		codeUrl = url + "code";
+	}
+
+	/**
+	 * Perform api call, which given a codeset and a code, returns the full
+	 * detailed information about this UMLS entry. The value of {code} can also
+	 * be an abbreviated code description/value as returned in prefix search
+	 * results. Codes are not necessarily unique so an array of matches is
+	 * returned. A good rule of thumb when processing multiple results is to use
+	 * the result with the longest 'desc' value. By design this is not part of
+	 * the API.
+	 * 
+	 * @param valueSet
 	 * @param code
 	 * @param callbackHandler
-	 *            CatalyzeListener that must expect an array of UmlsResult on
+	 *            CatalyzeListener that must expect a UmlsResult object on
 	 *            success
 	 */
-	public void searchByCodeOrConcept(String type, String codeSet, String code,
-			CatalyzeListener<UmlsResult[]> callbackHandler) {
-		Response.Listener<JSONArray> responseListener = createUmlsResultArrayCallback(callbackHandler);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
-				CatalyzeRequest.GET, relatedUrl + "/" + type + "/" + codeSet
-						+ "/" + code, null, responseListener,
+	public void valueLookup(String valueSet, String code,
+			CatalyzeListener<UmlsResult> callbackHandler) {
+		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
+				CatalyzeRequest.GET, valueUrl + "/" + valueSet + "/" + code,
+				null, createUmlsResultCallback(callbackHandler),
 				Catalyze.createErrorListener(callbackHandler));
 		request.setHeaders(catalyze.getDefaultHeaders());
-		request.execute(callbackHandler.getContext());
+		request.execute();
 	}
 
 	/**

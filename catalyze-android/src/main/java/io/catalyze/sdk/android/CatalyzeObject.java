@@ -12,15 +12,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-
-import com.google.common.base.Objects;
-
 /**
  * Base class for different Catalyze objects
  * 
  */
 public abstract class CatalyzeObject implements Serializable {
+
+	/**
+	 * UID
+	 */
+	private static final long serialVersionUID = 1952650184533673793L;
 
 	// Core data storage is in JSON as that's what the API talks
 	protected transient JSONObject mJson = new JSONObject();
@@ -60,6 +61,23 @@ public abstract class CatalyzeObject implements Serializable {
 	}
 
 	/**
+	 * Compare by JSON content.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (!(o instanceof CatalyzeObject)) {
+			return false;
+		}
+
+		CatalyzeObject that = (CatalyzeObject) o;
+		return mJson.equals(that.mJson);
+	}
+
+	/**
 	 * Gets the Catalyze instance associated with this object.
 	 * 
 	 * @return The Catalyze instance
@@ -69,14 +87,102 @@ public abstract class CatalyzeObject implements Serializable {
 	}
 
 	/**
-	 * Provides the ability to overwrite the current JSON. Used in the results
-	 * returned from update operations.
-	 * 
-	 * @param json
-	 *            The new JSON to use
+	 * Use the JSON's hash.
 	 */
-	protected void setJson(JSONObject json) {
-		mJson = json;
+	@Override
+	public int hashCode() {
+		return mJson.hashCode();
+	}
+
+	/**
+	 * Return the object as a JSON String.
+	 */
+	@Override
+	public String toString() {
+		return mJson.toString();
+	}
+
+	/**
+	 * A better formatted JSON String representation than the default
+	 * toString().
+	 * 
+	 * @param indentSpaces
+	 *            Number of spaces to indent on each level.
+	 * @return A Formatted String indented and useful for user presentation of
+	 *         JSON.
+	 */
+	public String toString(int indentSpaces) {
+		try {
+			return mJson.toString(indentSpaces);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * For de-serializing to/from Activities via Intents as extras.
+	 * 
+	 * @param ois
+	 *            The input stream
+	 * @throws ClassNotFoundException
+	 *             If there is a path problem
+	 * @throws IOException
+	 *             If there is an IO issue
+	 */
+	private void readObject(ObjectInputStream ois)
+			throws ClassNotFoundException, IOException {
+		// default deserialization
+		ois.defaultReadObject();
+
+		byte[] bytes = new byte[ois.readInt()];
+		ois.read(bytes, 0, bytes.length);
+		try {
+			this.mJson = new JSONObject(new String(bytes));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * For de-serializing to/from Activities via Intents as extras.
+	 * 
+	 * @param oos
+	 *            The output stream
+	 * @throws IOException
+	 *             If there is an IO issue
+	 */
+	private void writeObject(ObjectOutputStream oos) throws IOException {
+		oos.defaultWriteObject();
+		byte[] json = this.mJson.toString().getBytes();
+		oos.writeInt(json.length);
+		oos.write(json);
+	}
+
+	/**
+	 * Helper method for manipulating JSON array data.
+	 * 
+	 * @param array
+	 *            The array to process
+	 * @return Objects extracted from the input array
+	 */
+	protected Object[] handleJSONArray(JSONArray array) {
+		Object[] retVal = new Object[array.length()];
+		for (int i = 0, max = array.length(); i < max; i++) {
+			Object value = array.opt(i);
+			if (value instanceof JSONArray) {
+				retVal[i] = handleJSONArray((JSONArray) value);
+			} else if (value instanceof JSONObject) {
+				retVal[i] = handleJSONObject((JSONObject) value);
+			} else {
+				try {
+					retVal[i] = array.get(i);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return retVal;
 	}
 
 	/**
@@ -116,104 +222,14 @@ public abstract class CatalyzeObject implements Serializable {
 	}
 
 	/**
-	 * Helper method for manipulating JSON array data.
+	 * Provides the ability to overwrite the current JSON. Used in the results
+	 * returned from update operations.
 	 * 
-	 * @param array
-	 *            The array to process
-	 * @return Objects extracted from the input array
+	 * @param json
+	 *            The new JSON to use
 	 */
-	protected Object[] handleJSONArray(JSONArray array) {
-		Object[] retVal = new Object[array.length()];
-		for (int i = 0, max = array.length(); i < max; i++) {
-			Object value = array.opt(i);
-			if (value instanceof JSONArray) {
-				retVal[i] = handleJSONArray((JSONArray) value);
-			} else if (value instanceof JSONObject) {
-				retVal[i] = handleJSONObject((JSONObject) value);
-			} else {
-				try {
-					retVal[i] = array.get(i);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return retVal;
-	}
-
-	/**
-	 * Use the JSON's hash.
-	 */
-	@Override
-	public int hashCode() {
-		return mJson.hashCode();
-	}
-
-	/**
-	 * Compare by JSON content.
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-
-		if (!(o instanceof CatalyzeUser)) {
-			return false;
-		}
-
-		CatalyzeUser that = (CatalyzeUser) o;
-		return Objects.equal(mJson, that.mJson);
-	}
-
-	/**
-	 * Return the object as a JSON String.
-	 */
-	@Override
-	public String toString() {
-		return mJson.toString();
-	}
-
-	/**
-	 * A better formatted JSON String representation than the default
-	 * toString().
-	 * 
-	 * @param indentSpaces
-	 *            Number of spaces to indent on each level.
-	 * @return A Formatted String indented and useful for user presentation of
-	 *         JSON.
-	 */
-	public String toString(int indentSpaces) {
-		try {
-			return mJson.toString(indentSpaces);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private void writeObject(ObjectOutputStream oos) throws IOException {
-		// default serialization
-		oos.defaultWriteObject();
-		// write the object
-		byte[] json = this.mJson.toString().getBytes();
-		oos.writeInt(json.length);
-		oos.write(json);
-	}
-
-	private void readObject(ObjectInputStream ois)
-			throws ClassNotFoundException, IOException {
-		// default deserialization
-		ois.defaultReadObject();
-
-		byte[] bytes = new byte[ois.readInt()];
-		ois.read(bytes, 0, bytes.length);
-		try {
-			this.mJson = new JSONObject(new String(bytes));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	protected void setJson(JSONObject json) {
+		mJson = json;
 	}
 
 }
