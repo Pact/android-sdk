@@ -100,11 +100,11 @@ public class Catalyze implements Serializable {
 	 *            not active until a successful callback result is returned.
 	 */
 	public static void authenticate(String userName, String password,
-			Context context, final CatalyzeListener<Catalyze> callbackHandler) {
+			final CatalyzeListener<Catalyze> callbackHandler) {
 
 		final Catalyze catalyze = new Catalyze();
 
-		CatalyzeRequest.initRequestQueue(context);
+		CatalyzeRequest.initRequestQueue(callbackHandler.getContext());
 
 		Map<String, String> headers = catalyze.getDefaultHeaders();
 		JSONObject jsonBody = new JSONObject();
@@ -153,12 +153,12 @@ public class Catalyze implements Serializable {
 	 *            The call back to report back success or failure.
 	 */
 	public static void signUp(String userName, String password,
-			String firstName, String lastName, Context context,
+			String firstName, String lastName,
 			final CatalyzeListener<Catalyze> callbackHandler) {
 
 		final Catalyze catalyze = new Catalyze();
 
-		CatalyzeRequest.initRequestQueue(context);
+		CatalyzeRequest.initRequestQueue(callbackHandler.getContext());
 
 		Map<String, String> headers = catalyze.getDefaultHeaders();
 		JSONObject jsonBody = new JSONObject();
