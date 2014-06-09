@@ -18,8 +18,8 @@ apply plugin: 'android-library'
 apply plugin: 'eclipse'
 
 repositories {
-        mavenCentral()
-    }
+    mavenCentral()
+}
 
 dependencies {
     compile project(':volley')
@@ -30,20 +30,22 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 18
-    buildToolsVersion "18.0.1"
+    compileSdkVersion 19
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 18
-        versionCode 1
-        versionName '0.0.1'
-        packageName 'io.catalyze.sdk.android'
+        targetSdkVersion 19
+        versionCode 2
+        versionName '0.0.2'
+        applicationId 'io.catalyze.sdk.android'
     }
 
-    debug {
-        packageNameSuffix '.debug'
-        versionNameSuffix '-SNAPSHOT'
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-SNAPSHOT'
+        }
     }
 }
 
