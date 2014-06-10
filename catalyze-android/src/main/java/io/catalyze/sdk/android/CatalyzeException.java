@@ -1,5 +1,8 @@
 package io.catalyze.sdk.android;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
@@ -7,8 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.volley.NetworkResponse;
-import com.android.volley.VolleyError;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * CatalyzeException will be returned to the onError method of the user callback
@@ -25,26 +28,26 @@ public class CatalyzeException extends Exception {
 	 */
 	private static final long serialVersionUID = 6762913468935195414L;
 
-	// Encapsulated VolleyError
-	private VolleyError volleyError = null;
+	// Encapsulated RetrofitError
+	private RetrofitError retrofitError = null;
 
 	private int httpCode = -1;
 
 	private CatalyzeError[] errors = new CatalyzeError[0];
 
 	/**
-	 * Create a new exception baded on a VolleyError (or subclass).
+	 * Create a new exception baded on a RetrofitError (or subclass).
 	 */
-	protected CatalyzeException(VolleyError error) {
-		this.volleyError = error;
+	protected CatalyzeException(RetrofitError error) {
+		this.retrofitError = error;
 
 		// Check for API error information
-		NetworkResponse response = error.networkResponse;
+		Response response = error.getResponse();
 		if (response != null) {
-			this.httpCode = response.statusCode;
+			this.httpCode = response.getStatus();
 			JSONObject errorJson = null;
 			try {
-				errorJson = new JSONObject(new String(response.data));
+				errorJson = new JSONObject(new String(streamToBytes(response.getBody().in()), "UTF-8"));
 			} catch (Exception jse) {
 				// May not contain JSON
 			}
@@ -82,17 +85,30 @@ public class CatalyzeException extends Exception {
 		}
 	}
 
+    // Taken from https://github.com/square/retrofit/blob/master/retrofit/src/main/java/retrofit/Utils.java
+    private byte[] streamToBytes(InputStream stream) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if (stream != null) {
+            byte[] buf = new byte[0x1000];
+            int r;
+            while ((r = stream.read(buf)) != -1) {
+                baos.write(buf, 0, r);
+            }
+        }
+        return baos.toByteArray();
+    }
+
 	@Override
 	public Throwable fillInStackTrace() {
-		if (volleyError != null)
-			return volleyError.fillInStackTrace();
+		if (retrofitError != null)
+			return retrofitError.fillInStackTrace();
 		else
 			return new Exception().fillInStackTrace();
 	}
 
 	@Override
 	public Throwable getCause() {
-		return volleyError.getCause();
+		return retrofitError.getCause();
 	}
 
 	/**
@@ -122,14 +138,14 @@ public class CatalyzeException extends Exception {
 
 	@Override
 	public String getLocalizedMessage() {
-		return volleyError.getLocalizedMessage();
+		return retrofitError.getLocalizedMessage();
 	}
 
 	@Override
 	public String getMessage() {
 		if (httpCode == -1) {
 			// In this case rely on Volley, don't know what happened
-			return volleyError.getMessage();
+			return retrofitError.getMessage();
 		} else {
 			// Here rely on the API's error response to tell us what went wrong
 			String message = "The Catalyze API returned HTTP code " + httpCode
@@ -151,37 +167,37 @@ public class CatalyzeException extends Exception {
 
 	@Override
 	public StackTraceElement[] getStackTrace() {
-		return volleyError.getStackTrace();
+		return retrofitError.getStackTrace();
 	}
 
 	@Override
 	public Throwable initCause(Throwable cause) {
-		return volleyError.initCause(cause);
+		return retrofitError.initCause(cause);
 	}
 
 	@Override
 	public void printStackTrace() {
-		volleyError.printStackTrace();
+        retrofitError.printStackTrace();
 	}
 
 	@Override
 	public void printStackTrace(PrintStream s) {
-		volleyError.printStackTrace(s);
+        retrofitError.printStackTrace(s);
 	}
 
 	@Override
 	public void printStackTrace(PrintWriter s) {
-		volleyError.printStackTrace(s);
+        retrofitError.printStackTrace(s);
 	}
 
 	@Override
 	public void setStackTrace(StackTraceElement[] stackTrace) {
-		volleyError.setStackTrace(stackTrace);
+        retrofitError.setStackTrace(stackTrace);
 	}
 
 	@Override
 	public String toString() {
-		return volleyError.toString();
+		return retrofitError.toString();
 	}
 
 }

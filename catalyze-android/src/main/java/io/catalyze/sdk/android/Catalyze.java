@@ -1,16 +1,13 @@
 package io.catalyze.sdk.android;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import io.catalyze.sdk.android.api.CatalyzeAPIAdapter;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Base class for making Catalyze.io API calls. This class must be instantiated
@@ -27,28 +24,20 @@ import com.android.volley.VolleyError;
  * this must be handled outside of the Catalyze Android SDK (handled by app
  * logic).
  */
-public class Catalyze implements Serializable {
-
-	/**
-	 * UID
-	 */
-	private static final long serialVersionUID = -395490221349117410L;
-
-	// Const defining the API key prefix
-	private static final String ANDROID = "android";
+public class Catalyze {
 
 	/**
 	 * The API key of the application. This is generated in the Catalyze
-	 * Developer Portal. You must set it in your app's onCreate() method before
-	 * using the SDK.
+	 * Developer Portal. You must have it set in your app's manifest file as meta-data.
+     * This is the full ApiKey, "<type> <identifier> <id>"
 	 */
-	public static String API_KEY;
+	private static String apiKey;
 
-	/**
-	 * The identifier (name) of the application. You must set it in your app's
-	 * onCreate() method before using the SDK.
-	 */
-	public static String IDENTIFIER;
+    /**
+     * The App ID of the application. This is generated in the Catalyze
+     * Developer Portal. You must have it set in your app's manifest file as meta-data.
+     */
+    private static String appId;
 
 	// The authenticated user. Cannot be used until the instance is
 	// authenticated.
@@ -86,6 +75,46 @@ public class Catalyze implements Serializable {
 	// URL of route for user-related file operations
 	protected String userFileUrl;
 
+    private static Catalyze catalyzeInstance;
+    private Context context;
+
+    public static Catalyze getInstance(Context context) {
+        if (catalyzeInstance == null) {
+            synchronized (Catalyze.class) {
+                if (catalyzeInstance == null) {
+                    catalyzeInstance = new Catalyze(context);
+                }
+            }
+        }
+        catalyzeInstance.setContext(context);
+        return catalyzeInstance;
+    }
+
+    private Catalyze(Context context) {
+        this.context = context;
+        try {
+            Bundle bundle = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData;
+            apiKey = bundle.getString("io.catalyze.android.sdk.v2.API_KEY");
+            appId = bundle.getString("io.catalyze.android.sdk.v2.APP_ID");
+        } catch (PackageManager.NameNotFoundException nnfe) {
+            throw new IllegalStateException("ApiKey and AppId must be set in the manifest file");
+        }
+        this.setBaseURL("https://apiv2.catalyze.io/v2");
+    }
+
+    private void setContext(Context context) {
+        this.context = context;
+    }
+
+    /**
+     * Return the context associated with this instance.
+     *
+     * @return The context associated with this instance
+     */
+    protected Context getContext() {
+        return context;
+    }
+
 	/**
 	 * Initializes the instance by authenticating as the user provided. This
 	 * method must be called before a Catalyze instance can be used for any
@@ -99,142 +128,67 @@ public class Catalyze implements Serializable {
 	 *            The callback to handle the server's response. The instance is
 	 *            not active until a successful callback result is returned.
 	 */
-	public static void authenticate(String userName, String password,
-			final CatalyzeListener<Catalyze> callbackHandler) {
+	public void authenticate(String userName, String password,
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
 
-		final Catalyze catalyze = new Catalyze();
+		CatalyzeAPIAdapter.getApi().signIn(new CatalyzeCredentials(userName, password), new Callback<CatalyzeUser>() {
+            @Override
+            public void success(CatalyzeUser catalyzeUser, Response response) {
+                user = catalyzeUser;
+                CatalyzeSession.getInstance().setSessionToken(user.getSessionToken());
+                callbackHandler.onSuccess(user);
+            }
 
-		CatalyzeRequest.initRequestQueue(callbackHandler.getContext());
-
-		Map<String, String> headers = catalyze.getDefaultHeaders();
-		JSONObject jsonBody = new JSONObject();
-		try {
-			jsonBody.put(CatalyzeUser.USERNAME, userName);
-			jsonBody.put(CatalyzeUser.PASSWORD, password);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CatalyzeUser user = new CatalyzeUser(catalyze);
-				user.setJson(response);
-				user.setSessionToken(response.optString(
-						CatalyzeUser.SESSION_TOKEN, null));
-				catalyze.user = user;
-				callbackHandler.onResponse(catalyze);
-			}
-		};
-
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.POST, catalyze.signInUrl, jsonBody,
-				responseListener, createErrorListener(callbackHandler));
-		request.setHeaders(headers);
-
-		request.execute();
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                callbackHandler.onError(new CatalyzeException(retrofitError));
+            }
+        });
 	}
 
 	/**
 	 * Perform an API to create a new user. The callback will return an
 	 * authenticated Catalyze instance (authenticated as the new user).
 	 * 
-	 * Also initializes the singelton RequestQueue if needed.
+	 * Also initializes the singleton RequestQueue if needed.
 	 * 
 	 * @param userName
-	 *            The user name. Should be an email address.
+	 *            The user name.
 	 * @param password
 	 *            The user's password.
 	 * @param firstName
 	 *            The user's first name.
 	 * @param lastName
 	 *            The user's last name.
+     * @param email
+     *            The user's email.
 	 * @param callbackHandler
 	 *            The call back to report back success or failure.
 	 */
-	public static void signUp(String userName, String password,
-			String firstName, String lastName,
-			final CatalyzeListener<Catalyze> callbackHandler) {
+	public void signUp(String userName, String password,
+			String firstName, String lastName, String email,
+			final CatalyzeListener<CatalyzeUser> callbackHandler) {
 
-		final Catalyze catalyze = new Catalyze();
+		final CatalyzeUser catalyzeUser = new CatalyzeUser();
+        catalyzeUser.setUsername(userName);
+        catalyzeUser.setPassword(password);
+        catalyzeUser.getName().setFirstName(firstName);
+        catalyzeUser.getName().setLastName(lastName);
+        catalyzeUser.getEmail().setPrimary(email);
 
-		CatalyzeRequest.initRequestQueue(callbackHandler.getContext());
+        CatalyzeAPIAdapter.getApi().createUser(catalyzeUser, new Callback<CatalyzeUser>() {
+            @Override
+            public void success(CatalyzeUser catalyzeUser, Response response) {
+                user = catalyzeUser;
+                CatalyzeSession.getInstance().setSessionToken(user.getSessionToken());
+                callbackHandler.onSuccess(user);
+            }
 
-		Map<String, String> headers = catalyze.getDefaultHeaders();
-		JSONObject jsonBody = new JSONObject();
-		try {
-			jsonBody.put(CatalyzeUser.USERNAME, userName);
-			jsonBody.put(CatalyzeUser.FIRST_NAME, firstName);
-			jsonBody.put(CatalyzeUser.LAST_NAME, lastName);
-			jsonBody.put(CatalyzeUser.PASSWORD, password);
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
-
-		Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				CatalyzeUser user = new CatalyzeUser(catalyze);
-				catalyze.user = user;
-				callbackHandler.onResponse(catalyze);
-			}
-		};
-
-		Response.ErrorListener errorListener = Catalyze
-				.createErrorListener(callbackHandler);
-		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
-				CatalyzeRequest.POST, catalyze.userUrl, jsonBody,
-				responseListener, errorListener);
-		request.setHeaders(headers);
-		request.execute();
-	}
-
-	/**
-	 * Return the context associated with this instance. Cannot be changed.
-	 * 
-	 * @return The context associated with this instance
-	 */
-	// protected Context getContext() {
-	// return appContext;
-	// }
-
-	/**
-	 * Generic volley error callback handler, returns a CatalyzeError back to
-	 * the user passed callback handler
-	 * 
-	 * @param userCallback
-	 *            The user-defined callback to send results back to
-	 * @return The listener
-	 */
-	protected static <T> Response.ErrorListener createErrorListener(
-			final CatalyzeListener<T> userCallback) {
-		return new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				CatalyzeException ce = new CatalyzeException(error);
-				userCallback.onError(ce);
-			}
-		};
-	}
-
-	/**
-	 * Create a Catalyze interface for making authenticated api calls.
-	 * 
-	 * @param apiKey
-	 *            The app's API key
-	 * @param identifier
-	 *            The name of the app
-	 * 
-	 */
-	protected Catalyze() {
-		if (Catalyze.API_KEY == null) {
-			throw new IllegalStateException("The API key must be non-null.");
-		} else if (Catalyze.IDENTIFIER == null) {
-			throw new IllegalStateException("The identifier must be non-null.");
-		}
-
-		this.setBaseURL("https://api.catalyze.io/v1/");
-
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                callbackHandler.onError(new CatalyzeException(retrofitError));
+            }
+        });
 	}
 
 	/**
@@ -248,125 +202,9 @@ public class Catalyze implements Serializable {
 	public CatalyzeUser getAuthenticatedUser() {
 		if (user == null)
 			throw new IllegalStateException(
-					"No authenticated user has been assigned. Must call Catalyze.authenticate() and wait for the callback before using this instance.");
+					"No authenticated user has been assigned. Must call Catalyze.authenticate() " +
+                            "and wait for the callback before using this instance.");
 		return user;
-	}
-
-	/**
-	 * Builds and returns a new instance of CatalyzeUser associated with this
-	 * Catalyze instance.
-	 * 
-	 * @return The instance of CatalyzeUser associated with this Catalyze
-	 *         instance
-	 * @throws IllegalStateException
-	 *             If the Catalyze instance has not been authenticated.
-	 */
-	public CatalyzeUser getCatalyzeUserInstance() {
-		if (user == null) {
-			throw new IllegalStateException(
-					"The Catalyze instance was not authenticated.");
-		}
-		return new CatalyzeUser(this);
-	}
-
-	/**
-	 * Builds and returns a new instance of CustomClass associated with this
-	 * Catalyze instance. The JSON content is set to '{}'.
-	 * 
-	 * @param className
-	 *            The name of the custom class
-	 * @return The instance of CustomClass associated with this Catalyze
-	 *         instance
-	 * @throws IllegalStateException
-	 *             If the Catalyze instance has not been authenticated.
-	 */
-	public CustomClass getCustomClassInstance(String className) {
-		JSONObject obj = new JSONObject();
-		try {
-			obj = new JSONObject("{}");
-
-			obj.put(CustomClass.CONTENT, new JSONObject());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return this.getCustomClassInstance(className, obj);
-	}
-
-	/**
-	 * Builds and returns a new instance of CustomClass associated with this
-	 * Catalyze instance.
-	 * 
-	 * @param className
-	 *            The name of the custom class
-	 * @param json
-	 *            The JSON content to use for this instance
-	 * @return The instance of CustomClass associated with this Catalyze
-	 *         instance
-	 * @throws IllegalStateException
-	 *             If the Catalyze instance has not been authenticated.
-	 */
-	public CustomClass getCustomClassInstance(String className, JSONObject json) {
-		if (user == null) {
-			throw new IllegalStateException(
-					"The Catalyze instance was not authenticated.");
-		}
-		JSONObject newJson = new JSONObject();
-		try {
-			newJson.put(CustomClass.CONTENT, json);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return new CustomClass(this, className, newJson);
-	}
-
-	/**
-	 * Returns a FileManager instance associated with this Catalyze instance
-	 * capable of uploading/downloading and deleting files that the
-	 * authenticated user can access.
-	 * 
-	 * Marking as private for first release as the functionality is not quite
-	 * ready.
-	 * 
-	 * @return The instance of FileManager associated with this Catalyze
-	 *         instance
-	 * @throws IllegalStateException
-	 *             If the Catalyze instance has not been authenticated.
-	 */
-	private FileManager getFileManagerInstance() {
-		if (user == null) {
-			throw new IllegalStateException(
-					"The Catalyze instance was not authenticated.");
-		}
-		return new FileManager(this);
-	}
-
-	/**
-	 * Builds and returns a Query instance associated with this authenticated
-	 * Catalyze instance and a custom class.
-	 * 
-	 * @param className
-	 *            The custom class name to query
-	 * @return The Query instance
-	 * @throws IllegalStateException
-	 *             If the Catalyze instance has not been authenticated.
-	 */
-	public Query getQueryInstance(String className) {
-		if (user == null) {
-			throw new IllegalStateException(
-					"The Catalyze instance was not authenticated.");
-		}
-		return new Query(className, this);
-	}
-
-	/**
-	 * Builds and returns an instance of UMLS associated with this Catalyze
-	 * instance.
-	 * 
-	 * @return An instance of UMLS
-	 */
-	public UMLS getUmlsInstance() {
-		UMLS umls = new UMLS(this);
-		return umls;
 	}
 
 	/**
@@ -382,36 +220,50 @@ public class Catalyze implements Serializable {
 	}
 
 	/**
-	 * The version 1.0 URL is set by default but this method allows overriding
+	 * The version 2.0 URL is set by default but this method allows overriding
 	 * that URL in case of future upgrades/changes.
 	 * 
 	 * @param baseUrl
-	 *            The full base URL (default is 'https://api.catalyze.io/v1/')
+	 *            The full base URL (default is 'https://apiv2.catalyze.io/v2')
 	 */
 	public void setBaseURL(String baseUrl) {
 		this.baseUrl = baseUrl;
-		this.signInUrl = baseUrl + "auth/signin";
-		this.signOutUrl = baseUrl + "auth/signout";
-		this.userUrl = baseUrl + "user";
-		this.queryUrl = baseUrl + "classes/";
-		this.customClassUrl = baseUrl + "classes";
+		this.signInUrl = baseUrl + "/auth/signin";
+		this.signOutUrl = baseUrl + "/auth/signout";
+		this.userUrl = baseUrl + "/users";
+		this.queryUrl = baseUrl + "/classes/query";
+		this.customClassUrl = baseUrl + "/classes";
 
-		this.fileUrl = baseUrl + "file";
-		this.appFileUrl = baseUrl + "file/app";
-		this.userFileUrl = baseUrl + "file/user";
+		this.fileUrl = baseUrl + "/file";
+		this.appFileUrl = baseUrl + "/file/app";
+		this.userFileUrl = baseUrl + "/file/user";
 	}
 
 	/**
 	 * Sign out this authenticated CatalyzeUser.
 	 * 
 	 * @param callbackHandler
-	 *            Funtion to call after HTTP response handled
+	 *            Function to call after HTTP response handled
 	 */
-	public void signOut(CatalyzeListener<CatalyzeUser> callbackHandler) {
-		if (user == null)
-			throw new IllegalStateException(
-					"No authenticated user has been assigned. Must call Catalyze.authenticate() and wait for the callback before using this instance.");
-		user.signOut(callbackHandler);
+	public void signOut(final CatalyzeListener<String> callbackHandler) {
+		if (user == null) {
+            throw new IllegalStateException(
+                    "No authenticated user has been assigned. Must call Catalyze.authenticate() " +
+                            "and wait for the callback before using this instance.");
+        }
+		CatalyzeAPIAdapter.getApi().signOut(new Callback<String>() {
+            @Override
+            public void success(String s, Response response) {
+                user = null;
+                CatalyzeSession.getInstance().setSessionToken(null);
+                callbackHandler.onSuccess(s);
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                callbackHandler.onError(new CatalyzeException(retrofitError));
+            }
+        });
 	}
 
 	/**
@@ -419,33 +271,11 @@ public class Catalyze implements Serializable {
 	 * 
 	 * @return The API key
 	 */
-	protected String getAPIKey() {
-		return Catalyze.API_KEY;
+	public static String getApiKey() {
+		return apiKey;
 	}
 
-	/**
-	 * Builds the header fields needed to make an authenticated connection to
-	 * the API.
-	 * 
-	 * @return The headers in a Map.
-	 */
-	protected Map<String, String> getAuthorizedHeaders() {
-		Map<String, String> headers = this.getDefaultHeaders();
-		headers.put("Authorization", "Bearer " + user.getSessionToken());
-		return headers;
-	}
-
-	/**
-	 * Returns headers required for a non-user authorized API call
-	 * 
-	 * @return The Map of fields to add to the HTTP header
-	 */
-	protected Map<String, String> getDefaultHeaders() {
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("X-Api-Key", ANDROID + " " + Catalyze.IDENTIFIER + " "
-				+ getAPIKey());
-		headers.put("Content-Type", "application/json");
-		return headers;
-	}
-
+    public static String getAppId() {
+        return appId;
+    }
 }

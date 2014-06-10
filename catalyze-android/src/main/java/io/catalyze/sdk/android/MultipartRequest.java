@@ -13,12 +13,6 @@ import org.apache.http.HttpEntity;
 
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyLog;
-
 /**
  * A specialized request for handling Multipart binary data.
  * 
@@ -28,11 +22,11 @@ import com.android.volley.VolleyLog;
  * 
  * @param <T>
  */
-public class MultipartRequest<T> extends Request<T> {
+public class MultipartRequest<T> /*extends Request<T> */{
 
-	private Map<String, String> mHeaders = new HashMap<String, String>();
+	/*private Map<String, String> mHeaders = new HashMap<String, String>();
 	private final Response.Listener<T> mListener;
-	private HttpEntity httpEntity;
+	private HttpEntity httpEntity;*/
 
 	/**
 	 * MultipartRequest constructor to download or delete file
@@ -48,7 +42,7 @@ public class MultipartRequest<T> extends Request<T> {
 	 * @param fileHeaders
 	 *            The key-value pairs to add to the HTTP header
 	 */
-	public MultipartRequest(int method, String url,
+	/*public MultipartRequest(int method, String url,
 			Response.ErrorListener errorListener,
 			Response.Listener<T> listener, Map<String, String> fileHeaders) {
 		super(method, url, errorListener);
@@ -57,7 +51,7 @@ public class MultipartRequest<T> extends Request<T> {
 		if (true)
 			throw new IllegalStateException(
 					"File operations not yet supported.");
-	}
+	}*/
 
 	/**
 	 * MultipartRequest constructor to upload file
@@ -69,7 +63,7 @@ public class MultipartRequest<T> extends Request<T> {
 	 * @param phi
 	 * @param fileHeaders
 	 */
-	public MultipartRequest(String url, Response.ErrorListener errorListener,
+	/*public MultipartRequest(String url, Response.ErrorListener errorListener,
 			Response.Listener<T> listener, File file, String phi,
 			Map<String, String> fileHeaders) {
 		super(Method.POST, url, errorListener);
@@ -148,5 +142,5 @@ public class MultipartRequest<T> extends Request<T> {
 		// TODO no idea where this is or what is going on
 
 		return (Response<T>) Response.success(response, getCacheEntry());
-	}
+	}*/
 }

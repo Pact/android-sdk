@@ -1,11 +1,11 @@
 package io.catalyze.sdk.android;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import com.android.volley.Response;
+import io.catalyze.sdk.android.api.CatalyzeAPIAdapter;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Use this class to make API calls to query a custom class, and to interact
@@ -14,141 +14,93 @@ import com.android.volley.Response;
  * and an authenticated user. Next set field, searchBy, pageNumber and pageSize
  * as desired, then call execute query.
  */
-public class Query extends CatalyzeObject {
+public class Query {
 
-	/**
-	 * UID
-	 */
-	private static final long serialVersionUID = -9121968191350735246L;
-	
-	private static final String FIELD = "field";
-	private static final String SEARCH_BY = "searchBy";
-	private static final String PAGE_NUMBER = "pageNumber";
-	private static final String PAGE_SIZE = "pageSize";
+	private String field;
+	private String searchBy;
+	private int pageNumber;
+	private int pageSize;
 	private String customClassName;
-	private ArrayList<CustomClass> queryResults;
 
-	public Query(String className, Catalyze catalyze) {
-		super(catalyze);
-		this.customClassName = className;
-		this.queryResults = new ArrayList<CustomClass>();
-
-		// Set default settings (return the first ten items in a custom class). 
-		try {
-			//this.mJson.put(FIELD, "");
-			//this.mJson.put(SEARCH_BY, "");
-			this.mJson.put(PAGE_NUMBER, "1");
-			this.mJson.put(PAGE_SIZE, "10");
-		} catch (JSONException jse) {
-			jse.printStackTrace();
-		}
+	public Query(String customClassName) {
+		this.customClassName = customClassName;
+        this.pageNumber = 1;
+        this.pageSize = 10;
+        this.field = "";
+        this.searchBy = "";
 	}
 
-	/**
-	 * Run a query with the current settings of this isntance of Query
-	 * 
-	 * @param callbackHandler
-	 *            CatalyzeListener that must expect a Query on successful
-	 *            callback. This Query will be a reference to this instance of
-	 *            query, and will have been updated to so that a call to
-	 *            getResults will return a list containing the results form the
-	 *            last executed query
-	 */
-	public void executeQuery(CatalyzeListener<Query> callbackHandler) {
-		Response.Listener<JSONArray> responseListener = testListener(
-				callbackHandler, this);
-		CatalyzeRequest<JSONArray> request = new CatalyzeRequest<JSONArray>(
-				CatalyzeRequest.POST, catalyze.queryUrl + customClassName
-						+ "/query", this.mJson, responseListener,
-				Catalyze.createErrorListener(callbackHandler));
-		request.setHeaders(catalyze.getAuthorizedHeaders());
-		request.execute();
+    public String getField() {
+        return field;
+    }
+
+	public void setField(String field) {
+		this.field = field;
 	}
 
-	/**
-	 * Get the name of the custom class related to this query.
-	 * 
-	 * @return The custom class name.
-	 */
-	public String getCustomClassName() {
-		return this.customClassName;
-	}
+    public String getSearchBy() {
+        return searchBy;
+    }
 
-	public String getField() {
-		return mJson.optString(FIELD, null);
-	}
+    public void setSearchBy(String searchBy) {
+        this.searchBy = searchBy;
+    }
 
-	/**
-	 * Get the results from the last executed query.
-	 * 
-	 * @return
-	 */
-	public ArrayList<CustomClass> getResults() {
-		return queryResults;
-	}
-
-	public String getSearchBy() {
-		return mJson.optString(SEARCH_BY, null);
-	}
-
-	/**
-	 * Change the name of the custom class to query.
-	 * 
-	 * @param className
-	 */
-	public void setCustomClassName(String className) {
-		customClassName = className;
-	}
-
-	public Query setField(String name) {
-		setSomething(FIELD, name);
-		return this;
-	}
+    public int getPageNumber() {
+        return pageNumber;
+    }
 
 	public void setPageNumber(int pageNumber) {
-		try {
-			mJson.put(PAGE_NUMBER, pageNumber);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		this.pageNumber = pageNumber;
 	}
+
+    public int getPageSize() {
+        return pageSize;
+    }
 
 	public void setPageSize(int pageSize) {
-		try {
-			mJson.put(PAGE_SIZE, pageSize);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		this.pageSize = pageSize;
 	}
 
-	public void setSearchBy(String data) {
-		setSomething(SEARCH_BY, data);
-	}
+    /**
+     * Get the name of the custom class related to this query.
+     *
+     * @return The custom class name.
+     */
+    public String getCustomClassName() {
+        return customClassName;
+    }
 
-	private void setSomething(String key, String value) {
-		try {
-			mJson.put(key, value);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
+    /**
+     * Change the name of the custom class to query.
+     *
+     * @param customClassName
+     */
+    public void setCustomClassName(String customClassName) {
+        this.customClassName = customClassName;
+    }
 
-	private Response.Listener<JSONArray> testListener(
-			final CatalyzeListener<Query> callbackHandler, final Query q) {
-		return new Response.Listener<JSONArray>() {
-			@Override
-			public void onResponse(JSONArray response) {
-				for (int i = 0; i < response.length(); i++) {
-					try {
-						q.queryResults.add(new CustomClass(Query.this.catalyze,
-								Query.this.customClassName, response
-										.getJSONObject(i)));
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-				}
-				callbackHandler.onSuccess(q);
-			}
-		};
-	}
+    /**
+     * Run a query with the current settings of this instance of Query
+     *
+     * @param callbackHandler
+     *            CatalyzeListener that must expect a Query on successful
+     *            callback. This Query will be a reference to this instance of
+     *            query, and will have been updated to so that a call to
+     *            getResults will return a list containing the results form the
+     *            last executed query
+     */
+    public void executeQuery(final CatalyzeListener<List<CatalyzeEntry>> callbackHandler) {
+        CatalyzeAPIAdapter.getApi().queryCustomClass(customClassName, pageSize, pageNumber, field, searchBy, new Callback<List<CatalyzeEntry>>() {
+            @Override
+            public void success(List<CatalyzeEntry> catalyzeEntries, Response response) {
+                callbackHandler.onSuccess(catalyzeEntries);
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                callbackHandler.onError(new CatalyzeException(retrofitError));
+            }
+        });
+    }
 }

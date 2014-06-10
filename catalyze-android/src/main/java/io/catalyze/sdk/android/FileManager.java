@@ -5,9 +5,6 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import com.android.volley.Request.Method;
-import com.android.volley.Response;
-
 /**
  * The FileManager allows for the upload and download of files to the Catalyze
  * backend file store.
@@ -15,22 +12,13 @@ import com.android.volley.Response;
  * @author uphoff
  * 
  */
-public class FileManager extends CatalyzeObject {
-
-	/**
-	 * UID
-	 */
-	private static final long serialVersionUID = -4897104136578587456L;
+public class FileManager {
 
 	/**
 	 * Create a new instance associated with the authenticated Catalyze
 	 * instance.
-	 * 
-	 * @param catalyze
-	 *            An authenticated connection to the API
 	 */
-	protected FileManager(Catalyze catalyze) {
-		super(catalyze);
+	protected FileManager() {
 		if (true)
 			throw new IllegalStateException(
 					"File operations not yet supported.");
@@ -45,7 +33,7 @@ public class FileManager extends CatalyzeObject {
 	 *            CatalyzeListener that expects a string in response. On success
 	 *            a blank string is returned to this callback handler
 	 */
-	public void deleteFile(String fileID, boolean phi,
+	/*public void deleteFile(String fileID, boolean phi,
 			CatalyzeListener<String> userCallback) {
 		CatalyzeRequest<JSONObject> request = new CatalyzeRequest<JSONObject>(
 				CatalyzeRequest.DELETE, catalyze.fileUrl + "/" + fileID, null,
@@ -53,7 +41,7 @@ public class FileManager extends CatalyzeObject {
 				Catalyze.createErrorListener(userCallback));
 		request.setHeaders(catalyze.getAuthorizedHeaders());
 		request.execute();
-	}
+	}*/
 
 	/**
 	 * Retrieves a file from the backend. The authenticated user must be the
@@ -67,7 +55,7 @@ public class FileManager extends CatalyzeObject {
 	 *            CatalyzeListener that expects a File in response. On success a
 	 *            pointer to the File is returned to the callback handler.
 	 */
-	public void getFile(String fileID, File file,
+	/*public void getFile(String fileID, File file,
 			final CatalyzeListener<File> userCallback) {
 		Response.Listener<File> responseListener = new Response.Listener<File>() {
 			@Override
@@ -82,7 +70,7 @@ public class FileManager extends CatalyzeObject {
 				Catalyze.createErrorListener(userCallback), responseListener,
 				fileHeaders);
 		CatalyzeRequest.getRequestQueue().add(request);
-	}
+	}*/
 
 	/**
 	 * This method provides the ability to upload a file associated with the
@@ -95,10 +83,10 @@ public class FileManager extends CatalyzeObject {
 	 * @param userCallback
 	 *            Must expect a string on success
 	 */
-	public void uploadAppFile(File file, boolean phi,
+	/*public void uploadAppFile(File file, boolean phi,
 			CatalyzeListener<String> userCallback) {
 		uploadFile(catalyze.appFileUrl, file, phi, userCallback);
-	}
+	}*/
 
 	/**
 	 * This method provides the ability to upload a file associated with the
@@ -111,10 +99,10 @@ public class FileManager extends CatalyzeObject {
 	 * @param userCallback
 	 *            Must expect a string on success
 	 */
-	public void uploadUserFile(File file, boolean phi,
+	/*public void uploadUserFile(File file, boolean phi,
 			CatalyzeListener<String> userCallback) {
 		uploadFile(catalyze.userFileUrl, file, phi, userCallback);
-	}
+	}*/
 
 	/**
 	 * Volley callback handler that returns a string
@@ -123,7 +111,7 @@ public class FileManager extends CatalyzeObject {
 	 *            The callback created by the user
 	 * @return The callback listener
 	 */
-	private Response.Listener<JSONObject> createStringResponseListener(
+	/*private Response.Listener<JSONObject> createStringResponseListener(
 			final CatalyzeListener<String> userCallback) {
 		return new Response.Listener<JSONObject>() {
 			@Override
@@ -131,7 +119,7 @@ public class FileManager extends CatalyzeObject {
 				userCallback.onSuccess(response.toString());
 			}
 		};
-	}
+	}*/
 
 	/**
 	 * Helper method to upload either an app file or user file.
@@ -145,7 +133,7 @@ public class FileManager extends CatalyzeObject {
 	 * @param userCallback
 	 *            The user-defined callback to handle results
 	 */
-	private void uploadFile(String url, File file, boolean phi,
+	/*private void uploadFile(String url, File file, boolean phi,
 			CatalyzeListener<String> userCallback) {
 		Map<String, String> fileHeaders = catalyze.getAuthorizedHeaders();
 		fileHeaders.put("Content-Type", "multipart/form-data");
@@ -154,6 +142,6 @@ public class FileManager extends CatalyzeObject {
 				createStringResponseListener(userCallback), file,
 				Boolean.toString(phi), fileHeaders);
 		CatalyzeRequest.getRequestQueue().add(request);
-	}
+	}*/
 
 }

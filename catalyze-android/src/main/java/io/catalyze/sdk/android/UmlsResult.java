@@ -1,39 +1,18 @@
 package io.catalyze.sdk.android;
 
-import org.json.JSONObject;
-
 /**
  * Data wrapper class for Catalyze UMLS api responses
- * 
  */
-public class UmlsResult extends CatalyzeObject {
+public class UmlsResult {
 
-	/**
-	 * UID
-	 */
-	private static final long serialVersionUID = 4659873670773688366L;
-	
-	// Field names
-	private static final String DESCRIPTION = "desc";
-	private static final String CODE = "code";
-	private static final String VOCAB = "vocab";
-	private static final String VALUESET = "valueset";
-	private static final String OID = "oid";
-	private static final String CONCEPT = "concept";
+	private String desc;
+	private String code;
+	private String vocab;
+	private String valueset;
+	private String oid;
+	private String concept;
 
-	/**
-	 * Create a UMLS entry associated with the given Catalyze instance. Uses the
-	 * provided JSON data to set the values.
-	 * 
-	 * @param catalyze
-	 *            An instance of Catalyze. Does not need to be authenticated.
-	 * @param json
-	 *            The JSON data to populate the entry with
-	 */
-	protected UmlsResult(Catalyze catalyze, JSONObject json) {
-		super(catalyze);
-		this.mJson = json;
-	}
+	public UmlsResult() { }
 
 	/**
 	 * Get the UMLS code of this entry.
@@ -41,8 +20,12 @@ public class UmlsResult extends CatalyzeObject {
 	 * @return The UMLS code
 	 */
 	public String getCode() {
-		return mJson.optString(CODE, null);
+		return code;
 	}
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
 	/**
 	 * Get the concept code of this entry.
@@ -50,17 +33,25 @@ public class UmlsResult extends CatalyzeObject {
 	 * @return The concept code
 	 */
 	public String getConcept() {
-		return mJson.optString(CONCEPT, null);
+		return concept;
 	}
+
+    public void setConcept(String concept) {
+        this.concept = concept;
+    }
 
 	/**
 	 * Get the description of this entry.
 	 * 
 	 * @return The description
 	 */
-	public String getDescription() {
-		return mJson.optString(DESCRIPTION, null);
+	public String getDesc() {
+		return desc;
 	}
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 
 	/**
 	 * Return the object identifier (OID) of this entry.
@@ -68,8 +59,12 @@ public class UmlsResult extends CatalyzeObject {
 	 * @return The OID
 	 */
 	public String getOID() {
-		return mJson.optString(OID, null);
+		return oid;
 	}
+
+    public void setOid(String oid) {
+        this.oid = oid;
+    }
 
 	/**
 	 * Get the type of data (value set).
@@ -77,8 +72,12 @@ public class UmlsResult extends CatalyzeObject {
 	 * @return The type of data
 	 */
 	public String getValueset() {
-		return mJson.optString(VALUESET, null);
+		return valueset;
 	}
+
+    public void setValueset(String valueset) {
+        this.valueset = valueset;
+    }
 
 	/**
 	 * Get the vocabulary of this entry (e.g. SNOMEDCT, LOINC, etc).
@@ -86,7 +85,10 @@ public class UmlsResult extends CatalyzeObject {
 	 * @return The vocabulary name
 	 */
 	public String getVocab() {
-		return mJson.optString(VOCAB, null);
+		return vocab;
 	}
 
+    public void setVocab(String vocab) {
+        this.vocab = vocab;
+    }
 }

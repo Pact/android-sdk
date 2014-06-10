@@ -1,9 +1,5 @@
 package io.catalyze.sdk.android;
 
-import android.content.Context;
-
-import com.android.volley.Response;
-
 /**
  * Response handler for Catalyze API calls. A CatalyzeListener must be passed to
  * all Catalyze API call methods.
@@ -16,29 +12,9 @@ import com.android.volley.Response;
  * 
  * @param <T>
  */
-public abstract class CatalyzeListener<T> implements Response.Listener<T> {
+public abstract class CatalyzeListener<T> {
 
-	private Context context;
-
-	/**
-	 * The listener must be provided with a context to execute under (this is
-	 * used beneath the Catalyze SDK by Volley).
-	 * 
-	 * @param context
-	 *            The context for linking to background operations.
-	 */
-	public CatalyzeListener(Context context) {
-		this.context = context;
-	}
-
-	/**
-	 * The context associated with this callback.
-	 * 
-	 * @return The Context
-	 */
-	public Context getContext() {
-		return context;
-	}
+	public CatalyzeListener() { }
 
 	/***
 	 * Handle error response from Catalyze API call
@@ -46,14 +22,6 @@ public abstract class CatalyzeListener<T> implements Response.Listener<T> {
 	 * @param response
 	 */
 	public abstract void onError(CatalyzeException response);
-
-	/**
-	 * A successful call to the backend API will result in this method being
-	 * called. Simply redirect to onSuccess().
-	 */
-	public void onResponse(T response) {
-		onSuccess(response);
-	}
 
 	/**
 	 * Handle success response from Catalyze API call
