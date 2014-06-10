@@ -1,6 +1,7 @@
 package io.catalyze.sdk.android.api;
 
 import java.util.List;
+import java.util.Map;
 
 import io.catalyze.sdk.android.CatalyzeCredentials;
 import io.catalyze.sdk.android.CatalyzeEntry;
@@ -12,6 +13,7 @@ import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 public interface CatalyzeAPI {
     /*
@@ -51,7 +53,7 @@ public interface CatalyzeAPI {
     void retrieveEntry(@Path("className") String className, @Path("entryId") String entryId, Callback<CatalyzeEntry> cb);
 
     @PUT("/classes/{className}/entry/{entryId}")
-    void updateEntry(@Path("className") String className, @Path("entryId") String entryId, @Body CatalyzeEntry entry, Callback<CatalyzeEntry> cb);
+    void updateEntry(@Path("className") String className, @Path("entryId") String entryId, @Body Map<String, Object> content, Callback<CatalyzeEntry> cb);
 
     @DELETE("/classes/{className}/entry/{entryId}")
     void deleteEntry(@Path("className") String className, @Path("entryId") String entryId, Callback<String> cb);
@@ -59,7 +61,7 @@ public interface CatalyzeAPI {
     /*
      * Custom Class Queries
      */
-    @GET("/classes/{className}/query?pageSize={pageSize}&pageNumber={pageNumber}&field={field}&searchBy={searchBy}")
-    void queryCustomClass(@Path("className") String className, @Path("pageSize") int pageSize, @Path("pageNumber") int pageNumber, @Path("field") String field, @Path("searchBy") String searchBy, Callback<List<CatalyzeEntry>> cb);
+    @GET("/classes/{className}/query")
+    void queryCustomClass(@Path("className") String className, @Query("pageSize") int pageSize, @Query("pageNumber") int pageNumber, @Query("field") String field, @Query("searchBy") String searchBy, Callback<List<CatalyzeEntry>> cb);
 
 }

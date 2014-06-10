@@ -43,38 +43,6 @@ public class Catalyze {
 	// authenticated.
 	private CatalyzeUser user;
 
-	/**
-	 * URLs: The fields below define the route URLS for the operations supported
-	 * by the API.
-	 */
-
-	// Base URL of the app.
-	protected String baseUrl;
-
-	// URL of route for custom class operations
-	protected String customClassUrl;
-
-	// URL of route for query operations
-	protected String queryUrl;
-
-	// URL of route for sign in (log in)
-	protected String signInUrl;
-
-	// URL of route for sign out (log out)
-	protected String signOutUrl;
-
-	// URL of route for user operations
-	protected String userUrl;
-
-	// URL of route for file operations
-	protected String fileUrl;
-
-	// URL of route for application-related file operations
-	protected String appFileUrl;
-
-	// URL of route for user-related file operations
-	protected String userFileUrl;
-
     private static Catalyze catalyzeInstance;
     private Context context;
 
@@ -99,7 +67,6 @@ public class Catalyze {
         } catch (PackageManager.NameNotFoundException nnfe) {
             throw new IllegalStateException("ApiKey and AppId must be set in the manifest file");
         }
-        this.setBaseURL("https://apiv2.catalyze.io/v2");
     }
 
     private void setContext(Context context) {
@@ -134,6 +101,7 @@ public class Catalyze {
 		CatalyzeAPIAdapter.getApi().signIn(new CatalyzeCredentials(userName, password), new Callback<CatalyzeUser>() {
             @Override
             public void success(CatalyzeUser catalyzeUser, Response response) {
+                System.out.println("authed: " + catalyzeUser.toString());
                 user = catalyzeUser;
                 CatalyzeSession.getInstance().setSessionToken(user.getSessionToken());
                 callbackHandler.onSuccess(user);
@@ -217,26 +185,6 @@ public class Catalyze {
 	 */
 	public boolean isAuthenticated() {
 		return user == null;
-	}
-
-	/**
-	 * The version 2.0 URL is set by default but this method allows overriding
-	 * that URL in case of future upgrades/changes.
-	 * 
-	 * @param baseUrl
-	 *            The full base URL (default is 'https://apiv2.catalyze.io/v2')
-	 */
-	public void setBaseURL(String baseUrl) {
-		this.baseUrl = baseUrl;
-		this.signInUrl = baseUrl + "/auth/signin";
-		this.signOutUrl = baseUrl + "/auth/signout";
-		this.userUrl = baseUrl + "/users";
-		this.queryUrl = baseUrl + "/classes/query";
-		this.customClassUrl = baseUrl + "/classes";
-
-		this.fileUrl = baseUrl + "/file";
-		this.appFileUrl = baseUrl + "/file/app";
-		this.userFileUrl = baseUrl + "/file/user";
 	}
 
 	/**

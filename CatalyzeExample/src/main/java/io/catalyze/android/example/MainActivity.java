@@ -1,34 +1,20 @@
 package io.catalyze.android.example;
 
-//import java.util.Date;
-
-
-
 import android.app.Activity;
-//import android.content.Intent;
 import android.os.Bundle;
-//import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-//import android.widget.Button;
 import android.widget.EditText;
-//import android.widget.TextView;
 
 import io.catalyze.sdk.android.*;
-import io.catalyze.sdk.android.user.Gender;
-import io.catalyze.sdk.android.user.ZipCode;
 
 public class MainActivity extends Activity {
 
 	private MyApplication mMyApplication;
 	private CatalyzeUser mUser;
-	private Catalyze catalyze;
-	private CustomClass customClass;
-	private static final String APIKey = "1ca769ce-07b3-40bf-95c0-2feda3e3c909";
-	//private Object synchObj = new Object();										
+	private CatalyzeEntry customClassEntry;
+
 	private Query query;
-	private static final String api = "1f077962-18cc-4ade-8075-d9fa1642f316";
-	private static final String identifier = "android.example";
 	private CatalyzeUser otherUser;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +22,6 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		mMyApplication = (MyApplication) getApplication();
-		mMyApplication.getRequestQueue().start();
-
-		catalyze = new Catalyze(api, identifier, MainActivity.this);
-		// Catalyze.setAppID(AppId);
 
 		findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
 			@Override

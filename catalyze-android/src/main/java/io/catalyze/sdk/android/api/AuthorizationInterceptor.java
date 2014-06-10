@@ -12,4 +12,3 @@ public class AuthorizationInterceptor implements RequestInterceptor {
         request.addHeader("X-Api-Key", Catalyze.getApiKey());
     }
 }
-

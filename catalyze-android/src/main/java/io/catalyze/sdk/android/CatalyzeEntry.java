@@ -1,5 +1,6 @@
 package io.catalyze.sdk.android;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,9 +12,11 @@ import retrofit.client.Response;
 /**
  * Entry in a Custom Class.
  */
-public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry> {
+public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Serializable {
 
-    private String className;
+    private static final long serialVersionUID = 1952650184533673793L;
+
+    private transient String className;
 	private Map<String, Object> content;
     private String entryId;
     private String parentId;
@@ -134,7 +137,7 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry> {
 
     @Override
     public void update(final CatalyzeListener<CatalyzeEntry> callbackHandler) {
-        CatalyzeAPIAdapter.getApi().updateEntry(getClassName(), getEntryId(), this, new Callback<CatalyzeEntry>() {
+        CatalyzeAPIAdapter.getApi().updateEntry(getClassName(), getEntryId(), getContent(), new Callback<CatalyzeEntry>() {
             @Override
             public void success(CatalyzeEntry catalyzeEntry, Response response) {
                 copy(catalyzeEntry);
@@ -153,13 +156,17 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry> {
         CatalyzeAPIAdapter.getApi().deleteEntry(getClassName(), getEntryId(), new Callback<String>() {
             @Override
             public void success(String s, Response response) {
-                copy(new CatalyzeEntry());
+                copy(new CatalyzeEntry(getClassName()));
                 callbackHandler.onSuccess(CatalyzeEntry.this);
             }
 
             @Override
             public void failure(RetrofitError retrofitError) {
-                callbackHandler.onError(new CatalyzeException(retrofitError));
+                if (retrofitError.getResponse().getStatus() == 200) {
+                    success("", retrofitError.getResponse());
+                } else {
+                    callbackHandler.onError(new CatalyzeException(retrofitError));
+                }
             }
         });
     }

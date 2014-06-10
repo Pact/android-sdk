@@ -397,7 +397,11 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
 
             @Override
             public void failure(RetrofitError retrofitError) {
-                callbackHandler.onError(new CatalyzeException(retrofitError));
+                if (retrofitError.getResponse().getStatus() == 200) {
+                    success("", retrofitError.getResponse());
+                } else {
+                    callbackHandler.onError(new CatalyzeException(retrofitError));
+                }
             }
         });
 	}

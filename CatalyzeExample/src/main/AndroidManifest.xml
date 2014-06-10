@@ -34,8 +34,12 @@
         </activity>
 
         <meta-data
-                android:name="io.catalyze.andrioid.sdk.v1.API_KEY"
-                android:value="521f34580cf2520fa83f4f2e"/>
+                android:name="io.catalyze.android.sdk.v2.API_KEY"
+                android:value="browser app_1 a901ab3f-0b3e-4bfd-9f5d-9b1f7160884b"/>
+
+        <meta-data
+            android:name="io.catalyze.android.sdk.v2.APP_ID"
+            android:value="75611d0e-0720-4fb8-91d3-5f60995357a5"/>
     </application>
 
 </manifest>
