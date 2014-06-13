@@ -16,6 +16,7 @@
 
 apply plugin: 'android-library'
 apply plugin: 'eclipse'
+apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
 
 repositories {
     mavenCentral()
@@ -38,7 +39,7 @@ android {
         minSdkVersion 8
         targetSdkVersion 19
         versionCode 2
-        versionName '0.0.2'
+        versionName '0.1.0'
         applicationId 'io.catalyze.sdk.android'
     }
 
