@@ -1,6 +1,5 @@
 package io.catalyze.sdk.android;
 
-import io.catalyze.sdk.android.Catalyze;
 import retrofit.RequestInterceptor;
 
 public class UmlsInterceptor implements RequestInterceptor {
