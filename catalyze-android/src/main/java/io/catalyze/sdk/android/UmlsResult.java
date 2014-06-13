@@ -23,6 +23,11 @@ public class UmlsResult {
 		return code;
 	}
 
+    /**
+     * Set the UMLS code of this entry.
+     *
+     * @param code the code to set
+     */
     public void setCode(String code) {
         this.code = code;
     }
@@ -36,6 +41,11 @@ public class UmlsResult {
 		return concept;
 	}
 
+    /**
+     * Set the concept code of this entry.
+     *
+     * @param concept the concept to set
+     */
     public void setConcept(String concept) {
         this.concept = concept;
     }
@@ -49,6 +59,11 @@ public class UmlsResult {
 		return desc;
 	}
 
+    /**
+     * Set the description of this entry.
+     *
+     * @param desc the description to set
+     */
     public void setDesc(String desc) {
         this.desc = desc;
     }
@@ -62,6 +77,11 @@ public class UmlsResult {
 		return oid;
 	}
 
+    /**
+     * Return the object identifier (OID) of this entry.
+     *
+     * @param oid The OID to set
+     */
     public void setOid(String oid) {
         this.oid = oid;
     }
@@ -75,6 +95,11 @@ public class UmlsResult {
 		return valueset;
 	}
 
+    /**
+     * Set the type of data (value set).
+     *
+     * @param valueset The type of data to set
+     */
     public void setValueset(String valueset) {
         this.valueset = valueset;
     }
@@ -88,6 +113,11 @@ public class UmlsResult {
 		return vocab;
 	}
 
+    /**
+     * Set the vocabulary of this entry (e.g. SNOMEDCT, LOINC, etc).
+     *
+     * @param vocab The vocabulary name
+     */
     public void setVocab(String vocab) {
         this.vocab = vocab;
     }

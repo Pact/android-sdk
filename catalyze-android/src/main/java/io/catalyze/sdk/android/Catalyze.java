@@ -4,23 +4,20 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import io.catalyze.sdk.android.api.CatalyzeAPIAdapter;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Base class for making Catalyze.io API calls. This class must be instantiated
- * with an API key and Application identifier before any api calls can be made.
- * Once Catalyze has been instantiated it must be authenticated to retrieve a
- * CatalyzeUser instance that will be associated with this instance of Catalyze.
- * Once authenticated the instance can be used.
+ * Base class for making Catalyze.io API calls. Catalyze.getInstance() must be called at least
+ * once before any API calls are made.
  * 
  * Any API routes being performed must be provided a CatalyzeListener. Upon
  * completion of API request the provided CatalyzeListener will be called with
  * either a success or error response.
  * 
- * All API calls are handled asynchronously, if calls require a fixed order,
+ * All API calls are handled asynchronously (except Umls calls which are handled either
+ * synchronously or asynchronously), if calls require a fixed order,
  * this must be handled outside of the Catalyze Android SDK (handled by app
  * logic).
  */
@@ -85,7 +82,7 @@ public class Catalyze {
 	/**
 	 * Initializes the instance by authenticating as the user provided. This
 	 * method must be called before a Catalyze instance can be used for any
-	 * operations other than UMLS lookups.
+	 * operations other than Umls lookups.
 	 * 
 	 * @param userName
 	 *            The user to authenticate this instance as
@@ -101,7 +98,6 @@ public class Catalyze {
 		CatalyzeAPIAdapter.getApi().signIn(new CatalyzeCredentials(userName, password), new Callback<CatalyzeUser>() {
             @Override
             public void success(CatalyzeUser catalyzeUser, Response response) {
-                System.out.println("authed: " + catalyzeUser.toString());
                 user = catalyzeUser;
                 CatalyzeSession.getInstance().setSessionToken(user.getSessionToken());
                 callbackHandler.onSuccess(user);
@@ -116,9 +112,7 @@ public class Catalyze {
 
 	/**
 	 * Perform an API to create a new user. The callback will return an
-	 * authenticated Catalyze instance (authenticated as the new user).
-	 * 
-	 * Also initializes the singleton RequestQueue if needed.
+	 * authenticated CatalyzeUser instance.
 	 * 
 	 * @param userName
 	 *            The user name.
@@ -170,8 +164,9 @@ public class Catalyze {
 	public CatalyzeUser getAuthenticatedUser() {
 		if (user == null)
 			throw new IllegalStateException(
-					"No authenticated user has been assigned. Must call Catalyze.authenticate() " +
-                            "and wait for the callback before using this instance.");
+					"No authenticated user has been assigned. Must call " +
+                            "Catalyze.getInstance().authenticate() and wait for the callback " +
+                            "before using this instance.");
 		return user;
 	}
 
@@ -219,11 +214,16 @@ public class Catalyze {
 	 * 
 	 * @return The API key
 	 */
-	public static String getApiKey() {
+	protected static String getApiKey() {
 		return apiKey;
 	}
 
-    public static String getAppId() {
+    /**
+     * Returns the appId for this Catalyze instance.
+     *
+     * @return The appId
+     */
+    protected static String getAppId() {
         return appId;
     }
 }

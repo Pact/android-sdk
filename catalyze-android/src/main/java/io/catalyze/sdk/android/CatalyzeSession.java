@@ -1,10 +1,13 @@
 package io.catalyze.sdk.android;
 
+/**
+ * Singleton holder for the currently logged in user's session token. Used internally.
+ */
 public class CatalyzeSession {
 
     private static CatalyzeSession sessionInstance;
 
-    public static CatalyzeSession getInstance() {
+    protected static CatalyzeSession getInstance() {
         if (sessionInstance == null) {
             synchronized (CatalyzeSession.class) {
                 if (sessionInstance == null) {
@@ -19,11 +22,11 @@ public class CatalyzeSession {
 
     private CatalyzeSession() { }
 
-    public String getSessionToken() {
+    protected String getSessionToken() {
         return sessionToken;
     }
 
-    public void setSessionToken(String sessionToken) {
+    protected void setSessionToken(String sessionToken) {
         this.sessionToken = sessionToken;
     }
 }

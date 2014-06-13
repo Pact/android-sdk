@@ -1,4 +1,4 @@
-package io.catalyze.sdk.android.api;
+package io.catalyze.sdk.android;
 
 import io.catalyze.sdk.android.Catalyze;
 import retrofit.RequestInterceptor;

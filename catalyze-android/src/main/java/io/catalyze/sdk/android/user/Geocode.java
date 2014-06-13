@@ -1,5 +1,8 @@
 package io.catalyze.sdk.android.user;
 
+/**
+ * Simple class used in Address to accurately represent a location with a longitude and latitude.
+ */
 public class Geocode implements Comparable<Geocode> {
 
     private double latitude;
@@ -7,22 +10,34 @@ public class Geocode implements Comparable<Geocode> {
 
     public Geocode() { }
 
+    /**
+     * @return latitude
+     */
     public double getLatitude() {
         return latitude;
     }
 
-    public Geocode setLatitude(double latitude) {
+    /**
+     * Set the latitude
+     * @param latitude
+     */
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
-        return this;
     }
 
+    /**
+     * @return longitude
+     */
     public double getLongitude() {
         return longitude;
     }
 
-    public Geocode setLongitude(double longitude) {
+    /**
+     * Set the longitude.
+     * @param longitude
+     */
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
-        return this;
     }
 
     @Override

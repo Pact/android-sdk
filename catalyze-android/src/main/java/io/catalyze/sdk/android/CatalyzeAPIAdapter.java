@@ -1,4 +1,4 @@
-package io.catalyze.sdk.android.api;
+package io.catalyze.sdk.android;
 
 import com.squareup.okhttp.OkHttpClient;
 
@@ -8,7 +8,6 @@ import retrofit.client.OkClient;
 public class CatalyzeAPIAdapter {
 
     private static CatalyzeAPI api = new RestAdapter.Builder()
-            .setLogLevel(RestAdapter.LogLevel.FULL)
             .setEndpoint("https://apiv2.catalyze.io/v2")
             .setRequestInterceptor(new AuthorizationInterceptor())
             .setClient(new OkClient(new OkHttpClient()))
@@ -16,7 +15,7 @@ public class CatalyzeAPIAdapter {
 
     private CatalyzeAPIAdapter() { }
 
-    public static CatalyzeAPI getApi() {
+    protected static CatalyzeAPI getApi() {
         return api;
     }
 }

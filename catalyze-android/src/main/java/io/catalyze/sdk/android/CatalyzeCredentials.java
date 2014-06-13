@@ -1,6 +1,8 @@
 package io.catalyze.sdk.android;
 
-
+/**
+ * Helper class for authenticating with the Catalyze API.
+ */
 public class CatalyzeCredentials {
 
     private String username;
@@ -8,6 +10,12 @@ public class CatalyzeCredentials {
 
     public CatalyzeCredentials() { }
 
+    /**
+     * Helper constructor to set the username and password on creation.
+     *
+     * @param username
+     * @param password
+     */
     public CatalyzeCredentials(String username, String password) {
         setUsername(username);
         setPassword(password);

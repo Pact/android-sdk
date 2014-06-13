@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.catalyze.sdk.android.api.CatalyzeAPIAdapter;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -28,18 +27,33 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Ser
      */
     public CatalyzeEntry() { }
 
+    /**
+     * Creates a new CatalyzeEntry and sets the className that this entry will be created in.
+     *
+     * @param className
+     */
 	public CatalyzeEntry(String className) {
         this.className = className;
     }
 
+    /**
+     * @return the name of the custom class this entry is or will be associated with.
+     */
     public String getClassName() {
         return className;
     }
 
+    /**
+     * Set the name of the custom class that this entry is or will be associated with.
+     * @param className
+     */
     public void setClassName(String className) {
         this.className = className;
     }
 
+    /**
+     * @return the content of the custom class entry.
+     */
     public Map<String, Object> getContent() {
         if (content == null) {
             content = new HashMap<String, Object>();
@@ -47,30 +61,59 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Ser
         return content;
     }
 
+    /**
+     * Set the content of the custom class entry.
+     *
+     * @param content
+     */
     public void setContent(Map<String, Object> content) {
         this.content = content;
     }
 
+    /**
+     * @return The unique identifier representing this custom class entry on the Catalyze API.
+     */
     public String getEntryId() {
         return entryId;
     }
 
+    /**
+     * Set the unique identifier representing this custom class entry on the Catalyze API.
+     *
+     * @param entryId
+     */
     public void setEntryId(String entryId) {
         this.entryId = entryId;
     }
 
+    /**
+     * @return the unique identifier of the user who owns this custom class entry.
+     */
     public String getParentId() {
         return parentId;
     }
 
+    /**
+     * Set the owner of this custom class entry by their unique identifier.
+     *
+     * @param parentId
+     */
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 
+    /**
+     * @return the unique identifier for the entity who created this entry.
+     */
     public String getAuthorId() {
         return authorId;
     }
 
+    /**
+     * Set the unique identifier for the entity who created this entry.
+     *
+     * @param authorId
+     */
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
     }
@@ -103,6 +146,12 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Ser
 		return content.toString();
 	}
 
+    /**
+     * After setting the content and className, this creates the entry on the Catalyze API.
+     *
+     * @param callbackHandler the callback that is given the full CatalyzeEntry object with all
+     *                        unique values set.
+     */
     @Override
     public void create(final CatalyzeListener<CatalyzeEntry> callbackHandler) {
         CatalyzeAPIAdapter.getApi().createEntry(getClassName(), this, new Callback<CatalyzeEntry>() {
@@ -119,6 +168,12 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Ser
         });
     }
 
+    /**
+     * After setting the entryId and className, this retrieves the entry on the Catalyze API.
+     *
+     * @param callbackHandler the callback that is given the full CatalyzeEntry object with all
+     *                        unique values set.
+     */
     @Override
     public void retrieve(final CatalyzeListener<CatalyzeEntry> callbackHandler) {
         CatalyzeAPIAdapter.getApi().retrieveEntry(getClassName(), getEntryId(), new Callback<CatalyzeEntry>() {
@@ -135,6 +190,13 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Ser
         });
     }
 
+    /**
+     * After setting the entryId, updated content, and className, this retrieves the entry on the
+     * Catalyze API.
+     *
+     * @param callbackHandler the callback that is given the full CatalyzeEntry object with all
+     *                        unique values set.
+     */
     @Override
     public void update(final CatalyzeListener<CatalyzeEntry> callbackHandler) {
         CatalyzeAPIAdapter.getApi().updateEntry(getClassName(), getEntryId(), getContent(), new Callback<CatalyzeEntry>() {
@@ -151,6 +213,11 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Ser
         });
     }
 
+    /**
+     * After setting the entryId and className, this deletes the entry on the Catalyze API.
+     *
+     * @param callbackHandler the callback who's return value can be ignored.
+     */
     @Override
     public void delete(final CatalyzeListener<CatalyzeEntry> callbackHandler) {
         CatalyzeAPIAdapter.getApi().deleteEntry(getClassName(), getEntryId(), new Callback<String>() {

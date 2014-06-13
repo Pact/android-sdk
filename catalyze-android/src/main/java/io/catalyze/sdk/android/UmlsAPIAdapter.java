@@ -1,4 +1,4 @@
-package io.catalyze.sdk.android.api;
+package io.catalyze.sdk.android;
 
 import com.squareup.okhttp.OkHttpClient;
 
@@ -15,7 +15,7 @@ public class UmlsAPIAdapter {
 
     private UmlsAPIAdapter() { }
 
-    public static UmlsAPI getApi() {
+    protected static UmlsAPI getApi() {
         return api;
     }
 }

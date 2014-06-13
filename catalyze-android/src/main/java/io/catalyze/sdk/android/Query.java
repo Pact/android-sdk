@@ -2,7 +2,6 @@ package io.catalyze.sdk.android;
 
 import java.util.List;
 
-import io.catalyze.sdk.android.api.CatalyzeAPIAdapter;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -30,34 +29,76 @@ public class Query {
         this.searchBy = "";
 	}
 
+    /**
+     * The column name that the query will be looking in for the searchBy value. This field must
+     * be a valid column name specified in the Custom Class schema.
+     *
+     * @return field
+     */
     public String getField() {
         return field;
     }
 
+    /**
+     * Sets the column name that the query will be looking in for the searchBy value. This field must
+     * be a valid column name specified in the Custom Class schema.
+     *
+     * @param field
+     */
 	public void setField(String field) {
 		this.field = field;
 	}
 
+    /**
+     * The value that is to be queried for.
+     *
+     * @return searchBy
+     */
     public String getSearchBy() {
         return searchBy;
     }
 
+    /**
+     * Set the value that is being queried for.
+     *
+     * @param searchBy
+     */
     public void setSearchBy(String searchBy) {
         this.searchBy = searchBy;
     }
 
+    /**
+     * Used in pagination, get the page that will be retrieved. Defaulted to 1.
+     *
+     * @return pageNumber
+     */
     public int getPageNumber() {
         return pageNumber;
     }
 
+    /**
+     * Used in pagination, set the page to retrieve. Defaulted to 1.
+     *
+     * @param pageNumber
+     */
 	public void setPageNumber(int pageNumber) {
 		this.pageNumber = pageNumber;
 	}
 
+    /**
+     * Get the number of results that will be returned. Defaulted to 10.
+     *
+     * @return pageSize
+     */
     public int getPageSize() {
         return pageSize;
     }
 
+    /**
+     * Set the number of results to return. Defaulted to 10.
+     *
+     * @param pageSize
+     */
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
 	}

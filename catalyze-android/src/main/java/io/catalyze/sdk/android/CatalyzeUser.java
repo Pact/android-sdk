@@ -1,6 +1,5 @@
 package io.catalyze.sdk.android;
 
-import io.catalyze.sdk.android.api.CatalyzeAPIAdapter;
 import io.catalyze.sdk.android.user.Address;
 import io.catalyze.sdk.android.user.Email;
 import io.catalyze.sdk.android.user.Guardian;
@@ -28,8 +27,8 @@ import org.json.JSONObject;
  * This class is a critical element to understand when interacting with the SDK
  * (and thus the Catalyze API).
  * <p/>
- * To perform most operations in the SDK and authenticated CatalyzeUser is
- * needed. A call to Catalyze.authenticate() will take care of this and is a
+ * To perform most operations in the SDK an authenticated CatalyzeUser is
+ * needed. A call to Catalyze.getInstance().authenticate() will take care of this and is a
  * necessary first step for using a Catalyze instance (an exception to this is
  * UMLS lookups which only require an API key).
  * <p/>
@@ -66,48 +65,89 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
     private String profilePhoto;
     private Map<String, Object> extras;
 
-	protected CatalyzeUser() { }
+	public CatalyzeUser() { }
 
+    /**
+     * Used internally.
+     * @return sessionToken
+     */
     public String getSessionToken() {
         return sessionToken;
     }
 
+    /**
+     * Used internally.
+     * @param sessionToken
+     */
     public void setSessionToken(String sessionToken) {
         this.sessionToken = sessionToken;
     }
 
+    /**
+     * @return the unique identifier of this user
+     */
     public String getUsersId() {
         return usersId;
     }
 
+    /**
+     * Set the unique identifier of this user.
+     * @param usersId
+     */
     public void setUsersId(String usersId) {
         this.usersId = usersId;
     }
 
+    /**
+     * @return whether or not this user has activated their account through email confirmation
+     */
     public boolean isActive() {
         return active;
     }
 
+    /**
+     * Set whether or not this user has activated their account through email confirmation. This
+     * will be ignored on the API.
+     * @param active
+     */
     public void setActive(boolean active) {
         this.active = active;
     }
 
+    /**
+     * @return the username of this user, this is what thei authenticate with.
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Set the username of this user. This is what they will authenticate with.
+     * @param username
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     * @return the password of the user. This is only used for authentication and should never be
+     * set any other time.
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Set the password. This is only used for authentication and should never be set any other time.
+     * @param password
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * @return email, will never be null
+     */
     public Email getEmail() {
         if (email == null) {
             email = new Email();
@@ -115,10 +155,17 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return email;
     }
 
+    /**
+     * Set the email object.
+     * @param email
+     */
     public void setEmail(Email email) {
         this.email = email;
     }
 
+    /**
+     * @return name, will never be null
+     */
     public Name getName() {
         if (name == null) {
             name = new Name();
@@ -126,10 +173,17 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return name;
     }
 
+    /**
+     * Set the name object.
+     * @param name
+     */
     public void setName(Name name) {
         this.name = name;
     }
 
+    /**
+     * @return phoneNumber, will never be null
+     */
     public PhoneNumber getPhoneNumber() {
         if (phoneNumber == null) {
             phoneNumber = new PhoneNumber();
@@ -137,26 +191,47 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return phoneNumber;
     }
 
+    /**
+     * Set the phone number object.
+     * @param phoneNumber
+     */
     public void setPhoneNumber(PhoneNumber phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
+    /**
+     * @return date of birth
+     */
     public Date getDob() {
         return dob;
     }
 
+    /**
+     * Set the date of birth.
+     * @param dob
+     */
     public void setDob(Date dob) {
         this.dob = dob;
     }
 
+    /**
+     * @return age
+     */
     public int getAge() {
         return age;
     }
 
+    /**
+     * Set the age.
+     * @param age
+     */
     public void setAge(int age) {
         this.age = age;
     }
 
+    /**
+     * @return the list of addresses, will never be null
+     */
     public List<Address> getAddresses() {
         if (addresses == null) {
             addresses = new ArrayList<Address>();
@@ -164,50 +239,92 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return addresses;
     }
 
+    /**
+     * Set the list of addresses.
+     * @param addresses
+     */
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
     }
 
+    /**
+     * @return gender
+     */
     public String getGender() {
         return gender;
     }
 
+    /**
+     * Set the gender.
+     * @param gender
+     */
     public void setGender(String gender) {
         this.gender = gender;
     }
 
+    /**
+     * @return marital status
+     */
     public String getMaritalStatus() {
         return maritalStatus;
     }
 
+    /**
+     * Set the marital status.
+     * @param maritalStatus
+     */
     public void setMaritalStatus(String maritalStatus) {
         this.maritalStatus = maritalStatus;
     }
 
+    /**
+     * @return religion
+     */
     public String getReligion() {
         return religion;
     }
 
+    /**
+     * Set the religion.
+     * @param religion
+     */
     public void setReligion(String religion) {
         this.religion = religion;
     }
 
+    /**
+     * @return race
+     */
     public String getRace() {
         return race;
     }
 
+    /**
+     * Set the race.
+     * @param race
+     */
     public void setRace(String race) {
         this.race = race;
     }
 
+    /**
+     * @return ethnicity
+     */
     public String getEthnicity() {
         return ethnicity;
     }
 
+    /**
+     * Set the ethnicity.
+     * @param ethnicity
+     */
     public void setEthnicity(String ethnicity) {
         this.ethnicity = ethnicity;
     }
 
+    /**
+     * @return the list of guardians, will never be null
+     */
     public List<Guardian> getGuardians() {
         if (guardians == null) {
             guardians = new ArrayList<Guardian>();
@@ -215,18 +332,32 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return guardians;
     }
 
+    /**
+     * Set the list of guardians.
+     * @param guardians
+     */
     public void setGuardians(List<Guardian> guardians) {
         this.guardians = guardians;
     }
 
+    /**
+     * @return the confidentiality code
+     */
     public String getConfCode() {
         return confCode;
     }
 
+    /**
+     * Set the confidentiality code.
+     * @param confCode
+     */
     public void setConfCode(String confCode) {
         this.confCode = confCode;
     }
 
+    /**
+     * @return the list of languages, will never be null
+     */
     public List<Language> getLanguages() {
         if (languages == null) {
             languages = new ArrayList<Language>();
@@ -234,10 +365,17 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return languages;
     }
 
+    /**
+     * Set the list of languages.
+     * @param languages
+     */
     public void setLanguages(List<Language> languages) {
         this.languages = languages;
     }
 
+    /**
+     * @return the list of social IDs, will never be null
+     */
     public List<SocialId> getSocialIds() {
         if (socialIds == null) {
             socialIds = new ArrayList<SocialId>();
@@ -245,10 +383,17 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return socialIds;
     }
 
+    /**
+     * Set the list of social IDs.
+     * @param socialIds
+     */
     public void setSocialIds(List<SocialId> socialIds) {
         this.socialIds = socialIds;
     }
 
+    /**
+     * @return the list of MRNs, will never be null
+     */
     public List<Mrn> getMrns() {
         if (mrns == null) {
             mrns = new ArrayList<Mrn>();
@@ -256,10 +401,17 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return mrns;
     }
 
+    /**
+     * Set the list of MRNs.
+     * @param mrns
+     */
     public void setMrns(List<Mrn> mrns) {
         this.mrns = mrns;
     }
 
+    /**
+     * @return the list of health plans, will never be null
+     */
     public List<HealthPlan> getHealthPlans() {
         if (healthPlans == null) {
             healthPlans = new ArrayList<HealthPlan>();
@@ -267,34 +419,62 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return healthPlans;
     }
 
+    /**
+     * Set the list of health plans.
+     * @param healthPlans
+     */
     public void setHealthPlans(List<HealthPlan> healthPlans) {
         this.healthPlans = healthPlans;
     }
 
+    /**
+     * @return the unique ID of a file which is the avatar for this user
+     */
     public String getAvatar() {
         return avatar;
     }
 
+    /**
+     * Set the unique ID of a file which is the avatar for this user.
+     * @param avatar
+     */
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
 
+    /**
+     * @return social security number
+     */
     public String getSsn() {
         return ssn;
     }
 
+    /**
+     * Set the social security number.
+     * @param ssn
+     */
     public void setSsn(String ssn) {
         this.ssn = ssn;
     }
 
+    /**
+     * @return the ID of a file which is the profile photo for this user
+     */
     public String getProfilePhoto() {
         return profilePhoto;
     }
 
+    /**
+     * Set the ID of a file which is the profile photo for this user.
+     * @param profilePhoto
+     */
     public void setProfilePhoto(String profilePhoto) {
         this.profilePhoto = profilePhoto;
     }
 
+    /**
+     * @return extras
+     */
     public Map<String, Object> getExtras() {
         if (extras == null) {
             extras = new HashMap<String, Object>();
@@ -302,6 +482,10 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         return extras;
     }
 
+    /**
+     * Set the extras.
+     * @param extras
+     */
     public void setExtras(Map<String, Object> extras) {
         this.extras = extras;
     }
@@ -316,7 +500,7 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
 
     /**
      * Creates a new user. This does not login the user. You must call
-     * {@link io.catalyze.sdk.android.Catalyze#authenticate(String, String, CatalyzeListener)}
+     * {@link io.catalyze.sdk.android.Catalyze#authenticate(String, String, io.catalyze.sdk.android.CatalyzeListener)}
      *
      * @param callbackHandler
      */
@@ -336,6 +520,10 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         });
     }
 
+    /**
+     * After setting the usersId, this retrieves that user with the given usersId.
+     * @param callbackHandler
+     */
     @Override
     public void retrieve(final CatalyzeListener<CatalyzeUser> callbackHandler) {
         CatalyzeAPIAdapter.getApi().retrieveUser(getUsersId(), new Callback<CatalyzeUser>() {
@@ -381,7 +569,7 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
 
 	/**
 	 * Call the delete user api route, will also clear session data and current
-	 * user info
+	 * user info.
 	 * 
 	 * @param callbackHandler
 	 */
