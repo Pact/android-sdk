@@ -24,10 +24,6 @@ repositories {
 dependencies {
     compile 'com.squareup.retrofit:retrofit:1.5.1'
     compile 'com.squareup.okhttp:okhttp:1.5.1'
-    
-    compile files('src/main/libs/httpcore-4.3.jar')
-    compile files('src/main/libs/httpmime-4.3.1.jar')
-
 }
 
 android {
@@ -48,6 +44,28 @@ android {
             versionNameSuffix '-SNAPSHOT'
         }
     }
+}
+
+task gatherJars(type: Copy) {
+    description = 'Copy dependencies to libs. Useful for Eclipse'
+    libDir = new File(project.projectDir, '/src/main/libs')
+    println libDir
+    println 'Adding dependencies from compile configuration'
+    for(file in configurations.compile)
+    {
+        println 'Added ' + file
+        copy
+                {
+                    from file
+                    into libDir
+                }
+    }
+}
+
+task makeJar(type:Exec) {
+    workingDir project.rootDir
+
+    commandLine './build_sdk.sh'
 }
 
 //apply from: '../maven_push.gradle'

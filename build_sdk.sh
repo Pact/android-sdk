@@ -15,11 +15,12 @@ mkdir $DIR
 # cp -R volley/build/classes/release/* $DIR
 cp -R catalyze-android/build/intermediates/classes/release/* $DIR
 #cp catalyze-android/src/main/libs/*-jarjar-*.jar $DIR/
-cp catalyze-android/src/main/libs/http*-*.jar $DIR/
+cp catalyze-android/src/main/libs/*-*.jar $DIR/
 cd $DIR
-#jar xf httpcore-jarjar-4.3.jar
-#jar xf httpmime-jarjar-4.3.1.jar
-jar xf httpcore-4.3.jar
-jar xf httpmime-4.3.1.jar
-jar cf catalyze-sdk.jar org io
+
+# dont need to include the android support jar
+rm android-support-v4.jar
+
+jar xf *-*.jar
+jar cf catalyze-sdk.jar io
 cp catalyze-sdk.jar $REPO/
