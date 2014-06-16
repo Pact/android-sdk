@@ -21,6 +21,8 @@ cd $DIR
 # dont need to include the android support jar
 rm android-support-v4.jar
 
-jar xf *-*.jar
-jar cf catalyze-sdk.jar io
+jar xf gson*-*.jar
+jar xf okhttp*-*.jar
+jar xf retrofit*-*.jar
+jar cf catalyze-sdk.jar io com retrofit
 cp catalyze-sdk.jar $REPO/
