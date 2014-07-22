@@ -63,6 +63,10 @@ public interface CatalyzeAPI {
     @Headers("Content-Type: application/json")
     void createEntry(@Path("className") String className, @Body CatalyzeEntry entry, Callback<CatalyzeEntry> cb);
 
+    @POST("/classes/{className}/entry/{usersId}")
+    @Headers("Content-Type: application/json")
+    void createEntryForUser(@Path("className") String className, @Path("usersId") String usersId, @Body CatalyzeEntry entry, Callback<CatalyzeEntry> cb);
+
     @GET("/classes/{className}/entry/{entryId}")
     @Headers("Content-Type: application/json")
     void retrieveEntry(@Path("className") String className, @Path("entryId") String entryId, Callback<CatalyzeEntry> cb);

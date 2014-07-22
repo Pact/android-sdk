@@ -169,6 +169,30 @@ public class CatalyzeEntry implements CatalyzeObjectProtocol<CatalyzeEntry>, Ser
     }
 
     /**
+     * After setting the content and className, this creates the entry on the Catalyze API with
+     * the current user as the author, and the user indicated by the given usersId as the owner
+     * (or parent) of this data.
+     *
+     * @param usersId the ID of the user who will own this data.
+     * @param callbackHandler the callback that is given the full CatalyzeEntry object with all
+     *                        unique values set.
+     */
+    public void createForUserWithUsersId(String usersId, final CatalyzeListener<CatalyzeEntry> callbackHandler) {
+        CatalyzeAPIAdapter.getApi().createEntryForUser(getClassName(), usersId, this, new Callback<CatalyzeEntry>() {
+            @Override
+            public void success(CatalyzeEntry catalyzeEntry, Response response) {
+                copy(catalyzeEntry);
+                callbackHandler.onSuccess(CatalyzeEntry.this);
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                callbackHandler.onError(new CatalyzeException(retrofitError));
+            }
+        });
+    }
+
+    /**
      * After setting the entryId and className, this retrieves the entry on the Catalyze API.
      *
      * @param callbackHandler the callback that is given the full CatalyzeEntry object with all

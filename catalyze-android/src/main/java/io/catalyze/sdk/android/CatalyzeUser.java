@@ -63,6 +63,7 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
     private String avatar;
     private String ssn;
     private String profilePhoto;
+    private String type;
     private Map<String, Object> extras;
 
 	public CatalyzeUser() { }
@@ -472,6 +473,14 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         this.profilePhoto = profilePhoto;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     /**
      * @return extras
      */
@@ -675,6 +684,7 @@ public class CatalyzeUser implements Comparable<CatalyzeUser>, CatalyzeObjectPro
         setAvatar(other.getAvatar());
         setSsn(other.getSsn());
         setProfilePhoto(other.getProfilePhoto());
+        setType(other.getType());
         setExtras(other.getExtras());
     }
 }

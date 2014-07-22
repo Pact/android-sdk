@@ -110,6 +110,29 @@ public class Catalyze {
         });
 	}
 
+    /**
+     * Perform an API to create a new user. The callback will return an
+     * authenticated CatalyzeUser instance.
+     *
+     * @param userName
+     *            The user name.
+     * @param password
+     *            The user's password.
+     * @param firstName
+     *            The user's first name.
+     * @param lastName
+     *            The user's last name.
+     * @param email
+     *            The user's email.
+     * @param callbackHandler
+     *            The call back to report back success or failure.
+     */
+    public void signUp(String userName, String password,
+                       String firstName, String lastName, String email,
+                       final CatalyzeListener<CatalyzeUser> callbackHandler) {
+        signUp(userName, password, firstName, lastName, email, null, callbackHandler);
+    }
+
 	/**
 	 * Perform an API to create a new user. The callback will return an
 	 * authenticated CatalyzeUser instance.
@@ -124,14 +147,21 @@ public class Catalyze {
 	 *            The user's last name.
      * @param email
      *            The user's email.
+     * @param inviteCode
+     *            The invite code received by email or null to omit.
 	 * @param callbackHandler
 	 *            The call back to report back success or failure.
 	 */
 	public void signUp(String userName, String password,
-			String firstName, String lastName, String email,
+			String firstName, String lastName, String email, String inviteCode,
 			final CatalyzeListener<CatalyzeUser> callbackHandler) {
 
-		final CatalyzeUser catalyzeUser = new CatalyzeUser();
+	    CatalyzeUser catalyzeUser;
+        if (inviteCode == null || inviteCode.equals("")) {
+            catalyzeUser = new CatalyzeUser();
+        } else {
+            catalyzeUser = new CatalyzeInvitedUser(inviteCode);
+        }
         catalyzeUser.setUsername(userName);
         catalyzeUser.setPassword(password);
         catalyzeUser.getName().setFirstName(firstName);
@@ -151,7 +181,7 @@ public class Catalyze {
                 callbackHandler.onError(new CatalyzeException(retrofitError));
             }
         });
-	}
+    }
 
 	/**
 	 * All Catalyze instances must be associated with an authenticated user via
