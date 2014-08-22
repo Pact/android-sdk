@@ -1,10 +1,10 @@
 package io.catalyze.sdk.android;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import java.io.File;
 import java.io.InputStream;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -30,9 +30,9 @@ public class FileManager {
 	 *            a blank string is returned to this callback handler
 	 */
 	public static void deleteFile(String filesId, final CatalyzeListener<String> userCallback) {
-		CatalyzeAPIAdapter.getApi().deleteFile(filesId, new Callback<JsonObject>() {
+		CatalyzeAPIAdapter.getApi().deleteFile(filesId, new Callback<JSONObject>() {
             @Override
-            public void success(JsonObject jsonObject, Response response) {
+            public void success(JSONObject jsonObject, Response response) {
                 userCallback.onSuccess(jsonObject.toString());
             }
 
@@ -80,9 +80,9 @@ public class FileManager {
      *            CatalyzeListener that expects a String in response.
      */
     public static void listFiles(final CatalyzeListener<String> userCallback) {
-        CatalyzeAPIAdapter.getApi().listFiles(new Callback<JsonArray>() {
+        CatalyzeAPIAdapter.getApi().listFiles(new Callback<JSONArray>() {
             @Override
-            public void success(JsonArray jsonElements, Response response) {
+            public void success(JSONArray jsonElements, Response response) {
                 userCallback.onSuccess(jsonElements.toString());
             }
 
@@ -105,9 +105,9 @@ public class FileManager {
      *            Must expect a string on success
      */
     public static void uploadFileToUser(String mimeType, File file, boolean phi, final CatalyzeListener<String> userCallback) {
-        CatalyzeAPIAdapter.getApi().uploadFileToUser(new TypedFile(mimeType, file), new TypedString(Boolean.toString(phi)), new Callback<JsonObject>() {
+        CatalyzeAPIAdapter.getApi().uploadFileToUser(new TypedFile(mimeType, file), new TypedString(Boolean.toString(phi)), new Callback<JSONObject>() {
             @Override
-            public void success(JsonObject jsonObject, Response response) {
+            public void success(JSONObject jsonObject, Response response) {
                 userCallback.onSuccess(jsonObject.toString());
             }
 
@@ -130,9 +130,9 @@ public class FileManager {
      *            a blank string is returned to this callback handler
      */
     public static void deleteFileFromUser(String usersId, String filesId, final CatalyzeListener<String> userCallback) {
-        CatalyzeAPIAdapter.getApi().deleteFileFromUser(usersId, filesId, new Callback<JsonObject>() {
+        CatalyzeAPIAdapter.getApi().deleteFileFromUser(usersId, filesId, new Callback<JSONObject>() {
             @Override
-            public void success(JsonObject jsonObject, Response response) {
+            public void success(JSONObject jsonObject, Response response) {
                 userCallback.onSuccess(jsonObject.toString());
             }
 
@@ -184,9 +184,9 @@ public class FileManager {
      *            CatalyzeListener that expects a String in response.
      */
     public static void listFilesForUser(String usersId, final CatalyzeListener<String> userCallback) {
-        CatalyzeAPIAdapter.getApi().listFilesForUser(usersId, new Callback<JsonArray>() {
+        CatalyzeAPIAdapter.getApi().listFilesForUser(usersId, new Callback<JSONArray>() {
             @Override
-            public void success(JsonArray jsonElements, Response response) {
+            public void success(JSONArray jsonElements, Response response) {
                 userCallback.onSuccess(jsonElements.toString());
             }
 
@@ -211,9 +211,9 @@ public class FileManager {
 	 *            Must expect a string on success
 	 */
 	public static void uploadFileToOtherUser(String usersId, String mimeType, File file, boolean phi, final CatalyzeListener<String> userCallback) {
-        CatalyzeAPIAdapter.getApi().uploadFileToOtherUser(usersId, new TypedFile(mimeType, file), new TypedString(Boolean.toString(phi)), new Callback<JsonObject>() {
+        CatalyzeAPIAdapter.getApi().uploadFileToOtherUser(usersId, new TypedFile(mimeType, file), new TypedString(Boolean.toString(phi)), new Callback<JSONObject>() {
             @Override
-            public void success(JsonObject jsonObject, Response response) {
+            public void success(JSONObject jsonObject, Response response) {
                 userCallback.onSuccess(jsonObject.toString());
             }
 

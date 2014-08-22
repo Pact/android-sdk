@@ -1,10 +1,10 @@
 package io.catalyze.sdk.android;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -91,27 +91,27 @@ public interface CatalyzeAPI {
      */
     @Multipart
     @POST("/users/files")
-    void uploadFileToUser(@Part("file") TypedFile file, @Part("phi") TypedString phi, Callback<JsonObject> cb);
+    void uploadFileToUser(@Part("file") TypedFile file, @Part("phi") TypedString phi, Callback<JSONObject> cb);
 
     @GET("/users/files")
-    void listFiles(Callback<JsonArray> cb);
+    void listFiles(Callback<JSONArray> cb);
 
     @GET("/users/files/{filesId}")
     void retrieveFile(@Path("filesId") String filesId, Callback<Response> cb);
 
     @DELETE("/users/files/{filesId}")
-    void deleteFile(@Path("filesId") String filesId, Callback<JsonObject> cb);
+    void deleteFile(@Path("filesId") String filesId, Callback<JSONObject> cb);
 
     @Multipart
     @POST("/users/{usersId}/files")
-    void uploadFileToOtherUser(@Path("usersId") String usersId, @Part("file") TypedFile file, @Part("phi") TypedString phi, Callback<JsonObject> cb);
+    void uploadFileToOtherUser(@Path("usersId") String usersId, @Part("file") TypedFile file, @Part("phi") TypedString phi, Callback<JSONObject> cb);
 
     @GET("/users/{usersId}/files")
-    void listFilesForUser(@Path("usersId") String usersId, Callback<JsonArray> cb);
+    void listFilesForUser(@Path("usersId") String usersId, Callback<JSONArray> cb);
 
     @GET("/users/{usersId}/files/{filesId}")
     void retrieveFileFromUser(@Path("usersId") String usersId, @Path("filesId") String filesId, Callback<Response> cb);
 
     @DELETE("/users/{usersId}/files/{filesId}")
-    void deleteFileFromUser(@Path("usersId") String usersId, @Path("filesId") String filesId, Callback<JsonObject> cb);
+    void deleteFileFromUser(@Path("usersId") String usersId, @Path("filesId") String filesId, Callback<JSONObject> cb);
 }
