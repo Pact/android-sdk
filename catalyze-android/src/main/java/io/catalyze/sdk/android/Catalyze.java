@@ -209,7 +209,7 @@ public class Catalyze {
 	 * @return Returns true iff the user has been authenticated
 	 */
 	public boolean isAuthenticated() {
-		return user == null;
+		return user != null;
 	}
 
 	/**
